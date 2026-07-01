@@ -115,13 +115,64 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
     try {
       setIsAnalyzing(true);
       const user = (await supabase.auth.getUser()).data.user;
-      
+      if (!user) throw new Error('Not authenticated');
+
       let photoUrl = null;
+
+      // Upload photo if exists
+      if (image) {
+        const bucketName = 'meal-photos';
+        
+        // Ensure bucket exists
+        try {
+          const { data: buckets } = await supabase.storage.listBuckets();
+          const bucketExists = buckets?.some(b => b.name === bucketName);
+          
+          if (!bucketExists) {
+            await supabase.storage.createBucket(bucketName, {
+              public: false, // private bucket
+              allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+              fileSizeLimit: 5242880 // 5MB
+            });
+          }
+        } catch (e) {
+          console.log("Bucket check/create error:", e);
+        }
+
+        const timestamp = Date.now();
+        const fileExt = image.name.split('.').pop() || 'jpg';
+        const filePath = `${user.id}/${timestamp}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from(bucketName)
+          .upload(filePath, image, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error("Storage upload error details:", uploadError);
+          throw uploadError;
+        }
+
+        // Get signed URL for private bucket
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+          .from(bucketName)
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiration
+
+        if (signedUrlError) {
+          throw signedUrlError;
+        }
+
+        if (signedUrlData) {
+          photoUrl = signedUrlData.signedUrl;
+        }
+      }
 
       const { data: mealData, error: mealError } = await supabase
         .from('meals')
         .insert({
-          user_id: user?.id,
+          user_id: user.id,
           meal_type: mealType,
           photo_url: photoUrl,
           ai_raw_response: analysisResult
