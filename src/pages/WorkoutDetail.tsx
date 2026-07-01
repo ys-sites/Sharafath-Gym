@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Share2, MoreHorizontal, ArrowDown, Play, Heart, RefreshCw, X, Edit2, ArrowLeftRight, Navigation, Trash2, Star, Dumbbell, Clock, Flame } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { YouTubeReference } from '../components/ui/YouTubeReference';
 
 const ROUTINE_DETAILS: Record<string, {
   title: string;
@@ -161,12 +162,71 @@ const ROUTINE_DETAILS: Record<string, {
     ]
   }
 };
+const getExerciseVideoUrl = (name: string, imgUrl?: string) => {
+  if (imgUrl && imgUrl.includes('youtube.com/vi/')) {
+    const parts = imgUrl.split('youtube.com/vi/');
+    if (parts[1]) {
+      const id = parts[1].split('/')[0];
+      if (id) return `https://www.youtube.com/watch?v=${id}`;
+    }
+  }
+
+  const cleanName = name.toLowerCase().trim();
+  const map: Record<string, string> = {
+    'machine chest press': 'pLofEAcfsO8',
+    'incline dumbbell press': 'IP4oeKh1Sd4',
+    'machine pec deck fly': '4zV2Q1B5v6g',
+    'supported dips': '6lJ_s55V4rM',
+    'supported dips (optional)': '6lJ_s55V4rM',
+    'dumbbell lateral raise': 'PzsMitRdI_8',
+    'reverse pec deck': '7y4kY3U0-J4',
+    'tricep pushdown': '2-LAMcpzODU',
+    'tricep pushdown (rope)': '2-LAMcpzODU',
+    'overhead rope extension': 'hU5n69f-V0U',
+    'wide-grip lat pulldown': 'CAwf7n6Luuc',
+    'close-grip lat pulldown': '8d22D_B0UeM',
+    'seated cable row': 'GZBFZst_kXg',
+    'wide-grip row': '1nRP8S_O6l0',
+    'lat pullover machine': 'QdD8Jv2h_6U',
+    'preacher curl': 'fIWP-FRFNU0',
+    'incline dumbbell curl': '7T-Z5h8VwSg',
+    'hammer curl': '8XLxfXROrTo',
+    'hack squat': '0p3_N1YvP0E',
+    'leg press': 'IZxyjW7MPJQ',
+    'leg extension': 'YyvSfV9Qp60',
+    'dumbbell romanian deadlift': 'JGrD4N-_s44',
+    'seated leg curl': 'Orxowest56U',
+    'standing calf raise': 'N38e_lE9e08',
+    'seated leg raise': 'HbbOplfPjB0',
+    'seated leg raises (core)': 'HbbOplfPjB0',
+    'incline machine press': 'nAvsTnhG-2Q',
+    'pull-up': 'eGo4IYtl4jO',
+    'pull-ups / assisted pull-ups': 'eGo4IYtl4jO',
+    'assisted pull-up': 'eGo4IYtl4jO',
+    'chest-supported row': '0UbPz-y-c2U',
+    'cable curl': 'As7Z21c4F4k',
+    'rope pushdown': '2-LAMcpzODU',
+    'overhead cable extension': 'hU5n69f-V0U',
+    'smith machine squat': 'B78W94n-e2k',
+    'walking lunges': 'D7KaRcUTQeY',
+    'romanian deadlift (barbell)': 'jcV72t_4sCY',
+    'lying leg curl': '1Tq3Q-4c8dI',
+    'hip thrust': 'LM8XHLYJoYs',
+    'seated calf raise': 'm9V_cZqP6c8',
+    'cable crunch': '2CcgLpG8M3Y',
+    'plank': 'pvI5y1aq_JH',
+  };
+
+  const id = map[cleanName];
+  return id ? `https://www.youtube.com/watch?v=${id}` : 'https://www.youtube.com/watch?v=rxD321l2svE';
+};
 
 export default function WorkoutDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
 
   const activeDetails = (id && ROUTINE_DETAILS[id]) || ROUTINE_DETAILS.push_1;
   const [programDetails, setProgramDetails] = useState<any>(activeDetails);
@@ -530,13 +590,27 @@ export default function WorkoutDetail() {
                     {circuit.exercises.map((ex, eIdx) => (
                       <div key={ex.id} className="relative">
                         <div className="flex items-center gap-4">
-                          {/* Image box with small border */}
-                          <div className="w-16 h-16 rounded-2xl bg-neutral-800 overflow-hidden shrink-0 border border-neutral-700/40 z-10 shadow-md">
-                            <img src={ex.img} alt={ex.name} className="w-full h-full object-cover" />
+                          {/* Image box with small border & play click trigger */}
+                          <div 
+                            onClick={() => setActiveVideoUrl(getExerciseVideoUrl(ex.name, ex.img))}
+                            className="w-16 h-16 rounded-2xl bg-neutral-800 overflow-hidden shrink-0 border border-neutral-700/40 z-10 shadow-md relative group/thumb cursor-pointer active:scale-95 transition-transform"
+                          >
+                            <img src={ex.img} alt={ex.name} className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+                              <Play size={16} className="text-white fill-white" />
+                            </div>
                           </div>
                           
                           <div className="flex-1">
-                            <h3 className="font-extrabold text-white text-base leading-tight pr-8 tracking-tight">{ex.name}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-extrabold text-white text-base leading-tight tracking-tight">{ex.name}</h3>
+                              <button 
+                                onClick={() => setActiveVideoUrl(getExerciseVideoUrl(ex.name, ex.img))}
+                                className="text-[10px] text-indigo-400 font-extrabold uppercase hover:underline flex items-center gap-0.5 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full"
+                              >
+                                <Play size={8} className="fill-indigo-400" /> Tutorial
+                              </button>
+                            </div>
                             <p className="text-xs font-bold text-neutral-400 mt-1">{ex.details}</p>
                           </div>
                           
@@ -639,6 +713,26 @@ export default function WorkoutDetail() {
                   <div className="text-xs text-neutral-400 mt-0.5">Delete exercise completely</div>
                 </div>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Verified YouTube Form Tutorial Modal Popover */}
+      {activeVideoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6" onClick={() => setActiveVideoUrl(null)}>
+          <div className="bg-[#13141C] border border-neutral-800/40 rounded-3xl overflow-hidden max-w-md w-full relative" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-5 border-b border-neutral-800/40">
+              <h3 className="font-extrabold text-base text-white">Exercise Tutorial</h3>
+              <button 
+                onClick={() => setActiveVideoUrl(null)} 
+                className="w-8 h-8 bg-neutral-900 border border-neutral-800 rounded-full flex items-center justify-center text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="p-6">
+              <YouTubeReference url={activeVideoUrl} />
             </div>
           </div>
         </div>
