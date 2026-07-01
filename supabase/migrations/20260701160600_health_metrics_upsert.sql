@@ -38,7 +38,8 @@ BEGIN
 END $$;
 
 -- 4. Create health_daily_summary view for dashboard trend charts
-CREATE OR REPLACE VIEW public.health_daily_summary 
+DROP VIEW IF EXISTS public.health_daily_summary;
+CREATE VIEW public.health_daily_summary 
 WITH (security_invoker = true) AS
 SELECT 
   user_id,
