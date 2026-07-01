@@ -1,7 +1,5 @@
-const CACHE_NAME = 'sg-gym-cache-v1';
+const CACHE_NAME = 'sg-gym-cache-v2';
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/icons/icon.svg'
 ];
@@ -46,7 +44,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first strategy for static assets
+  // Network-first for navigations and index.html so a fresh deploy is
+  // always picked up instead of serving a stale shell that references
+  // JS/CSS asset filenames a later build has already deleted.
+  if (event.request.mode === 'navigate' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // Cache-first strategy for content-hashed static assets — safe because
+  // the filename changes whenever the content changes, so a cached entry
+  // can never go stale.
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -54,8 +70,8 @@ self.addEventListener('fetch', (event) => {
       }
       return fetch(event.request).then((networkResponse) => {
         if (networkResponse.status === 200 && (
-          url.pathname.endsWith('.js') || 
-          url.pathname.endsWith('.css') || 
+          url.pathname.endsWith('.js') ||
+          url.pathname.endsWith('.css') ||
           url.pathname.includes('/assets/')
         )) {
           const responseToCache = networkResponse.clone();
@@ -66,7 +82,7 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       }).catch(() => {
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          return caches.match('/index.html');
         }
       });
     })
