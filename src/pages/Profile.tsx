@@ -31,6 +31,7 @@ export default function Profile() {
   const [pingResult, setPingResult] = useState<{ success: boolean; message: string } | null>(null);
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
+  const [showShortcutsAdvanced, setShowShortcutsAdvanced] = useState(false);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [weightChange, setWeightChange] = useState<number | null>(null);
 
@@ -600,15 +601,46 @@ export default function Profile() {
 
                 {/* Step guide */}
                 <p className="text-[11px] text-neutral-500 leading-normal font-medium">
-                  Configure Apple Health syncing in the iOS Shortcuts App:
+                  Configure Apple Health syncing with the Health Auto Export app:
                 </p>
                 <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1.5 font-medium">
-                  <li>Open the iOS <strong>Shortcuts</strong> App and go to the <strong>Automation</strong> tab.</li>
-                  <li>Create a new automation running daily (e.g., 9:00 PM).</li>
-                  <li>Add <strong>"Find Health Samples"</strong> for both <strong>Steps</strong> and <strong>Active Energy</strong> (Group by: Day, Sum, Limit: Today).</li>
-                  <li>Add <strong>"Get Contents of URL"</strong> action targeting the Webhook URL above, set method to <strong>POST</strong>.</li>
-                  <li>Configure Request Body as <strong>JSON</strong> with:
+                  <li>Install <strong>Health Auto Export &ndash; JSON+CSV</strong> from the App Store.</li>
+                  <li>Go to the <strong>Automations</strong> tab &rarr; <strong>New Automation</strong> &rarr; <strong>REST API</strong>.</li>
+                  <li>Paste the Webhook URL above as the export endpoint.</li>
+                  <li>Add these two request headers:
                     <code className="block bg-neutral-900 border border-neutral-800/60 rounded p-2 mt-1 font-mono text-[8px] text-neutral-300 whitespace-pre-wrap leading-relaxed select-all">
+{`x-user-id: ${userId}
+x-sync-token: ${syncToken || "<your-token>"}`}
+                    </code>
+                  </li>
+                  <li>Select <strong>Steps</strong>, <strong>Active Energy</strong>, and <strong>Weight</strong> as the data types to export.</li>
+                  <li>Set the export format to <strong>JSON</strong>.</li>
+                  <li>Choose your sync frequency (e.g. Automatic, or a daily schedule).</li>
+                  <li>Tap <strong>Run Manual Export</strong> once to test, then confirm below with Send Test Ping.</li>
+                </ol>
+
+                {/* Advanced: iOS Shortcuts fallback */}
+                <div className="border-t border-neutral-800/40 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowShortcutsAdvanced(v => !v)}
+                    className="w-full flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-neutral-500 hover:text-neutral-300 transition-colors"
+                  >
+                    <span>Advanced: use iOS Shortcuts instead</span>
+                    <ChevronRight size={12} className={`transition-transform ${showShortcutsAdvanced ? 'rotate-90' : ''}`} />
+                  </button>
+                  {showShortcutsAdvanced && (
+                    <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <p className="text-[11px] text-neutral-500 leading-normal font-medium">
+                        Configure Apple Health syncing in the iOS Shortcuts App:
+                      </p>
+                      <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1.5 font-medium">
+                        <li>Open the iOS <strong>Shortcuts</strong> App and go to the <strong>Automation</strong> tab.</li>
+                        <li>Create a new automation running daily (e.g., 9:00 PM).</li>
+                        <li>Add <strong>"Find Health Samples"</strong> for both <strong>Steps</strong> and <strong>Active Energy</strong> (Group by: Day, Sum, Limit: Today).</li>
+                        <li>Add <strong>"Get Contents of URL"</strong> action targeting the Webhook URL above, set method to <strong>POST</strong>.</li>
+                        <li>Configure Request Body as <strong>JSON</strong> with:
+                          <code className="block bg-neutral-900 border border-neutral-800/60 rounded p-2 mt-1 font-mono text-[8px] text-neutral-300 whitespace-pre-wrap leading-relaxed select-all">
 {`{
   "user_id": "${userId}",
   "sync_token": "${syncToken || "<your-token>"}",
@@ -629,10 +661,13 @@ export default function Profile() {
     }
   ]
 }`}
-                    </code>
-                  </li>
-                  <li>Toggle off <strong>"Ask Before Running"</strong> to let it sync seamlessly in the background.</li>
-                </ol>
+                          </code>
+                        </li>
+                        <li>Toggle off <strong>"Ask Before Running"</strong> to let it sync seamlessly in the background.</li>
+                      </ol>
+                    </div>
+                  )}
+                </div>
 
                 {/* Test Ping Container */}
                 <div className="border-t border-neutral-800/40 pt-3 space-y-2">
