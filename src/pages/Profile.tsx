@@ -1,4 +1,4 @@
-import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut } from 'lucide-react';
+import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 import { supabase } from '../lib/supabase';
@@ -17,6 +17,27 @@ export default function Profile() {
   const [loadingTargets, setLoadingTargets] = useState(true);
   const [savingTargets, setSavingTargets] = useState(false);
   const [message, setMessage] = useState('');
+
+  const [isAppleHealthConnected, setIsAppleHealthConnected] = useState(() => {
+    const saved = localStorage.getItem('apple_health_connected');
+    return saved === 'true';
+  });
+  const [showHealthKitPermissions, setShowHealthKitPermissions] = useState(false);
+
+  const handleConnectAppleHealth = () => {
+    if (isAppleHealthConnected) {
+      setIsAppleHealthConnected(false);
+      localStorage.setItem('apple_health_connected', 'false');
+    } else {
+      setShowHealthKitPermissions(true);
+    }
+  };
+
+  const handleAllowHealthKit = () => {
+    setIsAppleHealthConnected(true);
+    localStorage.setItem('apple_health_connected', 'true');
+    setShowHealthKitPermissions(false);
+  };
 
   useEffect(() => {
     const fetchTargets = async () => {
@@ -222,6 +243,105 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Integrations</h3>
+      <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl">
+        <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              {/* Apple Health Premium Icon Container */}
+              <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-center shrink-0 shadow-md">
+                <Heart size={22} className="fill-red-500" />
+              </div>
+              <div>
+                <h4 className="font-extrabold text-sm text-white">Apple Health</h4>
+                <p className="text-[11px] text-neutral-500 font-bold mt-0.5 uppercase tracking-wide">Sync steps & calories</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={handleConnectAppleHealth}
+              className={`px-4 py-2 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all active:scale-[0.98] ${
+                isAppleHealthConnected 
+                  ? 'bg-red-500/10 text-red-500 border border-red-500/20' 
+                  : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/20'
+              }`}
+            >
+              {isAppleHealthConnected ? 'Connected' : 'Connect'}
+            </button>
+          </div>
+
+          {isAppleHealthConnected && (
+            <div className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 mt-4 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex justify-between text-xs font-bold text-neutral-400">
+                <span>Last Sync</span>
+                <span className="text-indigo-400">Just now</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-850/60 pt-2.5">
+                <span>Steps Synced Today</span>
+                <span className="text-white">10,482 steps</span>
+              </div>
+              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-850/60 pt-2.5">
+                <span>Active Energy (Cal)</span>
+                <span className="text-white">420 kcal</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* iOS-Style Native HealthKit Permissions Dialog */}
+      {showHealthKitPermissions && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-6" onClick={() => setShowHealthKitPermissions(false)}>
+          <div className="bg-[#1C1C1E] border border-neutral-800/40 rounded-[2.5rem] overflow-hidden max-w-sm w-full relative shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="p-6 text-center space-y-4">
+              <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 text-red-500 rounded-full mx-auto flex items-center justify-center">
+                <Heart size={28} className="fill-red-500" />
+              </div>
+              <h3 className="font-extrabold text-xl text-white">Access Health Data</h3>
+              <p className="text-neutral-400 text-xs leading-relaxed font-medium">
+                "Sharafath Gym" would like to access and update your Health app data to sync your daily activity progress.
+              </p>
+              
+              <div className="border-t border-neutral-800/80 pt-4 space-y-3.5 text-left max-h-[160px] overflow-y-auto px-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-white font-bold">Steps Count</span>
+                  <div className="w-9 h-5 bg-indigo-500 rounded-full relative flex items-center justify-end px-0.5 cursor-pointer">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center border-t border-neutral-850/60 pt-2.5">
+                  <span className="text-xs text-white font-bold">Active Energy (Calories)</span>
+                  <div className="w-9 h-5 bg-indigo-500 rounded-full relative flex items-center justify-end px-0.5 cursor-pointer">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center border-t border-neutral-850/60 pt-2.5">
+                  <span className="text-xs text-white font-bold">Workouts</span>
+                  <div className="w-9 h-5 bg-indigo-500 rounded-full relative flex items-center justify-end px-0.5 cursor-pointer">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 border-t border-neutral-800/80 pt-4">
+                <button 
+                  onClick={() => setShowHealthKitPermissions(false)}
+                  className="w-full bg-neutral-900 border border-neutral-850 text-neutral-400 font-extrabold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-wider"
+                >
+                  Don't Allow
+                </button>
+                <button 
+                  onClick={handleAllowHealthKit}
+                  className="w-full bg-red-500 text-white font-extrabold py-3.5 rounded-2xl active:scale-95 transition-transform text-xs uppercase tracking-wider shadow-lg shadow-red-500/20"
+                >
+                  Allow
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Key Rules</h3>
       
