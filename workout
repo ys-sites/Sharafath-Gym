@@ -3,8 +3,8 @@ Here is the Phase 1 training program with verified YouTube watch and embed links
 ## Day 1 – Push
 | Exercise | Video Link | Embed Link |
 |---|---|---|
-| Machine Chest Press | [Watch](https://www.youtube.com/watch?v=pLofEAcfsO8) | `https://www.youtube.com/embed/pLofEAcfsO8` |
-| Incline Dumbbell Press | [Watch](https://www.youtube.com/watch?v=IP4oeKh1Sd4) | `https://www.youtube.com/embed/IP4oeKh1Sd4` |
+| Machine Chest Press | [Watch](https://www.youtube.com/watch?v=pLofEAcfsO8) | `<iframe width="560" height="315" src="https://www.youtube.com/embed/pLofEAcfsO8?si=wlGHUaMw1Az6EwJn" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` |
+| Incline Dumbbell Press | [Watch](https://www.youtube.com/watch?v=IP4oeKh1Sd4) | `<iframe width="560" height="315" src="https://www.youtube.com/embed/IP4oeKh1Sd4?si=Qgc-vELnWKk9Gqxa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>` |
 | Machine Pec Deck Fly | [Watch](https://www.youtube.com/watch?v=4zV2Q1B5v6g) | `https://www.youtube.com/embed/4zV2Q1B5v6g` |
 | Supported Dips (optional) | [Watch](https://www.youtube.com/watch?v=6lJ_s55V4rM) | `https://www.youtube.com/embed/6lJ_s55V4rM` |
 | Dumbbell Lateral Raise | [Watch](https://www.youtube.com/watch?v=PzsMitRdI_8) | `https://www.youtube.com/embed/PzsMitRdI_8` |

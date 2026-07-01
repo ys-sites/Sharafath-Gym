@@ -221,6 +221,68 @@ const getExerciseVideoUrl = (name: string, imgUrl?: string) => {
   return id ? `https://www.youtube.com/watch?v=${id}` : 'https://www.youtube.com/watch?v=rxD321l2svE';
 };
 
+const getExerciseThumbnail = (name: string, imgUrl?: string) => {
+  if (imgUrl && imgUrl.includes('youtube.com/vi/')) {
+    const parts = imgUrl.split('youtube.com/vi/');
+    if (parts[1]) {
+      const id = parts[1].split('/')[0];
+      if (id && id.length === 11) {
+        return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+      }
+    }
+  }
+
+  const cleanName = name.toLowerCase().trim();
+  const map: Record<string, string> = {
+    'machine chest press': 'pLofEAcfsO8',
+    'incline dumbbell press': 'IP4oeKh1Sd4',
+    'machine pec deck fly': '4zV2Q1B5v6g',
+    'supported dips': '6lJ_s55V4rM',
+    'supported dips (optional)': '6lJ_s55V4rM',
+    'dumbbell lateral raise': 'PzsMitRdI_8',
+    'reverse pec deck': '7y4kY3U0-J4',
+    'tricep pushdown': '2-LAMcpzODU',
+    'tricep pushdown (rope)': '2-LAMcpzODU',
+    'overhead rope extension': 'hU5n69f-V0U',
+    'wide-grip lat pulldown': 'CAwf7n6Luuc',
+    'close-grip lat pulldown': '8d22D_B0UeM',
+    'seated cable row': 'GZBFZst_kXg',
+    'wide-grip row': '1nRP8S_O6l0',
+    'lat pullover machine': 'QdD8Jv2h_6U',
+    'preacher curl': 'fIWP-FRFNU0',
+    'incline dumbbell curl': '7T-Z5h8VwSg',
+    'hammer curl': '8XLxfXROrTo',
+    'hack squat': '0p3_N1YvP0E',
+    'leg press': 'IZxyjW7MPJQ',
+    'leg extension': 'YyvSfV9Qp60',
+    'dumbbell romanian deadlift': 'JGrD4N-_s44',
+    'seated leg curl': 'Orxowest56U',
+    'standing calf raise': 'N38e_lE9e08',
+    'seated leg raise': 'HbbOplfPjB0',
+    'seated leg raises (core)': 'HbbOplfPjB0',
+    'incline machine press': 'nAvsTnhG-2Q',
+    'pull-up': 'eGo4IYtl4jO',
+    'pull-ups / assisted pull-ups': 'eGo4IYtl4jO',
+    'assisted pull-up': 'eGo4IYtl4jO',
+    'chest-supported row': '0UbPz-y-c2U',
+    'cable curl': 'As7Z21c4F4k',
+    'rope pushdown': '2-LAMcpzODU',
+    'overhead cable extension': 'hU5n69f-V0U',
+    'smith machine squat': 'B78W94n-e2k',
+    'walking lunges': 'D7KaRcUTQeY',
+    'romanian deadlift (barbell)': 'jcV72t_4sCY',
+    'lying leg curl': '1Tq3Q-4c8dI',
+    'hip thrust': 'LM8XHLYJoYs',
+    'seated calf raise': 'm9V_cZqP6c8',
+    'cable crunch': '2CcgLpG8M3Y',
+    'plank': 'pvI5y1aq_JH',
+  };
+
+  const id = map[cleanName] || 'rxD321l2svE';
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+};
+
+
 export default function WorkoutDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -288,7 +350,7 @@ export default function WorkoutDetail() {
                 .insert({
                   name: ex.name,
                   user_id: user.id,
-                  youtube_url: `https://www.youtube.com/watch?v=rxD321l2svE`
+                  youtube_url: getExerciseVideoUrl(ex.name, ex.img)
                 })
                 .select()
                 .single();
@@ -332,7 +394,10 @@ export default function WorkoutDetail() {
           name: circ.name,
           rounds: slice[0]?.target_sets || circ.rounds,
           exercises: slice.map(te => {
-            const videoUrl = (te.exercises as any)?.youtube_url || '';
+            const dbVideoUrl = (te.exercises as any)?.youtube_url || '';
+            const videoUrl = dbVideoUrl && dbVideoUrl !== 'https://www.youtube.com/watch?v=rxD321l2svE' 
+              ? dbVideoUrl 
+              : getExerciseVideoUrl((te.exercises as any)?.name || '');
             const match = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
             const videoId = match ? match[1] : 'rxD321l2svE';
             return {
@@ -595,7 +660,7 @@ export default function WorkoutDetail() {
                             onClick={() => setActiveVideoUrl(getExerciseVideoUrl(ex.name, ex.img))}
                             className="w-16 h-16 rounded-2xl bg-neutral-800 overflow-hidden shrink-0 border border-neutral-700/40 z-10 shadow-md relative group/thumb cursor-pointer active:scale-95 transition-transform"
                           >
-                            <img src={ex.img} alt={ex.name} className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform" />
+                            <img src={getExerciseThumbnail(ex.name, ex.img)} alt={ex.name} className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform" />
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity">
                               <Play size={16} className="text-white fill-white" />
                             </div>
