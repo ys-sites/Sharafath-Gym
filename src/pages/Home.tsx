@@ -36,6 +36,27 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Horizontal Calendar row matching Sporter UI Kit */}
+      <section className="mb-8 overflow-x-auto flex gap-3 pb-2 scrollbar-none">
+        {[
+          { label: 'Sun', day: '28' },
+          { label: 'Mon', day: '29' },
+          { label: 'Tue', day: '30' },
+          { label: 'Wed', day: '01', active: true },
+          { label: 'Thu', day: '02' },
+          { label: 'Fri', day: '03' },
+          { label: 'Sat', day: '04' }
+        ].map((item, idx) => (
+          <div 
+            key={idx} 
+            className={`flex flex-col items-center justify-center min-w-[52px] h-20 rounded-[1.2rem] border transition-all ${item.active ? 'bg-indigo-500 border-indigo-400 text-white shadow-[0_8px_20px_rgba(136,98,255,0.4)]' : 'bg-[#13141C] border-neutral-800/40 text-neutral-400'}`}
+          >
+            <span className="text-[10px] uppercase font-bold tracking-wider opacity-60">{item.label}</span>
+            <span className="text-base font-extrabold mt-1">{item.day}</span>
+          </div>
+        ))}
+      </section>
+
       {/* Calories / Activity Widget (Double-Bezel Card) */}
       <section className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-indigo-500/5 to-transparent"></div>
