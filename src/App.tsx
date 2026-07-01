@@ -15,6 +15,8 @@ const ActiveWorkout = lazy(() => import('./pages/ActiveWorkout'));
 
 export default function App() {
   const [ready, setReady] = useState(false);
+  const [connectError, setConnectError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!supabase) {
@@ -22,22 +24,57 @@ export default function App() {
       return;
     }
 
-    // Silently sign in on every load — no login screen ever shown
-    const autoSignIn = async () => {
+    let cancelled = false;
+
+    const bootstrap = async () => {
+      setConnectError(false);
+
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const email = import.meta.env.VITE_DEFAULT_EMAIL || 'sharafath2001@hotmail.com';
-        const password = import.meta.env.VITE_DEFAULT_PASSWORD || 'TrainTrackPassword123!';
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          await supabase.auth.signUp({ email, password });
-        }
+      if (session) {
+        if (!cancelled) setReady(true);
+        return;
       }
-      setReady(true);
+
+      try {
+        const response = await fetch('/api/session');
+        if (!response.ok) throw new Error('Session request failed');
+        const { access_token, refresh_token } = await response.json();
+        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (error) throw error;
+        if (!cancelled) setReady(true);
+      } catch {
+        if (!cancelled) setConnectError(true);
+      }
     };
 
-    autoSignIn();
+    bootstrap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [retryCount]);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+    return () => subscription.unsubscribe();
   }, []);
+
+  if (connectError) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-neutral-950 px-6">
+        <div className="max-w-xs w-full text-center space-y-4">
+          <p className="text-neutral-300 text-sm font-bold">Couldn't connect — pull to retry</p>
+          <button
+            onClick={() => setRetryCount((c) => c + 1)}
+            className="px-4 py-2 rounded-lg bg-neutral-800 text-neutral-200 text-sm font-semibold hover:bg-neutral-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!ready) {
     return (

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -7,11 +8,74 @@ import postgres from "postgres";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+const SESSION_RATE_LIMIT_WINDOW_MS = 60_000;
+const SESSION_RATE_LIMIT_MAX = 10;
+const sessionRateLimitStore = new Map<string, { count: number; windowStart: number }>();
+
+function isSessionRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = sessionRateLimitStore.get(ip);
+
+  if (!entry || now - entry.windowStart > SESSION_RATE_LIMIT_WINDOW_MS) {
+    sessionRateLimitStore.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  entry.count += 1;
+  return entry.count > SESSION_RATE_LIMIT_MAX;
+}
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json({ limit: "10mb" }));
+
+  // API route for minting a session server-side (mirrors api/session.ts)
+  app.all("/api/session", async (req, res) => {
+    if (req.method !== "GET" && req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    const ip = req.ip || req.socket?.remoteAddress || "unknown";
+    if (isSessionRateLimited(ip)) {
+      return res.status(429).json({ error: "Too many requests" });
+    }
+
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+    const ownerEmail = process.env.OWNER_EMAIL;
+    const ownerPassword = process.env.OWNER_PASSWORD;
+
+    if (!supabaseUrl || !supabaseAnonKey || !ownerEmail || !ownerPassword) {
+      console.error("Session error: missing required environment variables");
+      return res.status(500).json({ error: "Unable to establish session" });
+    }
+
+    try {
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: { persistSession: false },
+      });
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: ownerEmail,
+        password: ownerPassword,
+      });
+
+      if (error || !data.session) {
+        console.error("Session error:", error?.message);
+        return res.status(500).json({ error: "Unable to establish session" });
+      }
+
+      return res.status(200).json({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+    } catch (err) {
+      console.error("Session error:", err);
+      return res.status(500).json({ error: "Unable to establish session" });
+    }
+  });
 
   // API route for meal analysis
   app.post("/api/analyze-meal", async (req, res) => {
