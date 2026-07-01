@@ -23,20 +23,74 @@ export default function Profile() {
     return saved === 'true';
   });
   const [showHealthKitPermissions, setShowHealthKitPermissions] = useState(false);
+  const [stepsSyncedToday, setStepsSyncedToday] = useState(0);
+  const [caloriesSyncedToday, setCaloriesSyncedToday] = useState(0);
+  const [lastHealthSync, setLastHealthSync] = useState('');
+  const [userId, setUserId] = useState('your-user-id');
 
-  const handleConnectAppleHealth = () => {
+  const formatLastSync = (timestamp: string) => {
+    if (!timestamp) return 'Never synced yet';
+    try {
+      const d = new Date(timestamp);
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } catch (e) {
+      return 'Never synced yet';
+    }
+  };
+
+  useEffect(() => {
+    const getUid = async () => {
+      if (supabase) {
+        const user = (await supabase.auth.getUser()).data.user;
+        if (user) setUserId(user.id);
+      }
+    };
+    getUid();
+  }, []);
+
+  const handleConnectAppleHealth = async () => {
     if (isAppleHealthConnected) {
       setIsAppleHealthConnected(false);
       localStorage.setItem('apple_health_connected', 'false');
+      setStepsSyncedToday(0);
+      setCaloriesSyncedToday(0);
+      setLastHealthSync('');
+      if (supabase) {
+        try {
+          const user = (await supabase.auth.getUser()).data.user;
+          if (user) {
+            await supabase.from('profiles').update({
+              apple_health_connected: false,
+              steps_synced_today: 0,
+              calories_synced_today: 0,
+              last_health_sync: null
+            }).eq('user_id', user.id);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
     } else {
       setShowHealthKitPermissions(true);
     }
   };
 
-  const handleAllowHealthKit = () => {
+  const handleAllowHealthKit = async () => {
     setIsAppleHealthConnected(true);
     localStorage.setItem('apple_health_connected', 'true');
     setShowHealthKitPermissions(false);
+    if (supabase) {
+      try {
+        const user = (await supabase.auth.getUser()).data.user;
+        if (user) {
+          await supabase.from('profiles').update({
+            apple_health_connected: true
+          }).eq('user_id', user.id);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
   };
 
   useEffect(() => {
@@ -48,12 +102,11 @@ export default function Profile() {
         
         let { data, error } = await supabase
           .from('profiles')
-          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g')
+          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync')
           .eq('user_id', user.id)
           .single();
           
         if (error && error.code === 'PGRST116') {
-          // Profile does not exist yet, let's insert it
           const { data: newProfile, error: insertError } = await supabase
             .from('profiles')
             .insert({
@@ -77,6 +130,10 @@ export default function Profile() {
           setProteinTarget(data.protein_target_g);
           setCarbsTarget(data.carbs_target_g);
           setFatsTarget(data.fats_target_g);
+          setIsAppleHealthConnected(!!data.apple_health_connected);
+          setStepsSyncedToday(data.steps_synced_today || 0);
+          setCaloriesSyncedToday(data.calories_synced_today || 0);
+          setLastHealthSync(data.last_health_sync || '');
         }
       } catch (err) {
         console.error(err);
@@ -272,18 +329,40 @@ export default function Profile() {
           </div>
 
           {isAppleHealthConnected && (
-            <div className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 mt-4 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 mt-4 space-y-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex justify-between text-xs font-bold text-neutral-400">
                 <span>Last Sync</span>
-                <span className="text-indigo-400">Just now</span>
+                <span className="text-indigo-400 font-extrabold">{formatLastSync(lastHealthSync)}</span>
               </div>
-              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-850/60 pt-2.5">
+              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-800/40 pt-2.5">
                 <span>Steps Synced Today</span>
-                <span className="text-white">10,482 steps</span>
+                <span className="text-white font-extrabold">{stepsSyncedToday.toLocaleString()} steps</span>
               </div>
-              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-850/60 pt-2.5">
+              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-800/40 pt-2.5">
                 <span>Active Energy (Cal)</span>
-                <span className="text-white">420 kcal</span>
+                <span className="text-white font-extrabold">{caloriesSyncedToday} kcal</span>
+              </div>
+
+              <div className="border-t border-neutral-800/60 pt-3.5 space-y-2 text-left">
+                <span className="text-[11px] font-extrabold text-neutral-400 block tracking-wide uppercase">Setup iOS Auto-Sync Guide</span>
+                <p className="text-[11px] text-neutral-500 leading-normal font-medium">
+                  To sync actual steps and workouts automatically, configure a Shortcut on your iPhone:
+                </p>
+                <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1 font-medium">
+                  <li>Open the <strong>Shortcuts</strong> app on iOS.</li>
+                  <li>Create a new shortcut. Find <strong>"Steps"</strong> and <strong>"Active Energy"</strong> for Today.</li>
+                  <li>Add <strong>"Get contents of URL"</strong> action, set it to <strong>POST</strong>.</li>
+                  <li>Set the request URL to:
+                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[9px] text-indigo-400 break-all select-all font-bold">
+                      {window.location.origin}/api/sync-health
+                    </code>
+                  </li>
+                  <li>Set Request Body as JSON, mapping your parameters:
+                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[8.5px] text-neutral-300 break-all select-all">
+                      {"{"} "user_id": "{userId}", "steps": {"{"}Steps{"}"}, "calories": {"{"}Active Energy{"}"} {"}"}
+                    </code>
+                  </li>
+                </ol>
               </div>
             </div>
           )}
