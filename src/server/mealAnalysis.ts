@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { lookupNutritionInUSDA, parseGrams } from "./nutritionLookup";
 
 export type Provider = "openai" | "anthropic" | "gemini";
 
@@ -300,6 +301,47 @@ async function callProvider(provider: Provider, promptText: string, image?: stri
   return callGemini(promptText, image, mimeType);
 }
 
+async function groundDataItems(data: any): Promise<any> {
+  if (!data || !Array.isArray(data.items)) return data;
+
+  let totalCalories = 0;
+  let totalProtein = 0;
+  let totalCarbs = 0;
+  let totalFats = 0;
+
+  for (const item of data.items) {
+    item.grounded = false; // default
+    
+    // Call USDA FoodData Central lookup
+    const usdaMatch = await lookupNutritionInUSDA(item.name || "");
+    if (usdaMatch) {
+      const grams = parseGrams(item.portion || "100g");
+      const factor = grams / 100;
+      
+      item.calories = Math.round(usdaMatch.calories * factor);
+      item.protein = Math.round(usdaMatch.protein * factor * 10) / 10;
+      item.carbs = Math.round(usdaMatch.carbs * factor * 10) / 10;
+      item.fats = Math.round(usdaMatch.fats * factor * 10) / 10;
+      item.grounded = true;
+      item.usda_food_name = usdaMatch.foodName;
+    }
+
+    totalCalories += Number(item.calories) || 0;
+    totalProtein += Number(item.protein) || 0;
+    totalCarbs += Number(item.carbs) || 0;
+    totalFats += Number(item.fats) || 0;
+  }
+
+  data.total = {
+    calories: Math.round(totalCalories),
+    protein: Math.round(totalProtein * 10) / 10,
+    carbs: Math.round(totalCarbs * 10) / 10,
+    fats: Math.round(totalFats * 10) / 10
+  };
+
+  return data;
+}
+
 // ---------------------------------------------------------------------------
 // Public entry point
 // ---------------------------------------------------------------------------
@@ -334,7 +376,8 @@ export async function analyzeMeal(input: AnalyzeMealInput): Promise<AnalyzeMealO
   const promptText = buildPromptText(input);
 
   try {
-    const data = enforceItemCap(await callProvider(primary, promptText, input.image, input.mimeType));
+    const rawData = enforceItemCap(await callProvider(primary, promptText, input.image, input.mimeType));
+    const data = await groundDataItems(rawData);
     return { data, provider: primary, fallbackUsed: false };
   } catch (err) {
     console.error(`Meal analysis provider "${primary}" failed:`, err instanceof Error ? err.message : err);
@@ -345,7 +388,8 @@ export async function analyzeMeal(input: AnalyzeMealInput): Promise<AnalyzeMealO
     }
 
     try {
-      const data = enforceItemCap(await callProvider(fallback, promptText, input.image, input.mimeType));
+      const rawData = enforceItemCap(await callProvider(fallback, promptText, input.image, input.mimeType));
+      const data = await groundDataItems(rawData);
       return { data, provider: fallback, fallbackUsed: true };
     } catch (fallbackErr) {
       console.error(

@@ -1,6 +1,7 @@
-import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart, Copy, ChevronDown, ChevronUp, ExternalLink, RefreshCw } from 'lucide-react';
+import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart, Copy, ChevronDown, ChevronUp, ExternalLink, RefreshCw, Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine } from 'recharts';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 import { supabase } from '../lib/supabase';
 
@@ -15,6 +16,7 @@ export default function Profile() {
   const [proteinTarget, setProteinTarget] = useState(160);
   const [carbsTarget, setCarbsTarget] = useState(300);
   const [fatsTarget, setFatsTarget] = useState(60);
+  const [targetWeight, setTargetWeight] = useState<string>('');
   const [message, setMessage] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [pingLoading, setPingLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function Profile() {
       if (!user) return null;
       let { data, error } = await supabase
         .from('profiles')
-        .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token')
+        .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token, target_weight_kg')
         .eq('user_id', user.id)
         .single();
           
@@ -73,8 +75,38 @@ export default function Profile() {
       setProteinTarget(profileData.protein_target_g);
       setCarbsTarget(profileData.carbs_target_g);
       setFatsTarget(profileData.fats_target_g);
+      setTargetWeight(profileData.target_weight_kg ? String(profileData.target_weight_kg) : '');
     }
   }, [profileData]);
+
+  // Fetch Weight History for Chart (last 90 days)
+  const { data: weightHistory = [] } = useQuery({
+    queryKey: ['weightHistory', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const ninetyDaysAgo = new Date();
+      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+      const { data, error } = await supabase
+        .from('health_metrics')
+        .select('start_date, value')
+        .eq('user_id', user.id)
+        .eq('type', 'weight')
+        .gte('start_date', ninetyDaysAgo.toISOString())
+        .order('start_date', { ascending: true });
+
+      if (error) {
+        console.error("Error fetching weight history:", error);
+        return [];
+      }
+      return (data || []).map((d: any) => ({
+        date: new Date(d.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        weight: d.value,
+        rawDate: d.start_date
+      }));
+    },
+    enabled: !!user?.id
+  });
 
   // Derived state values
   const userId = user?.id || 'your-user-id';
@@ -86,7 +118,7 @@ export default function Profile() {
 
   // 3. Mutations
   const saveTargetsMutation = useMutation({
-    mutationFn: async (targets: { daily_calorie_target: number; protein_target_g: number; carbs_target_g: number; fats_target_g: number }) => {
+    mutationFn: async (targets: { daily_calorie_target: number; protein_target_g: number; carbs_target_g: number; fats_target_g: number; target_weight_kg: number | null }) => {
       if (!user) throw new Error('No user authenticated');
       const { error } = await supabase
         .from('profiles')
@@ -98,6 +130,7 @@ export default function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profileTargets', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['weightHistory', user?.id] });
       setMessage('Targets saved successfully!');
       setTimeout(() => setMessage(''), 3000);
     },
@@ -125,8 +158,85 @@ export default function Profile() {
       daily_calorie_target: Number(calorieTarget),
       protein_target_g: Number(proteinTarget),
       carbs_target_g: Number(carbsTarget),
-      fats_target_g: Number(fatsTarget)
+      fats_target_g: Number(fatsTarget),
+      target_weight_kg: targetWeight ? Number(targetWeight) : null
     });
+  };
+
+  const handleExportData = async () => {
+    if (!user) return;
+    try {
+      const [
+        { data: sessions },
+        { data: allSets },
+        { data: meals },
+        { data: waterLogs },
+        { data: healthMetrics }
+      ] = await Promise.all([
+        supabase.from('workout_sessions').select('*').eq('user_id', user.id).order('start_time', { ascending: false }),
+        supabase.from('sets').select(`
+          *,
+          session_exercises!inner (
+            id,
+            session_id,
+            exercises ( name )
+          )
+        `),
+        supabase.from('meals').select('*, meal_items(*)').eq('user_id', user.id).order('logged_at', { ascending: false }),
+        supabase.from('water_logs').select('*').eq('user_id', user.id).order('logged_at', { ascending: false }),
+        supabase.from('health_metrics').select('*').eq('user_id', user.id).order('start_date', { ascending: false })
+      ]);
+
+      const exportJson = {
+        exported_at: new Date().toISOString(),
+        profile: {
+          user_id: user.id,
+          daily_calorie_target: calorieTarget,
+          protein_target_g: proteinTarget,
+          carbs_target_g: carbsTarget,
+          fats_target_g: fatsTarget,
+          target_weight_kg: targetWeight ? Number(targetWeight) : null
+        },
+        workouts: sessions || [],
+        sets: allSets || [],
+        meals: meals || [],
+        water: waterLogs || [],
+        weight_and_health_metrics: healthMetrics || []
+      };
+
+      const jsonBlob = new Blob([JSON.stringify(exportJson, null, 2)], { type: 'application/json' });
+      const jsonUrl = URL.createObjectURL(jsonBlob);
+      const jsonLink = document.createElement('a');
+      jsonLink.href = jsonUrl;
+      jsonLink.download = `traintrack_export_${user.id}_${Date.now()}.json`;
+      document.body.appendChild(jsonLink);
+      jsonLink.click();
+      document.body.removeChild(jsonLink);
+      URL.revokeObjectURL(jsonUrl);
+
+      let csvContent = "Session Name,Category,Date,Duration (min),Volume (kg)\n";
+      (sessions || []).forEach((s: any) => {
+        const dateStr = s.start_time ? new Date(s.start_time).toLocaleDateString() : '';
+        const durationMin = s.active_duration_seconds ? Math.round(s.active_duration_seconds / 60) : 0;
+        const name = (s.name || '').replace(/"/g, '""');
+        const category = (s.category || '').replace(/"/g, '""');
+        csvContent += `"${name}","${category}","${dateStr}",${durationMin},${s.total_volume || 0}\n`;
+      });
+
+      const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const csvUrl = URL.createObjectURL(csvBlob);
+      const csvLink = document.createElement('a');
+      csvLink.href = csvUrl;
+      csvLink.download = `traintrack_workout_history_${user.id}_${Date.now()}.csv`;
+      document.body.appendChild(csvLink);
+      csvLink.click();
+      document.body.removeChild(csvLink);
+      URL.revokeObjectURL(csvUrl);
+
+    } catch (err) {
+      console.error("Export data failed:", err);
+      alert("Failed to export data. Please try again.");
+    }
   };
 
   const handleConnectAppleHealth = async () => {
@@ -203,6 +313,13 @@ export default function Profile() {
   };
 
   const savingTargets = saveTargetsMutation.isPending;
+  const targetWeightVal = profileData?.target_weight_kg ? Number(profileData.target_weight_kg) : null;
+  const weightToGo = targetWeightVal ? currentWeight - targetWeightVal : null;
+  const weightToGoLabel = weightToGo !== null 
+    ? weightToGo > 0 
+      ? `${weightToGo.toFixed(1)} kg to go` 
+      : "Goal reached! 🎉"
+    : null;
 
   return (
     <div className="p-6 pb-24 bg-[#0C0D12] min-h-screen text-white font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
@@ -262,7 +379,75 @@ export default function Profile() {
               <Target size={18} />
             </div>
             <span className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase mb-1 relative z-10">Target Weight</span>
-            <p className="text-2xl font-extrabold text-white relative z-10">75 kg</p>
+            <p className="text-2xl font-extrabold text-white relative z-10">
+              {profileData?.target_weight_kg ? `${profileData.target_weight_kg} kg` : '75 kg'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Weight progression Chart (Double-Bezel Card) */}
+      <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl">
+        <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block">Weight Progression</span>
+              <h4 className="font-extrabold text-base text-white">90-Day Trend</h4>
+            </div>
+            {weightToGoLabel && (
+              <span className="bg-orange-500/10 text-orange-500 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border border-orange-500/20">
+                {weightToGoLabel}
+              </span>
+            )}
+          </div>
+
+          <div className="h-48 w-full mt-2">
+            {weightHistory.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center text-xs text-neutral-500 font-bold border border-dashed border-neutral-800/40 rounded-2xl p-4">
+                <span>No logged weight history yet</span>
+                <span className="text-[10px] text-neutral-600 font-normal mt-1">Weight entries will appear here once logged.</span>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={weightHistory} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#52525b" 
+                    fontSize={10} 
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="#52525b" 
+                    fontSize={10} 
+                    tickLine={false}
+                    axisLine={false}
+                    domain={['dataMin - 3', 'dataMax + 3']}
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#13141C', borderColor: '#27272a', borderRadius: '12px' }}
+                    labelStyle={{ color: '#a1a1aa', fontWeight: 'bold', fontSize: '10px' }}
+                    itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
+                  />
+                  {targetWeightVal && (
+                    <ReferenceLine 
+                      y={targetWeightVal} 
+                      stroke="#f97316" 
+                      strokeDasharray="4 4" 
+                      label={{ value: `Goal: ${targetWeightVal}kg`, fill: '#f97316', fontSize: 9, position: 'top' }}
+                    />
+                  )}
+                  <Line 
+                    type="monotone" 
+                    dataKey="weight" 
+                    stroke="#6366f1" 
+                    strokeWidth={3} 
+                    dot={{ fill: '#6366f1', strokeWidth: 0, r: 4 }}
+                    activeDot={{ r: 6, fill: '#818cf8' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
@@ -302,12 +487,23 @@ export default function Profile() {
                     className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
-                <div className="space-y-1">
+                 <div className="space-y-1">
                   <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Fats (g)</label>
                   <input
                     type="number"
                     value={fatsTarget}
                     onChange={(e) => setFatsTarget(Number(e.target.value))}
+                    className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Target Weight (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    placeholder="E.g. 75"
+                    value={targetWeight}
+                    onChange={(e) => setTargetWeight(e.target.value)}
                     className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
                   />
                 </div>
@@ -554,6 +750,22 @@ export default function Profile() {
           </div>
         </div>
       )}
+
+      {/* Data Ownership */}
+      <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Data Ownership</h3>
+      <div className="bg-white/5 border border-white/10 p-1.5 rounded-[1.8rem] shadow-xl mb-8">
+        <div className="bg-[#13141C] rounded-[calc(1.8rem-0.375rem)] p-5 border border-neutral-800/30 space-y-4">
+          <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+            Download a full copy of your health and training data. Export includes complete workouts history, recorded sets, meal logs, water logs, tracked weight, and general health metrics.
+          </p>
+          <button 
+            onClick={handleExportData}
+            className="w-full py-3.5 bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold rounded-2xl active:scale-[0.98] transition-all text-xs uppercase tracking-wider shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+          >
+            <Download size={14} /> Export My Data (JSON & CSV)
+          </button>
+        </div>
+      </div>
 
       <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Key Rules</h3>
       

@@ -25,7 +25,13 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fitia/Sporter customization states
-  const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
+  const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>(() => {
+    const hour = new Date().getHours();
+    if (hour < 11) return 'breakfast';
+    if (hour < 16) return 'lunch';
+    if (hour < 21) return 'dinner';
+    return 'snack';
+  });
   const [inputMode, setInputMode] = useState<'camera' | 'text' | 'barcode' | 'quickadd'>('camera');
 
   // Barcode scanning states
@@ -500,7 +506,8 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
         protein_g: Number(item.protein) || 0,
         carbs_g: Number(item.carbs) || 0,
         fats_g: Number(item.fats) || 0,
-        source: item.source || 'manual_entry'
+        source: item.source || 'ai_detected',
+        grounded: item.grounded || false
       }));
 
       const { error: itemsError } = await supabase
@@ -1006,7 +1013,14 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                       <div key={i} className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500 col-span-2">
-                             <span className="text-[9px] text-neutral-500 uppercase block font-bold">Food Name</span>
+                             <div className="flex justify-between items-center">
+                               <span className="text-[9px] text-neutral-500 uppercase block font-bold">Food Name</span>
+                               {item.grounded && (
+                                 <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                    ✓ Verified
+                                 </span>
+                               )}
+                             </div>
                              <input 
                                value={item.name}
                                onChange={(e) => updateItem(i, 'name', e.target.value)}

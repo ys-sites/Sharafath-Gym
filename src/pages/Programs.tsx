@@ -155,9 +155,18 @@ export default function Programs() {
     fetchDbTemplates();
   }, []);
 
-  const allPrograms = [...dbTemplates, ...MOCK_PROGRAMS];
+  // Standard split templates (e.g. "Day 1: PUSH...") are already shown via MOCK_PROGRAMS below;
+  // exclude DB templates that match that naming pattern so they don't show up twice.
+  const STANDARD_SPLIT_NAME = /^day\s*\d+\s*:/i;
+  const dedupedDbTemplates = dbTemplates.filter(t => !STANDARD_SPLIT_NAME.test(t.name));
 
-  const filteredPrograms = allPrograms.filter(p => 
+  // Rest days have no exercises to log, so they don't belong in an explore/browse list.
+  const REST_DAY_IDS = new Set(['rest_4', 'rest_7']);
+  const visibleMockPrograms = MOCK_PROGRAMS.filter(p => !REST_DAY_IDS.has(p.id));
+
+  const allPrograms = [...dedupedDbTemplates, ...visibleMockPrograms];
+
+  const filteredPrograms = allPrograms.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

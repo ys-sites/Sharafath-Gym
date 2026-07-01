@@ -137,11 +137,11 @@ export default function Nutrition() {
     queryKey: ['recentMeals', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase
+       const { data } = await supabase
         .from('meals')
         .select(`
           id, meal_type, logged_at, photo_url,
-          meal_items ( name, calories, protein_g, carbs_g, fats_g, portion )
+          meal_items ( name, calories, protein_g, carbs_g, fats_g, portion, grounded )
         `)
         .eq('user_id', user.id)
         .order('logged_at', { ascending: false })
@@ -168,7 +168,7 @@ export default function Nutrition() {
         .from('meals')
         .select(`
           id, meal_type, logged_at, photo_url,
-          meal_items ( id, name, portion, calories, protein_g, carbs_g, fats_g )
+          meal_items ( id, name, portion, calories, protein_g, carbs_g, fats_g, grounded )
         `)
         .eq('user_id', user.id)
         .gte('logged_at', start.toISOString())
@@ -485,72 +485,112 @@ export default function Nutrition() {
 
         {/* Grouped Meals List */}
         <div className="space-y-5">
-          <h2 className="text-base font-extrabold uppercase tracking-widest text-neutral-500 px-1">Today's Meals</h2>
+          <h2 className="text-base font-extrabold uppercase tracking-widest text-neutral-500 px-1">Today's Diary</h2>
           
           {loading ? (
             <p className="text-center py-6 text-sm text-neutral-500 animate-pulse font-medium">Fetching logged meals...</p>
-          ) : meals.length === 0 ? (
-            <div className="text-center py-10 border border-dashed border-neutral-800 rounded-3xl text-neutral-500 font-bold text-sm">
-              No meals logged for this date.
-            </div>
           ) : (
-            (['breakfast', 'lunch', 'dinner', 'snack'] as const).map((groupKey) => {
-              const groupMeals = mealGroups[groupKey];
-              if (groupMeals.length === 0) return null;
-              
-              return (
-                <div key={groupKey} className="space-y-3">
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-400 pl-1 capitalize">{groupKey}</h3>
-                  {groupMeals.map((meal) => {
-                    const mealCals = meal.meal_items.reduce((acc: number, item: any) => acc + (item.calories || 0), 0);
-                    const isStarred = favorites.some(f => f.id === meal.id);
+            (() => {
+              const budgetRatios = {
+                breakfast: 0.25,
+                lunch: 0.35,
+                dinner: 0.30,
+                snack: 0.10
+              };
+
+              return (['breakfast', 'lunch', 'dinner', 'snack'] as const).map((groupKey) => {
+                const groupMeals = mealGroups[groupKey];
+                const groupBudget = targets.calories * budgetRatios[groupKey];
+                const groupCals = groupMeals.reduce((acc: number, meal: any) => {
+                  return acc + meal.meal_items.reduce((sum: number, item: any) => sum + (item.calories || 0), 0);
+                }, 0);
+                const budgetPercent = Math.min((groupCals / groupBudget) * 100, 100);
+
+                return (
+                  <div key={groupKey} className="bg-white/5 border border-white/10 p-4 rounded-[2.2rem] space-y-4 shadow-xl">
+                    <div className="flex justify-between items-center px-1">
+                      <h3 className="text-sm font-extrabold uppercase tracking-widest text-indigo-400 capitalize">{groupKey}</h3>
+                      <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-widest">Budget: {Math.round(groupBudget)} kcal</span>
+                    </div>
                     
-                    return (
-                      <div key={meal.id} className="bg-white/5 border border-white/10 p-1.5 rounded-[1.8rem] shadow-xl group/card">
-                        <div className="bg-[#13141C] border border-neutral-800/30 rounded-[calc(1.8rem-0.375rem)] p-4 flex gap-4 items-center">
-                          {meal.photo_url ? (
-                            <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 border border-neutral-800/60">
-                              <img src={meal.photo_url} alt="Meal" className="w-full h-full object-cover" />
-                            </div>
-                          ) : (
-                            <div className="w-14 h-14 rounded-2xl bg-indigo-500/5 text-indigo-400 border border-indigo-500/10 flex items-center justify-center shrink-0">
-                              <Apple size={20} />
-                            </div>
-                          )}
-
-                          <div 
-                            onClick={() => setActiveMealDetail(meal)}
-                            className="flex-1 cursor-pointer"
-                          >
-                            <h4 className="font-extrabold text-sm text-white capitalize leading-tight mb-1 group-hover/card:text-indigo-400 transition-colors">
-                              {meal.meal_items.map((i: any) => i.name).join(', ')}
-                            </h4>
-                            <span className="font-bold text-neutral-500 text-xs">{Math.round(mealCals)} kcal</span>
-                          </div>
-
-                          {/* Action stars / chevron */}
-                          <div className="flex items-center gap-1">
-                            <button 
-                              onClick={() => toggleFavorite(meal)}
-                              className={`p-2 rounded-full hover:bg-neutral-800 transition-colors ${isStarred ? 'text-amber-500' : 'text-neutral-500 hover:text-neutral-400'}`}
-                            >
-                              <Star size={16} className={isStarred ? 'fill-amber-500' : ''} />
-                            </button>
-                            
-                            <button 
-                              onClick={() => setActiveMealDetail(meal)}
-                              className="p-2 rounded-full text-neutral-500 hover:text-white"
-                            >
-                              <ChevronRight size={16} />
-                            </button>
-                          </div>
-                        </div>
+                    {/* Budget Progress Bar */}
+                    <div className="space-y-1.5 px-1">
+                      <div className="h-1.5 w-full bg-neutral-900 rounded-full overflow-hidden border border-neutral-800/50">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${budgetPercent >= 100 ? 'bg-orange-500' : 'bg-indigo-500'}`}
+                          style={{ width: `${budgetPercent}%` }}
+                        />
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })
+                      <div className="flex justify-between items-center text-[10px] font-bold text-neutral-500">
+                        <span>{Math.round(groupCals)} kcal logged</span>
+                        <span>{Math.round((groupCals / groupBudget) * 100)}%</span>
+                      </div>
+                    </div>
+
+                    {groupMeals.length === 0 ? (
+                      <div className="text-center py-6 text-xs text-neutral-600 font-bold border border-dashed border-neutral-800/40 rounded-2xl">
+                        No meals logged for {groupKey}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {groupMeals.map((meal) => {
+                          const mealCals = meal.meal_items.reduce((acc: number, item: any) => acc + (item.calories || 0), 0);
+                          const isStarred = favorites.some(f => f.id === meal.id);
+                          
+                          return (
+                            <div key={meal.id} className="bg-[#13141C]/60 border border-neutral-800/40 p-1.5 rounded-[1.8rem] shadow-md group/card">
+                              <div className="bg-[#13141C] border border-neutral-805 rounded-[calc(1.8rem-0.375rem)] p-3.5 flex gap-4 items-center">
+                                {meal.photo_url ? (
+                                  <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-neutral-800/60">
+                                    <img src={meal.photo_url} alt="Meal" className="w-full h-full object-cover" />
+                                  </div>
+                                ) : (
+                                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/5 text-indigo-400 border border-indigo-500/10 flex items-center justify-center shrink-0">
+                                    <Apple size={18} />
+                                  </div>
+                                )}
+
+                                <div 
+                                  onClick={() => setActiveMealDetail(meal)}
+                                  className="flex-1 cursor-pointer min-w-0"
+                                >
+                                  <h4 className="font-extrabold text-sm text-white capitalize leading-tight mb-1 group-hover/card:text-indigo-400 transition-colors flex items-center gap-1.5 flex-wrap truncate">
+                                    {meal.meal_items.map((i: any) => i.name).join(', ')}
+                                    {meal.meal_items.some((i: any) => i.grounded) && (
+                                      <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0">
+                                        ✓ Verified
+                                      </span>
+                                    )}
+                                  </h4>
+                                  <span className="font-bold text-neutral-500 text-xs">{Math.round(mealCals)} kcal</span>
+                                </div>
+
+                                {/* Action stars / chevron */}
+                                <div className="flex items-center gap-1">
+                                  <button 
+                                    onClick={() => toggleFavorite(meal)}
+                                    className={`p-2 rounded-full hover:bg-neutral-800 transition-colors ${isStarred ? 'text-amber-500' : 'text-neutral-500 hover:text-neutral-400'}`}
+                                  >
+                                    <Star size={16} className={isStarred ? 'fill-amber-500' : ''} />
+                                  </button>
+                                  
+                                  <button 
+                                    onClick={() => setActiveMealDetail(meal)}
+                                    className="p-2 rounded-full text-neutral-500 hover:text-white"
+                                  >
+                                    <ChevronRight size={16} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()
           )}
         </div>
 
@@ -654,7 +694,14 @@ export default function Nutrition() {
                   </button>
 
                   <div className="space-y-1 pr-6">
-                    <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Food Item</label>
+                    <div className="flex justify-between items-center pr-2">
+                      <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Food Item</label>
+                      {item.grounded && (
+                        <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0">
+                          ✓ Verified
+                        </span>
+                      )}
+                    </div>
                     <input 
                       value={item.name}
                       onChange={(e) => handleUpdateMealItem(item.id, 'name', e.target.value)}

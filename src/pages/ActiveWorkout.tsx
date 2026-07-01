@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize, Clock } from 'lucide-react';
+import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize, Clock, Trophy } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { supabase } from '../lib/supabase';
+import { calculate1RM, getPastSetsForExercise, getExercisePRs, PastSet } from '../utils/prs';
 
 const ROUTINES: Record<string, { name: string; category: string; duration: string; calories: string; difficulty: string; exercises: Array<{ name: string; reps: string; sets: number; videoUrl?: string; tip?: string }> }> = {
   push_1: {
@@ -122,6 +125,107 @@ export default function ActiveWorkout() {
   const [restTimerSeconds, setRestTimerSeconds] = useState(0);
   const [isRestTimerActive, setIsRestTimerActive] = useState(false);
 
+  // Live session tracking state
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [totalVolume, setTotalVolume] = useState(0);
+  type ExerciseLink = { exerciseId: string; sessionExerciseId: string; setCount: number };
+  const [exerciseLinks, setExerciseLinks] = useState<Record<string, ExerciseLink>>({});
+  type LoggedSet = { setNumber: number; reps: number; weight: number; isPR: boolean };
+  const [loggedSetsByExercise, setLoggedSetsByExercise] = useState<Record<string, LoggedSet[]>>({});
+  const [exercisePRs, setExercisePRs] = useState<Record<string, { maxWeight: number; max1RM: number }>>({});
+  const [lastSessionHint, setLastSessionHint] = useState<string | null>(null);
+  const [justHitPR, setJustHitPR] = useState(false);
+  const sessionInitRef = useRef(false);
+
+  const currentSets = loggedSetsByExercise[currentExercise.name] || [];
+
+  // Create the workout session and resolve/create exercise + session_exercise rows once on mount
+  useEffect(() => {
+    if (sessionInitRef.current) return;
+    sessionInitRef.current = true;
+
+    (async () => {
+      const { data: userRes } = await supabase.auth.getUser();
+      const user = userRes?.user;
+      if (!user) return;
+      setUserId(user.id);
+
+      const { data: session, error: sessionErr } = await supabase
+        .from('workout_sessions')
+        .insert({
+          user_id: user.id,
+          name: activeRoutine.name,
+          category: activeRoutine.category,
+          status: 'in_progress'
+        })
+        .select('id')
+        .single();
+      if (sessionErr || !session) return;
+      setSessionId(session.id);
+
+      const links: Record<string, ExerciseLink> = {};
+      for (let i = 0; i < activeRoutine.exercises.length; i++) {
+        const ex = activeRoutine.exercises[i];
+        let exerciseId: string | null = null;
+
+        const { data: existing } = await supabase
+          .from('exercises')
+          .select('id')
+          .eq('name', ex.name)
+          .limit(1)
+          .maybeSingle();
+
+        if (existing) {
+          exerciseId = existing.id;
+        } else {
+          const { data: created } = await supabase
+            .from('exercises')
+            .insert({ name: ex.name, muscle_group: activeRoutine.category })
+            .select('id')
+            .single();
+          exerciseId = created?.id || null;
+        }
+        if (!exerciseId) continue;
+
+        const { data: sessionEx } = await supabase
+          .from('session_exercises')
+          .insert({ session_id: session.id, exercise_id: exerciseId, order_index: i })
+          .select('id')
+          .single();
+        if (!sessionEx) continue;
+
+        links[ex.name] = { exerciseId, sessionExerciseId: sessionEx.id, setCount: 0 };
+      }
+      setExerciseLinks(links);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Load last-session hint, PR baseline, and prefill inputs whenever the active exercise changes
+  useEffect(() => {
+    const link = exerciseLinks[currentExercise.name];
+    if (!userId || !link) return;
+
+    (async () => {
+      const pastSets: PastSet[] = await getPastSetsForExercise(userId, link.exerciseId);
+      const pr = getExercisePRs(pastSets);
+      setExercisePRs(prev => ({ ...prev, [currentExercise.name]: pr }));
+
+      if (pastSets.length > 0) {
+        const lastDateKey = new Date(pastSets[pastSets.length - 1].created_at).toDateString();
+        const lastGroup = pastSets.filter(s => new Date(s.created_at).toDateString() === lastDateKey);
+        const lastSet = lastGroup[lastGroup.length - 1];
+        setLastSessionHint(`Last: ${lastGroup.length}×${lastSet.reps} @ ${lastSet.weight}kg`);
+        setReps(lastSet.reps);
+        setWeight(String(lastSet.weight));
+      } else {
+        setLastSessionHint(null);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExercise.name, userId, exerciseLinks]);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (isRestTimerActive && restTimerSeconds > 0) {
@@ -157,10 +261,73 @@ export default function ActiveWorkout() {
     return `${mins}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const finalizeSession = async (status: 'completed' | 'incomplete') => {
+    if (!sessionId) return;
+    await supabase
+      .from('workout_sessions')
+      .update({
+        status,
+        end_time: new Date().toISOString(),
+        active_duration_seconds: seconds,
+        total_volume: totalVolume
+      })
+      .eq('id', sessionId);
+  };
+
   const handleExitWorkout = () => {
     const confirmExit = window.confirm("Are you sure you want to end this workout? Progress will not be saved.");
     if (confirmExit) {
+      finalizeSession('incomplete');
       navigate('/');
+    }
+  };
+
+  const handleSaveSet = async () => {
+    const restTime = (currentExercise as any).rest || 90;
+    setRestTimerSeconds(restTime);
+    setIsRestTimerActive(true);
+
+    const weightNum = Number(weight) || 0;
+    const repsNum = Number(reps) || 0;
+    if (repsNum <= 0) return;
+
+    const priorPR = exercisePRs[currentExercise.name] || { maxWeight: 0, max1RM: 0 };
+    const oneRM = calculate1RM(weightNum, repsNum);
+    const isPR = weightNum > 0 && (weightNum > priorPR.maxWeight || oneRM > priorPR.max1RM);
+
+    setExercisePRs(prev => ({
+      ...prev,
+      [currentExercise.name]: {
+        maxWeight: Math.max(priorPR.maxWeight, weightNum),
+        max1RM: Math.max(priorPR.max1RM, oneRM)
+      }
+    }));
+
+    const link = exerciseLinks[currentExercise.name];
+    const setNumber = (link?.setCount || 0) + 1;
+    if (link) {
+      setExerciseLinks(prev => ({ ...prev, [currentExercise.name]: { ...prev[currentExercise.name], setCount: setNumber } }));
+      await supabase.from('sets').insert({
+        session_exercise_id: link.sessionExerciseId,
+        set_number: setNumber,
+        reps: repsNum,
+        weight: weightNum
+      });
+    }
+
+    setLoggedSetsByExercise(prev => ({
+      ...prev,
+      [currentExercise.name]: [...(prev[currentExercise.name] || []), { setNumber, reps: repsNum, weight: weightNum, isPR }]
+    }));
+    setTotalVolume(prev => prev + weightNum * repsNum);
+
+    if (isPR) {
+      setJustHitPR(true);
+      setTimeout(() => setJustHitPR(false), 2500);
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (!reducedMotion) {
+        confetti({ particleCount: 140, spread: 75, origin: { y: 0.6 } });
+      }
     }
   };
 
@@ -169,6 +336,7 @@ export default function ActiveWorkout() {
       setCurrentExerciseIndex(prev => prev + 1);
       setWeight('');
     } else {
+      finalizeSession('completed');
       alert("Workout Completed! Excellent job Mohamed Sharafath!");
       navigate('/');
     }
@@ -243,6 +411,11 @@ export default function ActiveWorkout() {
         <h1 className="text-3xl font-extrabold tracking-tight mb-2 max-w-xs leading-none">
           {currentExercise.name}
         </h1>
+        {lastSessionHint && (
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 text-neutral-300 px-3 py-1 rounded-full text-[11px] font-bold mt-1">
+            {lastSessionHint}
+          </div>
+        )}
         <div className="w-10 h-1 bg-indigo-500 rounded-full mt-2"></div>
       </div>
 
@@ -363,6 +536,29 @@ export default function ActiveWorkout() {
              <div className="h-[1px] bg-neutral-800/80 w-full mb-6"></div>
 
              <div className="px-6 space-y-6">
+                {justHitPR && (
+                  <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 font-extrabold text-xs uppercase tracking-wider py-2.5 rounded-xl animate-in fade-in duration-300">
+                    <Trophy size={14} /> New PR!
+                  </div>
+                )}
+
+                {currentSets.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[9px] text-neutral-500 uppercase block font-bold tracking-wider">Logged This Set</span>
+                    {currentSets.map((s) => (
+                      <div key={s.setNumber} className="flex items-center justify-between bg-neutral-900/60 border border-neutral-850 rounded-lg px-3 py-1.5 text-xs">
+                        <span className="text-neutral-400 font-bold">Set {s.setNumber}</span>
+                        <span className="text-white font-extrabold">{s.reps} reps @ {s.weight}kg</span>
+                        {s.isPR && (
+                          <span className="flex items-center gap-1 text-amber-400 font-extrabold text-[10px] uppercase">
+                            <Trophy size={11} /> PR
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-neutral-900/60 rounded-xl p-3 border border-neutral-850">
                      <span className="text-[9px] text-neutral-500 uppercase block font-bold">Reps Performed</span>
@@ -402,13 +598,8 @@ export default function ActiveWorkout() {
                    </div>
                 </div>
 
-                <button 
-                  onClick={() => {
-                    const restTime = (currentExercise as any).rest || 90;
-                    setRestTimerSeconds(restTime);
-                    setIsRestTimerActive(true);
-                    setShowLogSheet(false);
-                  }}
+                <button
+                  onClick={handleSaveSet}
                   className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-4 rounded-xl text-sm transition-all active:scale-[0.98] uppercase tracking-wider shadow-lg shadow-indigo-500/25"
                 >
                   Save Set

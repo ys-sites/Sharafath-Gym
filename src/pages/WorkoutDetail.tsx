@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Share2, MoreHorizontal, ArrowDown, Play, Heart, RefreshCw, X, Edit2, ArrowLeftRight, Navigation, Trash2, Star, Dumbbell, Clock, Flame } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useQuery } from '@tanstack/react-query';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
+import { getPastSetsForExercise } from '../utils/prs';
 import { YouTubeReference } from '../components/ui/YouTubeReference';
 
 const ROUTINE_DETAILS: Record<string, {
@@ -328,6 +331,52 @@ export default function WorkoutDetail() {
   const [programDetails, setProgramDetails] = useState<any>(activeDetails);
   const [circuits, setCircuits] = useState<any[]>(activeDetails.circuits);
   const [loading, setLoading] = useState(true);
+
+  // Fetch user
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const res = await supabase.auth.getUser();
+      return res.data.user;
+    },
+    staleTime: Infinity,
+  });
+
+  const selectedExercise = circuits.flatMap(c => c.exercises || []).find(ex => ex.id === activeMenu);
+
+  // Fetch personal record stats & weight trend for selected exercise
+  const { data: exerciseHistory = [] } = useQuery({
+    queryKey: ['exerciseHistory', user?.id, selectedExercise?.name],
+    queryFn: async () => {
+      if (!user || !selectedExercise?.name) return [];
+      
+      const { data: exData } = await supabase
+        .from('exercises')
+        .select('id')
+        .eq('name', selectedExercise.name)
+        .limit(1)
+        .maybeSingle();
+
+      if (!exData) return [];
+
+      const sets = await getPastSetsForExercise(user.id, exData.id);
+      
+      const bestSetPerDay = new Map<string, number>();
+      sets.forEach((s: any) => {
+        const dateStr = new Date(s.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const existing = bestSetPerDay.get(dateStr) || 0;
+        if (s.weight > existing) {
+          bestSetPerDay.set(dateStr, s.weight);
+        }
+      });
+
+      return Array.from(bestSetPerDay.entries()).map(([date, weight]) => ({
+        date,
+        weight
+      }));
+    },
+    enabled: !!user?.id && !!selectedExercise?.name
+  });
 
   const fetchTemplateData = async () => {
     try {
@@ -913,6 +962,29 @@ export default function WorkoutDetail() {
                 </div>
               </button>
             </div>
+
+            {/* PR Progression chart */}
+            {selectedExercise && (
+              <div className="border-t border-neutral-850 pt-4 mt-6">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-widest block mb-3">Best Weight Progression</span>
+                <div className="h-32 w-full bg-black/20 rounded-2xl p-2 border border-neutral-850/50">
+                  {exerciseHistory.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-xs text-neutral-600 font-extrabold text-center">
+                      No tracked set history yet
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={exerciseHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                        <XAxis dataKey="date" stroke="#52525b" fontSize={8} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#52525b" fontSize={8} tickLine={false} axisLine={false} domain={['dataMin - 5', 'dataMax + 5']} />
+                        <Tooltip contentStyle={{ backgroundColor: '#13141C', borderColor: '#27272a', borderRadius: '8px', fontSize: '10px' }} />
+                        <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 3 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
