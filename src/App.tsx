@@ -4,7 +4,6 @@ import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import WorkoutLogger from './pages/WorkoutLogger';
-import Auth from './pages/Auth';
 import WorkoutDetail from './pages/WorkoutDetail';
 import { supabase } from './lib/supabase';
 
@@ -15,54 +14,37 @@ const Nutrition = lazy(() => import('./pages/Nutrition'));
 const ActiveWorkout = lazy(() => import('./pages/ActiveWorkout'));
 
 export default function App() {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
-      setLoading(false);
+      setReady(true);
       return;
     }
-    
-    const checkSession = async () => {
-      const { data: { session: activeSession } } = await supabase.auth.getSession();
-      setSession(activeSession);
-      setLoading(false);
+
+    // Silently sign in on every load — no login screen ever shown
+    const autoSignIn = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const email = import.meta.env.VITE_DEFAULT_EMAIL || 'sharafath2001@hotmail.com';
+        const password = import.meta.env.VITE_DEFAULT_PASSWORD || 'TrainTrackPassword123!';
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          await supabase.auth.signUp({ email, password });
+        }
+      }
+      setReady(true);
     };
-    
-    checkSession();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-
-    return () => subscription.unsubscribe();
+    autoSignIn();
   }, []);
 
-  if (loading) {
-    return <div className="h-screen flex items-center justify-center bg-neutral-950 text-neutral-400">Loading Sharafath Gym...</div>;
-  }
-
-  // If Supabase is not configured, we should show a warning screen
-  if (!supabase) {
+  if (!ready) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-orange-500">Sharafath Gym Setup</h1>
-        <p className="mb-6 text-neutral-400">
-          Supabase environment variables are missing. Please add <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_URL</code> and <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_ANON_KEY</code> to your <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">.env</code> file.
-        </p>
-        <p className="text-sm text-neutral-500 max-w-md">
-          This app requires a Supabase project with Postgres & Auth to persist your workout data across devices.
-        </p>
+      <div className="h-screen flex items-center justify-center bg-neutral-950">
+        <div className="text-neutral-400 text-sm font-bold animate-pulse">Loading...</div>
       </div>
     );
-  }
-
-  // Security Hardening: Gate access via Auth screen if session is not active
-  if (!session) {
-    return <Auth />;
   }
 
   const LoadingPlaceholder = (
@@ -93,7 +75,6 @@ export default function App() {
           } />
           <Route path="profile" element={<Profile />} />
         </Route>
-        {/* Logger is outside the standard layout (no bottom nav during workout) */}
         <Route path="/logger" element={<WorkoutLogger />} />
         <Route path="/workout/:id" element={<WorkoutDetail />} />
         <Route path="/active-workout/:id" element={
