@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import History from './pages/History';
@@ -12,53 +12,23 @@ import ActiveWorkout from './pages/ActiveWorkout';
 import { supabase } from './lib/supabase';
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-
+  // Sign in silently in background — never block rendering
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
+    if (!supabase) return;
 
-    const autoLogin = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          const email = import.meta.env.VITE_DEFAULT_EMAIL || 'sharafath2001@hotmail.com';
-          const password = import.meta.env.VITE_DEFAULT_PASSWORD || 'TrainTrackPassword123!';
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) {
-            await supabase.auth.signUp({ email, password });
-          }
-        }
-      } catch (e) {
-        console.error('Auth error:', e);
-      } finally {
-        setLoading(false);
-      }
-    };
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) return; // already logged in
 
-    autoLogin();
+      const email = import.meta.env.VITE_DEFAULT_EMAIL || 'sharafath2001@hotmail.com';
+      const password = import.meta.env.VITE_DEFAULT_PASSWORD || 'TrainTrackPassword123!';
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
-    return () => subscription.unsubscribe();
+      supabase.auth.signInWithPassword({ email, password }).then(({ error }) => {
+        if (error) supabase.auth.signUp({ email, password });
+      });
+    });
   }, []);
 
-  if (loading) {
-    return <div className="h-screen flex items-center justify-center bg-neutral-950 text-neutral-400">Loading Sharafath Gym...</div>;
-  }
-
-  if (!supabase) {
-    return (
-      <div className="h-screen flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-orange-500">Sharafath Gym Setup</h1>
-        <p className="mb-6 text-neutral-400">
-          Add <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_URL</code> and <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_ANON_KEY</code> to your <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">.env</code> file.
-        </p>
-      </div>
-    );
-  }
-
+  // Render the app immediately — no loading gate
   return (
     <BrowserRouter>
       <Routes>
