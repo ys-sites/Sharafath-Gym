@@ -1,11 +1,17 @@
-import { useState, useRef, ChangeEvent } from 'react';
-import { Camera, X, Check, Info, ScanLine, Barcode, ImageIcon } from 'lucide-react';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { Camera, X, Check, ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface MealLoggerModalProps {
   onClose: () => void;
   onSave: () => void;
 }
+
+const SCAN_STATUSES = [
+  'Identifying ingredients...',
+  'Estimating portions...',
+  'Calculating macros...'
+];
 
 export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProps) {
   const [image, setImage] = useState<File | null>(null);
@@ -19,6 +25,23 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
   // Fitia/Sporter customization states
   const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
   const [inputMode, setInputMode] = useState<'camera' | 'text'>('camera');
+
+  // Scanning animation states
+  const [scanStatusIndex, setScanStatusIndex] = useState(0);
+
+  useEffect(() => {
+    let interval: any = null;
+    if (isAnalyzing) {
+      interval = setInterval(() => {
+        setScanStatusIndex(prev => (prev + 1) % SCAN_STATUSES.length);
+      }, 1500);
+    } else {
+      setScanStatusIndex(0);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isAnalyzing]);
 
   const handleImageCapture = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -342,9 +365,17 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
              <div className="w-20"></div>
           </div>
 
-          {previewUrl && !analysisResult && (
-            <div className="w-full aspect-square rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 max-w-sm mx-auto">
-              <img src={previewUrl} alt="Captured meal" className="w-full h-full object-cover" />
+          {previewUrl && (
+            <div className="w-full aspect-square rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 max-w-sm mx-auto relative shadow-2xl">
+              <img src={previewUrl} alt="Captured meal" className={`w-full h-full object-cover transition-opacity duration-300 ${isAnalyzing ? 'opacity-70' : 'opacity-100'}`} />
+              
+              {/* Scanning Overlay (only visible during analysis) */}
+              {isAnalyzing && (
+                <>
+                  <div className="absolute inset-0 bg-indigo-500/10 mix-blend-overlay"></div>
+                  <div className="absolute left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent shadow-[0_0_12px_rgba(99,102,241,0.9)] animate-scanner z-20"></div>
+                </>
+              )}
             </div>
           )}
 
@@ -361,9 +392,12 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
           )}
 
           {isAnalyzing && (
-            <div className="flex flex-col items-center justify-center py-12 space-y-4 max-w-sm mx-auto">
-              <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-neutral-400 font-bold text-sm animate-pulse uppercase tracking-wider">Analyzing nutritional data...</p>
+            <div className="flex flex-col items-center justify-center py-6 space-y-3 max-w-sm mx-auto text-center">
+              <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-indigo-400 font-extrabold text-sm uppercase tracking-widest animate-pulse">
+                {SCAN_STATUSES[scanStatusIndex]}
+              </p>
+              <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">AI engine is processing your image...</span>
             </div>
           )}
 

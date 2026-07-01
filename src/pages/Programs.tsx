@@ -111,7 +111,12 @@ export default function Programs() {
                 <div className="w-2/5 relative shrink-0">
                   <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#13141C] to-transparent z-10 w-1/3"></div>
                   <img 
-                    src={program.image} 
+                    src={
+                      program.id === 'push_1' ? 'https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg' :
+                      program.id === 'pull_1' ? 'https://img.youtube.com/vi/CAwf7n6Luuc/hqdefault.jpg' :
+                      program.id === 'legs_1' ? 'https://img.youtube.com/vi/0p3_N1YvP0E/hqdefault.jpg' :
+                      'https://img.youtube.com/vi/rxD321l2svE/hqdefault.jpg'
+                    } 
                     alt={program.name} 
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-80"
                   />

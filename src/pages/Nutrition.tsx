@@ -483,127 +483,15 @@ export default function Nutrition() {
           </div>
         </div>
 
-        {/* Scan & Manual Quick Buttons */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Scan Quick Button (Full Width, AI-Only) */}
+        <div className="max-w-md mx-auto w-full">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all active:scale-[0.98] text-xs uppercase tracking-wider shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2"
+            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-4 px-6 rounded-2xl transition-all active:scale-[0.98] text-sm uppercase tracking-widest shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2.5"
           >
-            <Camera size={16} /> Scan Meal
-          </button>
-          
-          <button 
-            onClick={() => setShowManualForm(true)}
-            className="bg-neutral-900 hover:bg-neutral-855 text-white font-extrabold py-3.5 px-4 rounded-2xl transition-all active:scale-[0.98] text-xs uppercase tracking-wider border border-neutral-850 flex items-center justify-center gap-2"
-          >
-            <Plus size={16} className="text-indigo-400" /> Log Manually
+            <Camera size={18} /> Scan Meal (AI Analyzer)
           </button>
         </div>
-
-        {/* Manual Log Drawer Overlay Form */}
-        {showManualForm && (
-          <div className="bg-white/5 border border-white/10 p-1.5 rounded-[2.2rem] shadow-2xl relative animate-in slide-in-from-bottom-5 duration-300">
-            <button 
-              onClick={() => setShowManualForm(false)} 
-              className="absolute top-4 right-4 w-7 h-7 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white z-20"
-              type="button"
-            >
-              <X size={14} />
-            </button>
-
-            <form onSubmit={handleManualSave} className="bg-[#13141C] border border-neutral-800/30 rounded-[calc(2.2rem-0.5rem)] p-6 space-y-4">
-              <h3 className="font-extrabold text-sm text-neutral-400 uppercase tracking-wider mb-2">Log Food Item</h3>
-              
-              <div className="space-y-1">
-                <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Food Name</label>
-                <input
-                  type="text"
-                  required
-                  value={manualName}
-                  onChange={(e) => setManualName(e.target.value)}
-                  placeholder="E.g., Greek Yogurt"
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Portion</label>
-                  <input
-                    type="text"
-                    required
-                    value={manualPortion}
-                    onChange={(e) => setManualPortion(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Calories (kcal)</label>
-                  <input
-                    type="number"
-                    required
-                    value={manualCalories}
-                    onChange={(e) => setManualCalories(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Prot (g)</label>
-                  <input
-                    type="number"
-                    value={manualProtein}
-                    onChange={(e) => setManualProtein(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Carb (g)</label>
-                  <input
-                    type="number"
-                    value={manualCarbs}
-                    onChange={(e) => setManualCarbs(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Fat (g)</label>
-                  <input
-                    type="number"
-                    value={manualFats}
-                    onChange={(e) => setManualFats(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl p-3 text-white text-xs focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Meal category</label>
-                <div className="flex gap-1.5">
-                  {(['breakfast', 'lunch', 'dinner', 'snack'] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setManualMealType(type)}
-                      className={`flex-1 py-2 text-[10px] font-bold rounded-lg capitalize border transition-all ${manualMealType === type ? 'bg-indigo-500 border-indigo-400 text-white' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-3.5 rounded-xl uppercase tracking-wider text-xs mt-2"
-              >
-                Log to Diary
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* Grouped Meals List */}
         <div className="space-y-5">

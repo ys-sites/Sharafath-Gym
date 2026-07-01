@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X, Play, Pause, ChevronUp, Check, Plus, ChevronLeft, Volume2, Edit2, ShieldAlert } from 'lucide-react';
+import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize } from 'lucide-react';
 
 const ROUTINES: Record<string, { name: string; category: string; duration: string; calories: string; difficulty: string; exercises: Array<{ name: string; reps: string; sets: number; videoUrl?: string; tip?: string }> }> = {
   push_1: {
@@ -10,13 +10,13 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '320 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Machine Chest Press', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'First set is warm up. Focus on feeling the muscle, not lifting heavy.' },
-      { name: 'Incline Dumbbell Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Control the tempo. Keep your lower back protected.' },
-      { name: 'Machine Pec Deck Fly', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Contract the chest at the peak. Do not let shoulders rotate forward.' },
-      { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Keep arms slightly bent. Lift with your elbows.' },
-      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Perform with controlled speed. Do not throw the weight.' },
-      { name: 'Tricep Pushdown', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Keep elbows locked at your side. Full range of motion.' },
-      { name: 'Overhead Rope Extension', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Stretch triceps at the bottom, brace core.' }
+      { name: 'Machine Chest Press', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'First set is warm up. Focus on feeling the muscle, not lifting heavy.' },
+      { name: 'Incline Dumbbell Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=IP4oeKh1Sd4', tip: 'Control the tempo. Keep your lower back protected.' },
+      { name: 'Machine Pec Deck Fly', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Contract the chest at the peak. Do not let shoulders rotate forward.' },
+      { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=PzsMitRdI_8', tip: 'Keep arms slightly bent. Lift with your elbows.' },
+      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Perform with controlled speed. Do not throw the weight.' },
+      { name: 'Tricep Pushdown', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Keep elbows locked at your side. Full range of motion.' },
+      { name: 'Overhead Rope Extension', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Stretch triceps at the bottom, brace core.' }
     ]
   },
   pull_1: {
@@ -26,14 +26,14 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '300 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Wide-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Pull down to upper chest, squeeze shoulder blades.' },
-      { name: 'Close-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Pull down focusing on lower lats activation.' },
-      { name: 'Seated Cable Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Keep back flat. Do not swing your upper body.' },
-      { name: 'Wide-Grip Row', reps: '3x8', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Target upper back thickness. Pull with elbows wide.' },
-      { name: 'Lat Pullover Machine', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Isolate lats. Keep arms locked and control the stretch.' },
-      { name: 'Preacher Curl', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Keep armpits locked against pad. Focus on bicep peak.' },
-      { name: 'Incline Dumbbell Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Curl with palms facing up, control the eccentric phase.' },
-      { name: 'Hammer Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Target brachialis. Palms facing each other throughout.' }
+      { name: 'Wide-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=CAwf7n6Luuc', tip: 'Pull down to upper chest, squeeze shoulder blades.' },
+      { name: 'Close-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=8d22D_B0UeM', tip: 'Pull down focusing on lower lats activation.' },
+      { name: 'Seated Cable Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Keep back flat. Do not swing your upper body.' },
+      { name: 'Wide-Grip Row', reps: '3x8', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Target upper back thickness. Pull with elbows wide.' },
+      { name: 'Lat Pullover Machine', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=QdD8Jv2h_6U', tip: 'Isolate lats. Keep arms locked and control the stretch.' },
+      { name: 'Preacher Curl', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Keep armpits locked against pad. Focus on bicep peak.' },
+      { name: 'Incline Dumbbell Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Curl with palms facing up, control the eccentric phase.' },
+      { name: 'Hammer Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Target brachialis. Palms facing each other throughout.' }
     ]
   },
   legs_1: {
@@ -43,13 +43,13 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '420 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Hack Squat', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=bEv6CCg2BC8', tip: 'Go deep, control speed, keep heels flat on platform.' },
-      { name: 'Leg Press', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=bEv6CCg2BC8', tip: 'Do not lock out knees. Keep feet shoulder-width apart.' },
-      { name: 'Leg Extension', reps: '12-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=bEv6CCg2BC8', tip: 'Pause at the top extension to maximize quad loading.' },
-      { name: 'Dumbbell Romanian Deadlift', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=op9kVnSso6Q', tip: 'Push hips back. Lower weight along shins, protect lower back.' },
-      { name: 'Seated Leg Curl', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=bEv6CCg2BC8', tip: 'Flex hamstrings fully at the bottom. Hold for a split second.' },
-      { name: 'Standing Calf Raise', reps: '12-20', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=bEv6CCg2BC8', tip: 'Full range of motion. Go up on tiptoes, stretch down.' },
-      { name: 'Seated Leg Raise', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=op9kVnSso6Q', tip: 'Brace core, lift legs without shifting weight.' }
+      { name: 'Hack Squat', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=0p3_N1YvP0E', tip: 'Go deep, control speed, keep heels flat on platform.' },
+      { name: 'Leg Press', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=IZxyjW7MPJQ', tip: 'Do not lock out knees. Keep feet shoulder-width apart.' },
+      { name: 'Leg Extension', reps: '12-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=YyvSfV9Qp60', tip: 'Pause at the top extension to maximize quad loading.' },
+      { name: 'Dumbbell Romanian Deadlift', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=JGrD4N-_s44', tip: 'Push hips back. Lower weight along shins, protect lower back.' },
+      { name: 'Seated Leg Curl', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=Orxowest56U', tip: 'Flex hamstrings fully at the bottom. Hold for a split second.' },
+      { name: 'Standing Calf Raise', reps: '12-20', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=N38e_lE9e08', tip: 'Full range of motion. Go up on tiptoes, stretch down.' },
+      { name: 'Seated Leg Raise', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=HbbOplfPjB0', tip: 'Brace core, lift legs without shifting weight.' }
     ]
   },
   upper_1: {
@@ -59,17 +59,17 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '380 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Incline Machine Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Focus on upper chest muscle tension. Squeeze at peak.' },
-      { name: 'Machine Chest Press', reps: '8-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Maintain a stable trunk. Retract shoulders.' },
+      { name: 'Incline Machine Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'Focus on upper chest muscle tension. Squeeze at peak.' },
+      { name: 'Machine Chest Press', reps: '8-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'Maintain a stable trunk. Retract shoulders.' },
       { name: 'Assisted Pull-Up', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Pull chest to bar. Control descent fully.' },
-      { name: 'Chest-Supported Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Keep chest glued to support. Squeeze middle back.' },
-      { name: 'Lat Pullover Machine', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Slow stretch at the top. Drive down with elbows.' },
-      { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Keep shoulders down. Isolate lateral deltoids.' },
-      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=rxD321l2svE', tip: 'Focus rear shoulders. Do not use momentum.' },
-      { name: 'Preacher Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Strict arm curls on preacher pad.' },
-      { name: 'Cable Curl', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Constant bicep tension throughout the motion.' },
-      { name: 'Rope Pushdown', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Flare rope outward at full extension.' },
-      { name: 'Overhead Cable Extension', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=2yjwXTZEpac', tip: 'Extend fully to load triceps long head.' }
+      { name: 'Chest-Supported Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Keep chest glued to support. Squeeze middle back.' },
+      { name: 'Lat Pullover Machine', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=QdD8Jv2h_6U', tip: 'Slow stretch at the top. Drive down with elbows.' },
+      { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=PzsMitRdI_8', tip: 'Keep shoulders down. Isolate lateral deltoids.' },
+      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Focus rear shoulders. Do not use momentum.' },
+      { name: 'Preacher Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Strict arm curls on preacher pad.' },
+      { name: 'Cable Curl', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Constant bicep tension throughout the motion.' },
+      { name: 'Rope Pushdown', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Flare rope outward at full extension.' },
+      { name: 'Overhead Cable Extension', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Extend fully to load triceps long head.' }
     ]
   }
 };
@@ -94,6 +94,10 @@ export default function ActiveWorkout() {
   const [reps, setReps] = useState(10);
   const [weight, setWeight] = useState('');
   const [feeling, setFeeling] = useState(1); // 0 = Too easy, 1 = Just right, 2 = Too hard
+  
+  // Fullscreen states
+  const [isFullscreenVideo, setIsFullscreenVideo] = useState(false);
+  const [isFullscreenMuted, setIsFullscreenMuted] = useState(true);
 
   useEffect(() => {
     let interval: any = null;
@@ -121,7 +125,6 @@ export default function ActiveWorkout() {
   const handleNext = () => {
     if (currentExerciseIndex < activeRoutine.exercises.length - 1) {
       setCurrentExerciseIndex(prev => prev + 1);
-      // Reset input fields for next exercise
       setWeight('');
     } else {
       alert("Workout Completed! Excellent job Mohamed Sharafath!");
@@ -176,6 +179,17 @@ export default function ActiveWorkout() {
           className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 active:scale-95 transition-transform hover:bg-black/60"
         >
           <X size={16} className="text-neutral-300" />
+        </button>
+      </div>
+
+      {/* Floating Expand Button */}
+      <div className="absolute top-[38vh] right-4 z-10">
+        <button 
+          onClick={() => setIsFullscreenVideo(true)}
+          className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10 active:scale-95 transition-transform hover:bg-black/60 text-white shadow-lg"
+          title="Fullscreen Video"
+        >
+          <Maximize size={16} />
         </button>
       </div>
 
@@ -240,7 +254,7 @@ export default function ActiveWorkout() {
 
             {/* Reps display counter indicator */}
             <div className="w-28 h-28 rounded-full border-4 border-neutral-850 flex flex-col items-center justify-center relative bg-[#13141C] shadow-inner">
-              <div className="text-3xl font-extrabold text-white">{currentExercise.reps.split('-').pop()}</div>
+              <div className="text-3xl font-extrabold text-white">{currentExercise.reps.split('-').pop().split('x').pop()}</div>
               <div className="text-[9px] text-neutral-500 uppercase tracking-widest font-extrabold mt-0.5">Target Reps</div>
             </div>
 
@@ -326,6 +340,45 @@ export default function ActiveWorkout() {
                   Save Set
                 </button>
              </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Video Modal */}
+      {isFullscreenVideo && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
+          {videoId ? (
+            <iframe 
+              className="w-full h-full object-cover absolute inset-0 pointer-events-none scale-[1.35]" 
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${isFullscreenMuted ? 1 : 0}&loop=1&playlist=${videoId}&vq=hd720&controls=0`}
+              allow="autoplay; encrypted-media"
+              title="Fullscreen demo video"
+              frameBorder="0"
+            />
+          ) : (
+            <div className="text-neutral-500 text-sm">No video available</div>
+          )}
+          
+          {/* Header controls overlay */}
+          <div className="absolute top-0 inset-x-0 p-6 pt-12 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+            <h3 className="font-extrabold text-lg text-white tracking-tight">{currentExercise.name}</h3>
+            <button 
+              onClick={() => setIsFullscreenVideo(false)}
+              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-95 transition-transform"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Bottom sound toggle overlay */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex gap-4">
+            <button 
+              onClick={() => setIsFullscreenMuted(!isFullscreenMuted)}
+              className="px-6 py-3 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold text-xs tracking-wider uppercase flex items-center gap-2 shadow-lg active:scale-95 transition-transform"
+            >
+              {isFullscreenMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              {isFullscreenMuted ? "Unmute Audio" : "Mute Audio"}
+            </button>
           </div>
         </div>
       )}

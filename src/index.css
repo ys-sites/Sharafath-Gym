@@ -58,3 +58,20 @@ body {
   width: 0px;
   background: transparent; 
 }
+
+@keyframes scanner {
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 0%;
+  }
+}
+
+.animate-scanner {
+  animation: scanner 2.5s ease-in-out infinite;
+}
+

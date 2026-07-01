@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Share2, MoreHorizontal, ArrowDown, Play, Heart, RefreshCw, X, Edit2, ArrowLeftRight, Navigation, Trash2, Star, Dumbbell, Clock, Flame } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const ROUTINE_DETAILS: Record<string, {
   title: string;
@@ -35,9 +36,9 @@ const ROUTINE_DETAILS: Record<string, {
         name: "CHEST CIRCUIT",
         rounds: 3,
         exercises: [
-          { id: "p1", name: "Machine Chest Press", details: "3 Sets x 6-10 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "p2", name: "Incline Dumbbell Press", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&q=80&w=200" },
-          { id: "p3", name: "Machine Pec Deck Fly", details: "2 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+          { id: "p1", name: "Machine Chest Press", details: "3 Sets x 6-10 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
+          { id: "p2", name: "Incline Dumbbell Press", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/IP4oeKh1Sd4" },
+          { id: "p3", name: "Machine Pec Deck Fly", details: "2 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g" }
         ]
       },
       {
@@ -45,10 +46,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "SHOULDERS & TRICEPS",
         rounds: 3,
         exercises: [
-          { id: "p4", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "p5", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "p6", name: "Tricep Pushdown", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "p7", name: "Overhead Rope Extension", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+          { id: "p4", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/PzsMitRdI_8" },
+          { id: "p5", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g" },
+          { id: "p6", name: "Tricep Pushdown", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU" },
+          { id: "p7", name: "Overhead Rope Extension", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU" }
         ]
       }
     ]
@@ -69,10 +70,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "BACK WIDTH & THICKNESS",
         rounds: 3,
         exercises: [
-          { id: "pl1", name: "Wide-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl2", name: "Close-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl3", name: "Seated Cable Row", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl4", name: "Wide-Grip Row", details: "3 Sets x 8 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+          { id: "pl1", name: "Wide-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/CAwf7n6Luuc/hqdefault.jpg" },
+          { id: "pl2", name: "Close-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/8d22D_B0UeM/hqdefault.jpg" },
+          { id: "pl3", name: "Seated Cable Row", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" },
+          { id: "pl4", name: "Wide-Grip Row", details: "3 Sets x 8 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" }
         ]
       },
       {
@@ -80,10 +81,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "ISOLATION & ARMS",
         rounds: 3,
         exercises: [
-          { id: "pl5", name: "Lat Pullover Machine", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl6", name: "Preacher Curl", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl7", name: "Incline Dumbbell Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
-          { id: "pl8", name: "Hammer Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+          { id: "pl5", name: "Lat Pullover Machine", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/QdD8Jv2h_6U/hqdefault.jpg" },
+          { id: "pl6", name: "Preacher Curl", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
+          { id: "pl7", name: "Incline Dumbbell Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
+          { id: "pl8", name: "Hammer Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" }
         ]
       }
     ]
@@ -104,9 +105,9 @@ const ROUTINE_DETAILS: Record<string, {
         name: "QUADS & GLUTES",
         rounds: 3,
         exercises: [
-          { id: "l1", name: "Hack Squat", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
-          { id: "l2", name: "Leg Press", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
-          { id: "l3", name: "Leg Extension", details: "2 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" }
+          { id: "l1", name: "Hack Squat", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/0p3_N1YvP0E/hqdefault.jpg" },
+          { id: "l2", name: "Leg Press", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/IZxyjW7MPJQ/hqdefault.jpg" },
+          { id: "l3", name: "Leg Extension", details: "2 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/YyvSfV9Qp60/hqdefault.jpg" }
         ]
       },
       {
@@ -114,10 +115,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "HAMSTRINGS & CALVES",
         rounds: 3,
         exercises: [
-          { id: "l4", name: "Dumbbell Romanian Deadlift", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
-          { id: "l5", name: "Seated Leg Curl", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
-          { id: "l6", name: "Standing Calf Raise", details: "3 Sets x 12-20 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
-          { id: "l7", name: "Seated Leg Raise", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" }
+          { id: "l4", name: "Dumbbell Romanian Deadlift", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/JGrD4N-_s44/hqdefault.jpg" },
+          { id: "l5", name: "Seated Leg Curl", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/Orxowest56U/hqdefault.jpg" },
+          { id: "l6", name: "Standing Calf Raise", details: "3 Sets x 12-20 Reps", img: "https://img.youtube.com/vi/N38e_lE9e08/hqdefault.jpg" },
+          { id: "l7", name: "Seated Leg Raise", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/HbbOplfPjB0/hqdefault.jpg" }
         ]
       }
     ]
@@ -138,10 +139,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "CHEST & BACK",
         rounds: 3,
         exercises: [
-          { id: "u1", name: "Incline Machine Press", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u2", name: "Machine Chest Press", details: "2 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u3", name: "Assisted Pull-Up", details: "3 Sets x 6-10 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u4", name: "Chest-Supported Row", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+          { id: "u1", name: "Incline Machine Press", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
+          { id: "u2", name: "Machine Chest Press", details: "2 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
+          { id: "u3", name: "Assisted Pull-Up", details: "3 Sets x 6-10 Reps", img: "https://img.youtube.com/vi/eGo4IYtl4jO/hqdefault.jpg" },
+          { id: "u4", name: "Chest-Supported Row", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" }
         ]
       },
       {
@@ -149,12 +150,12 @@ const ROUTINE_DETAILS: Record<string, {
         name: "SHOULDERS & ARMS",
         rounds: 3,
         exercises: [
-          { id: "u5", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u6", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u7", name: "Preacher Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u8", name: "Cable Curl", details: "2 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u9", name: "Rope Pushdown", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
-          { id: "u10", name: "Overhead Cable Extension", details: "2 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+          { id: "u5", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/PzsMitRdI_8/hqdefault.jpg" },
+          { id: "u6", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g/hqdefault.jpg" },
+          { id: "u7", name: "Preacher Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
+          { id: "u8", name: "Cable Curl", details: "2 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
+          { id: "u9", name: "Rope Pushdown", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU/hqdefault.jpg" },
+          { id: "u10", name: "Overhead Cable Extension", details: "2 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU/hqdefault.jpg" }
         ]
       }
     ]
@@ -168,8 +169,251 @@ export default function WorkoutDetail() {
   const [isSaved, setIsSaved] = useState(false);
 
   const activeDetails = (id && ROUTINE_DETAILS[id]) || ROUTINE_DETAILS.push_1;
-  const programDetails = activeDetails;
-  const circuits = activeDetails.circuits;
+  const [programDetails, setProgramDetails] = useState<any>(activeDetails);
+  const [circuits, setCircuits] = useState<any[]>(activeDetails.circuits);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTemplateData = async () => {
+    try {
+      const userRes = await supabase.auth.getUser();
+      const user = userRes?.data?.user;
+      if (!user) {
+        setCircuits(activeDetails.circuits);
+        setLoading(false);
+        return;
+      }
+
+      let splitDay = 'Day 1';
+      if (id === 'pull_1') splitDay = 'Day 2';
+      if (id === 'legs_1') splitDay = 'Day 3';
+      if (id === 'upper_1') splitDay = 'Day 5';
+
+      let { data: templateData } = await supabase
+        .from('workout_templates')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('split_day', splitDay)
+        .maybeSingle();
+
+      if (!templateData) {
+        // Seed standard template matching user_id
+        const { data: newTemplate, error: insertError } = await supabase
+          .from('workout_templates')
+          .insert({
+            user_id: user.id,
+            name: activeDetails.title,
+            split_day: splitDay
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        templateData = newTemplate;
+
+        // Insert exercises
+        let orderIndex = 0;
+        for (const circuit of activeDetails.circuits) {
+          for (const ex of circuit.exercises) {
+            let { data: existingEx } = await supabase
+              .from('exercises')
+              .select('*')
+              .eq('name', ex.name)
+              .maybeSingle();
+
+            let exerciseId = existingEx?.id;
+
+            if (!existingEx) {
+              const { data: newEx } = await supabase
+                .from('exercises')
+                .insert({
+                  name: ex.name,
+                  user_id: user.id,
+                  youtube_url: `https://www.youtube.com/watch?v=rxD321l2svE`
+                })
+                .select()
+                .single();
+              exerciseId = newEx?.id;
+            }
+
+            await supabase
+              .from('template_exercises')
+              .insert({
+                template_id: templateData.id,
+                exercise_id: exerciseId,
+                order_index: orderIndex++,
+                target_sets: circuit.rounds,
+                target_reps: ex.details.match(/\d+(?:-\d+)?/)?.[0] || '10',
+                is_circuit: true
+              });
+          }
+        }
+      }
+
+      // Fetch template exercises
+      const { data: tempExercises, error: exError } = await supabase
+        .from('template_exercises')
+        .select(`
+          id, order_index, target_sets, target_reps, is_circuit,
+          exercises ( id, name, youtube_url )
+        `)
+        .eq('template_id', templateData.id)
+        .order('order_index', { ascending: true });
+
+      if (exError) throw exError;
+
+      let exercisePointer = 0;
+      const loadedCircuits = activeDetails.circuits.map((circ, cIdx) => {
+        const limit = circ.exercises.length;
+        const slice = tempExercises?.slice(exercisePointer, exercisePointer + limit) || [];
+        exercisePointer += limit;
+
+        return {
+          id: circ.id,
+          name: circ.name,
+          rounds: slice[0]?.target_sets || circ.rounds,
+          exercises: slice.map(te => {
+            const videoUrl = (te.exercises as any)?.youtube_url || '';
+            const match = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+            const videoId = match ? match[1] : 'rxD321l2svE';
+            return {
+              id: te.id,
+              name: (te.exercises as any)?.name || 'Exercise',
+              details: `${te.target_sets} Sets x ${te.target_reps} Reps`,
+              img: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+              target_sets: te.target_sets,
+              target_reps: te.target_reps
+            };
+          })
+        };
+      });
+
+      setCircuits(loadedCircuits);
+      setProgramDetails({
+        ...activeDetails,
+        title: templateData.name
+      });
+    } catch (err) {
+      console.error(err);
+      setCircuits(activeDetails.circuits);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTemplateData();
+  }, [id]);
+
+  const handleEditRepsSets = async (templateExerciseId: string) => {
+    const newSets = prompt("Enter new target Sets:", "3");
+    const newReps = prompt("Enter new target Reps range (e.g. 8-12):", "10");
+    if (!newSets || !newReps) return;
+
+    try {
+      const { error } = await supabase
+        .from('template_exercises')
+        .update({
+          target_sets: Number(newSets),
+          target_reps: newReps
+        })
+        .eq('id', templateExerciseId);
+
+      if (error) throw error;
+      fetchTemplateData();
+      setActiveMenu(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSwapExercise = async (templateExerciseId: string) => {
+    const newName = prompt("Enter new exercise name:");
+    if (!newName) return;
+
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) return;
+
+      let { data: existingEx } = await supabase
+        .from('exercises')
+        .select('*')
+        .eq('name', newName)
+        .maybeSingle();
+
+      let exerciseId = existingEx?.id;
+
+      if (!existingEx) {
+        const { data: newEx } = await supabase
+          .from('exercises')
+          .insert({
+            name: newName,
+            user_id: user.id,
+            youtube_url: 'https://www.youtube.com/watch?v=rxD321l2svE'
+          })
+          .select()
+          .single();
+        exerciseId = newEx?.id;
+      }
+
+      const { error } = await supabase
+        .from('template_exercises')
+        .update({ exercise_id: exerciseId })
+        .eq('id', templateExerciseId);
+
+      if (error) throw error;
+      fetchTemplateData();
+      setActiveMenu(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReorder = async (templateExerciseId: string) => {
+    const newOrder = prompt("Enter new position index (e.g. 0, 1, 2):", "0");
+    if (newOrder === null) return;
+
+    try {
+      const { error } = await supabase
+        .from('template_exercises')
+        .update({ order_index: Number(newOrder) })
+        .eq('id', templateExerciseId);
+
+      if (error) throw error;
+      fetchTemplateData();
+      setActiveMenu(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemoveExercise = async (templateExerciseId: string) => {
+    const confirmRemove = window.confirm("Are you sure you want to remove this exercise from the routine?");
+    if (!confirmRemove) return;
+
+    try {
+      const { error } = await supabase
+        .from('template_exercises')
+        .delete()
+        .eq('id', templateExerciseId);
+
+      if (error) throw error;
+      fetchTemplateData();
+      setActiveMenu(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-[#0C0D12] min-h-screen flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-sm font-bold text-neutral-400">Loading plan details...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0C0D12] min-h-screen text-white font-sans flex flex-col pb-36 relative">
@@ -344,7 +588,10 @@ export default function WorkoutDetail() {
             </div>
             
             <div className="space-y-4">
-              <button className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all">
+              <button 
+                onClick={() => handleEditRepsSets(activeMenu)}
+                className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all"
+              >
                 <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
                   <Edit2 size={18} />
                 </div>
@@ -354,7 +601,10 @@ export default function WorkoutDetail() {
                 </div>
               </button>
               
-              <button className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all">
+              <button 
+                onClick={() => handleSwapExercise(activeMenu)}
+                className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all"
+              >
                 <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center text-teal-400 border border-teal-500/20">
                   <ArrowLeftRight size={18} />
                 </div>
@@ -364,7 +614,10 @@ export default function WorkoutDetail() {
                 </div>
               </button>
 
-              <button className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all">
+              <button 
+                onClick={() => handleReorder(activeMenu)}
+                className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all"
+              >
                 <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 border border-yellow-500/20">
                   <Navigation size={18} />
                 </div>
@@ -374,7 +627,10 @@ export default function WorkoutDetail() {
                 </div>
               </button>
 
-              <button className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all">
+              <button 
+                onClick={() => handleRemoveExercise(activeMenu)}
+                className="w-full flex items-center gap-4 p-2.5 text-left bg-white/5 rounded-2xl border border-white/5 active:scale-95 transition-all"
+              >
                 <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
                   <Trash2 size={18} />
                 </div>
