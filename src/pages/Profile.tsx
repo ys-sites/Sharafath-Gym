@@ -1,6 +1,5 @@
-import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart, Copy, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip } from 'recharts';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 import { supabase } from '../lib/supabase';
 
@@ -19,163 +18,15 @@ export default function Profile() {
   const [savingTargets, setSavingTargets] = useState(false);
   const [message, setMessage] = useState('');
 
-  const [isAppleHealthConnected, setIsAppleHealthConnected] = useState(false);
+  const [isAppleHealthConnected, setIsAppleHealthConnected] = useState(() => {
+    const saved = localStorage.getItem('apple_health_connected');
+    return saved === 'true';
+  });
   const [showHealthKitPermissions, setShowHealthKitPermissions] = useState(false);
   const [stepsSyncedToday, setStepsSyncedToday] = useState(0);
   const [caloriesSyncedToday, setCaloriesSyncedToday] = useState(0);
   const [lastHealthSync, setLastHealthSync] = useState('');
   const [userId, setUserId] = useState('your-user-id');
-  const [syncToken, setSyncToken] = useState('');
-  const [isRegeneratingToken, setIsRegeneratingToken] = useState(false);
-  const [isTestingPing, setIsTestingPing] = useState(false);
-  const [pingResult, setPingResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [copiedUrl, setCopiedUrl] = useState(false);
-  const [copiedToken, setCopiedToken] = useState(false);
-  const [showShortcutsAdvanced, setShowShortcutsAdvanced] = useState(false);
-  const [weightHistory, setWeightHistory] = useState<any[]>([]);
-  const [weightChange, setWeightChange] = useState<number | null>(null);
-
-  const fetchWeightHistory = async () => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-
-      const ninetyDaysAgo = new Date();
-      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
-      const { data, error } = await supabase
-        .from('health_metrics')
-        .select('value, start_date')
-        .eq('user_id', user.id)
-        .eq('type', 'weight')
-        .gte('start_date', ninetyDaysAgo.toISOString())
-        .order('start_date', { ascending: true });
-
-      if (!error && data) {
-        const formatted = data.map(item => {
-          const d = new Date(item.start_date);
-          return {
-            value: Number(item.value),
-            dateStr: `${d.getMonth() + 1}/${d.getDate()}`,
-            rawDate: d
-          };
-        });
-        setWeightHistory(formatted);
-
-        if (formatted.length >= 2) {
-          const latest = formatted[formatted.length - 1];
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          const oldLog = formatted.find(item => item.rawDate >= thirtyDaysAgo);
-          if (oldLog && oldLog !== latest) {
-            setWeightChange(Number((latest.value - oldLog.value).toFixed(1)));
-          } else {
-            const first = formatted[0];
-            setWeightChange(Number((latest.value - first.value).toFixed(1)));
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Error fetching weight history:', e);
-    }
-  };
-
-  const generateUUID = () => {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      return crypto.randomUUID();
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  };
-
-  const handleRegenerateToken = async () => {
-    if (!supabase) return;
-    setIsRegeneratingToken(true);
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-      
-      const newToken = generateUUID();
-      const { error } = await supabase
-        .from('profiles')
-        .update({ sync_token: newToken })
-        .eq('user_id', user.id);
-        
-      if (!error) {
-        setSyncToken(newToken);
-        alert('Sync token regenerated successfully!');
-      } else {
-        alert('Failed to regenerate token: ' + error.message);
-      }
-    } catch (err: any) {
-      console.error(err);
-      alert('Error: ' + err.message);
-    } finally {
-      setIsRegeneratingToken(false);
-    }
-  };
-
-  const handleSendTestPing = async () => {
-    setIsTestingPing(true);
-    setPingResult(null);
-    try {
-      const edgeUrl = "https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync";
-      const payload = {
-        user_id: userId,
-        sync_token: syncToken,
-        metrics: [
-          {
-            type: "steps",
-            value: 0,
-            unit: "count",
-            start_date: new Date().toISOString(),
-            end_date: new Date().toISOString()
-          }
-        ]
-      };
-
-      const res = await fetch(edgeUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const resData = await res.json();
-      if (res.ok && resData.success) {
-        setPingResult({ success: true, message: "Test ping successful! Sent 0 steps to Edge Function." });
-        if (supabase) {
-          const user = (await supabase.auth.getUser()).data.user;
-          if (user) {
-            const { data } = await supabase
-              .from('profiles')
-              .select('last_health_sync')
-              .eq('user_id', user.id)
-              .single();
-            if (data?.last_health_sync) {
-              setLastHealthSync(data.last_health_sync);
-            }
-          }
-        }
-      } else {
-        setPingResult({ success: false, message: `Ping failed: ${resData.error || res.statusText}` });
-      }
-    } catch (err: any) {
-      setPingResult({ success: false, message: `Error sending ping: ${err.message}` });
-    } finally {
-      setIsTestingPing(false);
-    }
-  };
-
-  const copyToClipboard = (text: string, flagSetter: (val: boolean) => void) => {
-    navigator.clipboard.writeText(text);
-    flagSetter(true);
-    setTimeout(() => flagSetter(false), 2000);
-  };
 
   const formatLastSync = (timestamp: string) => {
     if (!timestamp) return 'Never synced yet';
@@ -200,6 +51,7 @@ export default function Profile() {
   const handleConnectAppleHealth = async () => {
     if (isAppleHealthConnected) {
       setIsAppleHealthConnected(false);
+      localStorage.setItem('apple_health_connected', 'false');
       setStepsSyncedToday(0);
       setCaloriesSyncedToday(0);
       setLastHealthSync('');
@@ -225,6 +77,7 @@ export default function Profile() {
 
   const handleAllowHealthKit = async () => {
     setIsAppleHealthConnected(true);
+    localStorage.setItem('apple_health_connected', 'true');
     setShowHealthKitPermissions(false);
     if (supabase) {
       try {
@@ -249,7 +102,7 @@ export default function Profile() {
         
         let { data, error } = await supabase
           .from('profiles')
-          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token')
+          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync')
           .eq('user_id', user.id)
           .single();
           
@@ -271,7 +124,6 @@ export default function Profile() {
             setProteinTarget(newProfile.protein_target_g);
             setCarbsTarget(newProfile.carbs_target_g);
             setFatsTarget(newProfile.fats_target_g);
-            setSyncToken(newProfile.sync_token || '');
           }
         } else if (data) {
           setCalorieTarget(data.daily_calorie_target);
@@ -282,13 +134,11 @@ export default function Profile() {
           setStepsSyncedToday(data.steps_synced_today || 0);
           setCaloriesSyncedToday(data.calories_synced_today || 0);
           setLastHealthSync(data.last_health_sync || '');
-          setSyncToken(data.sync_token || '');
         }
       } catch (err) {
         console.error(err);
       } finally {
         setLoadingTargets(false);
-        fetchWeightHistory();
       }
     };
     
@@ -386,46 +236,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      {/* Weight Trend Section */}
-      {weightHistory.length > 0 && (
-        <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl">
-          <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30">
-            <div className="flex justify-between items-center mb-5">
-              <div>
-                <h4 className="font-extrabold text-sm text-white">Weight Trend (90 Days)</h4>
-                <p className="text-[11px] text-neutral-500 font-bold mt-0.5 uppercase tracking-wide">Manual logs & HealthKit logs</p>
-              </div>
-              {weightChange !== null && (
-                <div className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
-                  weightChange < 0 
-                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-                    : 'bg-red-500/10 text-red-500 border border-red-500/20'
-                }`}>
-                  {weightChange < 0 ? <TrendingDown size={14} /> : <TrendingUp size={14} />}
-                  <span>{weightChange > 0 ? `+${weightChange}` : weightChange} kg</span>
-                  <span className="text-[10px] text-neutral-500 font-medium ml-0.5">Change</span>
-                </div>
-              )}
-            </div>
-            <div className="h-48 w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={weightHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
-                  <XAxis dataKey="dateStr" stroke="#525252" fontSize={9} tickLine={false} />
-                  <YAxis stroke="#525252" fontSize={9} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#13141C', border: '1px solid #262626', borderRadius: '12px' }}
-                    labelStyle={{ color: '#a3a3a3', fontWeight: 'bold', fontSize: '10px' }}
-                    itemStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '11px' }}
-                  />
-                  <Line type="monotone" dataKey="value" stroke="#f97316" strokeWidth={2.5} dot={{ fill: '#f97316', r: 3 }} activeDot={{ r: 5 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
 
       <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Daily Calorie & Macro Targets</h3>
       <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl">
@@ -533,164 +343,26 @@ export default function Profile() {
                 <span className="text-white font-extrabold">{caloriesSyncedToday} kcal</span>
               </div>
 
-              {/* Sync Status Badge */}
-              <div className="flex justify-between text-xs font-bold text-neutral-400 border-t border-neutral-800/40 pt-2.5">
-                <span>Status</span>
-                {(() => {
-                  if (!lastHealthSync) return <span className="text-neutral-500 font-extrabold uppercase tracking-wide">Never synced</span>;
-                  const diff = Date.now() - new Date(lastHealthSync).getTime();
-                  if (diff < 26 * 60 * 60 * 1000) {
-                    return <span className="text-emerald-500 font-extrabold uppercase tracking-wide">Active</span>;
-                  }
-                  return (
-                    <span className="text-amber-500 font-extrabold uppercase tracking-wide flex items-center gap-1">
-                      <AlertTriangle size={12} /> Sync may have stopped
-                    </span>
-                  );
-                })()}
-              </div>
-
-              <div className="border-t border-neutral-800/60 pt-3.5 space-y-3 text-left">
+              <div className="border-t border-neutral-800/60 pt-3.5 space-y-2 text-left">
                 <span className="text-[11px] font-extrabold text-neutral-400 block tracking-wide uppercase">Setup iOS Auto-Sync Guide</span>
-                
-                {/* Endpoint Section */}
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider">Edge Function Webhook URL</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value="https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync"
-                      className="w-full bg-neutral-900 border border-neutral-800/60 rounded-xl px-2.5 py-1.5 text-[9px] font-mono text-indigo-400 focus:outline-none"
-                    />
-                    <button
-                      onClick={() => copyToClipboard("https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync", setCopiedUrl)}
-                      className="px-3 bg-neutral-900 border border-neutral-800 rounded-xl hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
-                    >
-                      {copiedUrl ? <CheckCircle size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Token Section */}
-                <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-neutral-500 uppercase tracking-wider">Your Personal Sync Token</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={syncToken || "Loading token..."}
-                      className="w-full bg-neutral-900 border border-neutral-800/60 rounded-xl px-2.5 py-1.5 text-[9px] font-mono text-neutral-300 focus:outline-none"
-                    />
-                    <button
-                      onClick={() => copyToClipboard(syncToken, setCopiedToken)}
-                      className="px-3 bg-neutral-900 border border-neutral-800 rounded-xl hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
-                    >
-                      {copiedToken ? <CheckCircle size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                    </button>
-                    <button
-                      onClick={handleRegenerateToken}
-                      disabled={isRegeneratingToken}
-                      className="px-3 bg-neutral-900 border border-neutral-800 rounded-xl hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors disabled:opacity-55"
-                      title="Regenerate Token"
-                    >
-                      <RefreshCw size={12} className={isRegeneratingToken ? "animate-spin" : ""} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Step guide */}
                 <p className="text-[11px] text-neutral-500 leading-normal font-medium">
-                  Configure Apple Health syncing with the Health Auto Export app:
+                  To sync actual steps and workouts automatically, configure a Shortcut on your iPhone:
                 </p>
-                <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1.5 font-medium">
-                  <li>Install <strong>Health Auto Export &ndash; JSON+CSV</strong> from the App Store.</li>
-                  <li>Go to the <strong>Automations</strong> tab &rarr; <strong>New Automation</strong> &rarr; <strong>REST API</strong>.</li>
-                  <li>Paste the Webhook URL above as the export endpoint.</li>
-                  <li>Add these two request headers:
-                    <code className="block bg-neutral-900 border border-neutral-800/60 rounded p-2 mt-1 font-mono text-[8px] text-neutral-300 whitespace-pre-wrap leading-relaxed select-all">
-{`x-user-id: ${userId}
-x-sync-token: ${syncToken || "<your-token>"}`}
+                <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1 font-medium">
+                  <li>Open the <strong>Shortcuts</strong> app on iOS.</li>
+                  <li>Create a new shortcut. Find <strong>"Steps"</strong> and <strong>"Active Energy"</strong> for Today.</li>
+                  <li>Add <strong>"Get contents of URL"</strong> action, set it to <strong>POST</strong>.</li>
+                  <li>Set the request URL to:
+                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[9px] text-indigo-400 break-all select-all font-bold">
+                      {window.location.origin}/api/sync-health
                     </code>
                   </li>
-                  <li>Select <strong>Steps</strong>, <strong>Active Energy</strong>, and <strong>Weight</strong> as the data types to export.</li>
-                  <li>Set the export format to <strong>JSON</strong>.</li>
-                  <li>Choose your sync frequency (e.g. Automatic, or a daily schedule).</li>
-                  <li>Tap <strong>Run Manual Export</strong> once to test, then confirm below with Send Test Ping.</li>
+                  <li>Set Request Body as JSON, mapping your parameters:
+                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[8.5px] text-neutral-300 break-all select-all">
+                      {"{"} "user_id": "{userId}", "steps": {"{"}Steps{"}"}, "calories": {"{"}Active Energy{"}"} {"}"}
+                    </code>
+                  </li>
                 </ol>
-
-                {/* Advanced: iOS Shortcuts fallback */}
-                <div className="border-t border-neutral-800/40 pt-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowShortcutsAdvanced(v => !v)}
-                    className="w-full flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-neutral-500 hover:text-neutral-300 transition-colors"
-                  >
-                    <span>Advanced: use iOS Shortcuts instead</span>
-                    <ChevronRight size={12} className={`transition-transform ${showShortcutsAdvanced ? 'rotate-90' : ''}`} />
-                  </button>
-                  {showShortcutsAdvanced && (
-                    <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                      <p className="text-[11px] text-neutral-500 leading-normal font-medium">
-                        Configure Apple Health syncing in the iOS Shortcuts App:
-                      </p>
-                      <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1.5 font-medium">
-                        <li>Open the iOS <strong>Shortcuts</strong> App and go to the <strong>Automation</strong> tab.</li>
-                        <li>Create a new automation running daily (e.g., 9:00 PM).</li>
-                        <li>Add <strong>"Find Health Samples"</strong> for both <strong>Steps</strong> and <strong>Active Energy</strong> (Group by: Day, Sum, Limit: Today).</li>
-                        <li>Add <strong>"Get Contents of URL"</strong> action targeting the Webhook URL above, set method to <strong>POST</strong>.</li>
-                        <li>Configure Request Body as <strong>JSON</strong> with:
-                          <code className="block bg-neutral-900 border border-neutral-800/60 rounded p-2 mt-1 font-mono text-[8px] text-neutral-300 whitespace-pre-wrap leading-relaxed select-all">
-{`{
-  "user_id": "${userId}",
-  "sync_token": "${syncToken || "<your-token>"}",
-  "metrics": [
-    {
-      "type": "steps",
-      "value": StepsValue,
-      "unit": "count",
-      "start_date": "TodayDateISO",
-      "end_date": "TodayDateISO"
-    },
-    {
-      "type": "active_energy",
-      "value": CaloriesValue,
-      "unit": "kcal",
-      "start_date": "TodayDateISO",
-      "end_date": "TodayDateISO"
-    }
-  ]
-}`}
-                          </code>
-                        </li>
-                        <li>Toggle off <strong>"Ask Before Running"</strong> to let it sync seamlessly in the background.</li>
-                      </ol>
-                    </div>
-                  )}
-                </div>
-
-                {/* Test Ping Container */}
-                <div className="border-t border-neutral-800/40 pt-3 space-y-2">
-                  <button
-                    onClick={handleSendTestPing}
-                    disabled={isTestingPing || !syncToken}
-                    className="w-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 text-[10px] font-extrabold uppercase tracking-wider py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 disabled:opacity-50"
-                  >
-                    {isTestingPing ? (
-                      <>
-                        <RefreshCw size={11} className="animate-spin" /> Sending Test Ping...
-                      </>
-                    ) : (
-                      'Send Test Ping'
-                    )}
-                  </button>
-                  {pingResult && (
-                    <p className={`text-[10px] font-bold text-center ${pingResult.success ? 'text-emerald-500' : 'text-red-500'}`}>
-                      {pingResult.message}
-                    </p>
-                  )}
-                </div>
-
               </div>
             </div>
           )}
