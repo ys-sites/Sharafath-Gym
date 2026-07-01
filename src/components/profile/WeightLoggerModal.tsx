@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { X, Scale, Calendar, Check, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
@@ -15,7 +15,7 @@ export default function WeightLoggerModal({ onClose, onSave, currentWeight = 84 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!weight || isNaN(Number(weight))) {
       setError('Please enter a valid weight.');

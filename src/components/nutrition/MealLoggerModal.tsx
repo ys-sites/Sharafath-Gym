@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import { Camera, X, Check, Info, ScanLine, Barcode, ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -16,7 +16,7 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageCapture = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > 5 * 1024 * 1024) {
@@ -29,6 +29,19 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64Str = reader.result as string;
+        const base64Data = base64Str.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const analyzeMeal = async () => {
     if (!image && !description) {
       setError('Please provide a photo or description.');
@@ -39,17 +52,23 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
     setError('');
 
     try {
-      const formData = new FormData();
+      const payload: { image?: string; mimeType?: string; description?: string } = {};
+
       if (image) {
-        formData.append('image', image);
+        const base64Data = await fileToBase64(image);
+        payload.image = base64Data;
+        payload.mimeType = image.type;
       }
       if (description) {
-        formData.append('description', description);
+        payload.description = description;
       }
 
       const response = await fetch('/api/analyze-meal', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {

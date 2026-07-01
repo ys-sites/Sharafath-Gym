@@ -1,4 +1,4 @@
-import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Check } from 'lucide-react';
+import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 

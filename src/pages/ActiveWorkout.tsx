@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X, Play, Pause, ChevronUp, ChevronDown, Check, ArrowRight, ArrowLeftRight, Volume2, Maximize, Plus } from 'lucide-react';
+import { X, Play, Pause, ChevronUp, ChevronDown, Check, ArrowRight, ArrowLeftRight, Volume2, Maximize, Plus, ChevronLeft, Edit2 } from 'lucide-react';
 
 export default function ActiveWorkout() {
   const navigate = useNavigate();

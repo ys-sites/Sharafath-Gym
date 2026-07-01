@@ -2,20 +2,19 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import multer from "multer";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "10mb" }));
 
   // API route for meal analysis
-  app.post("/api/analyze-meal", upload.single("image"), async (req, res) => {
+  app.post("/api/analyze-meal", async (req, res) => {
     try {
+      const { image, mimeType, description } = req.body;
       let promptParts: any[] = [];
       const promptText = `Analyze this meal. Provide a response strictly in JSON format.
 Identify food items and estimate: food name, estimated portion size, calories, protein (g), carbs (g), fats (g).
@@ -30,19 +29,15 @@ Respond ONLY in this exact JSON schema:
 
       promptParts.push(promptText);
 
-      if (req.file) {
-        // Image was uploaded
-        const mimeType = req.file.mimetype;
-        const data = req.file.buffer.toString("base64");
+      if (image && mimeType) {
         promptParts.push({
           inlineData: {
             mimeType,
-            data,
+            data: image,
           }
         });
-      } else if (req.body.description) {
-        // Text description provided
-        promptParts.push(`\nMeal description: ${req.body.description}`);
+      } else if (description) {
+        promptParts.push(`\nMeal description: ${description}`);
       } else {
         return res.status(400).json({ error: "Please provide an image or description." });
       }
