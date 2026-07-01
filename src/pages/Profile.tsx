@@ -1,6 +1,7 @@
 import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
+import { supabase } from '../lib/supabase';
 
 export default function Profile() {
   const [isWeightModalOpen, setIsWeightModalOpen] = useState(false);
@@ -8,6 +9,92 @@ export default function Profile() {
     const saved = localStorage.getItem('user_weight');
     return saved ? parseFloat(saved) : 84;
   });
+
+  const [calorieTarget, setCalorieTarget] = useState(2200);
+  const [proteinTarget, setProteinTarget] = useState(160);
+  const [carbsTarget, setCarbsTarget] = useState(300);
+  const [fatsTarget, setFatsTarget] = useState(60);
+  const [loadingTargets, setLoadingTargets] = useState(true);
+  const [savingTargets, setSavingTargets] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const fetchTargets = async () => {
+      if (!supabase) return;
+      try {
+        const user = (await supabase.auth.getUser()).data.user;
+        if (!user) return;
+        
+        let { data, error } = await supabase
+          .from('profiles')
+          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (error && error.code === 'PGRST116') {
+          // Profile does not exist yet, let's insert it
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: user.id,
+              daily_calorie_target: 2200,
+              protein_target_g: 160,
+              carbs_target_g: 300,
+              fats_target_g: 60
+            })
+            .select()
+            .single();
+            
+          if (newProfile) {
+            setCalorieTarget(newProfile.daily_calorie_target);
+            setProteinTarget(newProfile.protein_target_g);
+            setCarbsTarget(newProfile.carbs_target_g);
+            setFatsTarget(newProfile.fats_target_g);
+          }
+        } else if (data) {
+          setCalorieTarget(data.daily_calorie_target);
+          setProteinTarget(data.protein_target_g);
+          setCarbsTarget(data.carbs_target_g);
+          setFatsTarget(data.fats_target_g);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingTargets(false);
+      }
+    };
+    
+    fetchTargets();
+  }, []);
+
+  const saveTargets = async () => {
+    if (!supabase) return;
+    setSavingTargets(true);
+    setMessage('');
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          daily_calorie_target: Number(calorieTarget),
+          protein_target_g: Number(proteinTarget),
+          carbs_target_g: Number(carbsTarget),
+          fats_target_g: Number(fatsTarget)
+        });
+
+      if (error) throw error;
+      setMessage('Targets saved successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err: any) {
+      console.error(err);
+      setMessage('Failed to save targets.');
+    } finally {
+      setSavingTargets(false);
+    }
+  };
 
   return (
     <div className="p-6 pb-24 bg-[#0C0D12] min-h-screen text-white font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
@@ -69,6 +156,70 @@ export default function Profile() {
             <span className="text-[11px] font-bold tracking-wider text-neutral-500 uppercase mb-1 relative z-10">Target Weight</span>
             <p className="text-2xl font-extrabold text-white relative z-10">75 kg</p>
           </div>
+        </div>
+      </div>
+
+      <h3 className="text-lg font-extrabold text-white tracking-tight mb-5 px-1">Daily Calorie & Macro Targets</h3>
+      <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl">
+        <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30 space-y-4">
+          {loadingTargets ? (
+            <p className="text-neutral-400 text-sm animate-pulse text-center py-4">Loading targets...</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Calories (kcal)</label>
+                  <input
+                    type="number"
+                    value={calorieTarget}
+                    onChange={(e) => setCalorieTarget(Number(e.target.value))}
+                    className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Protein (g)</label>
+                  <input
+                    type="number"
+                    value={proteinTarget}
+                    onChange={(e) => setProteinTarget(Number(e.target.value))}
+                    className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Carbs (g)</label>
+                  <input
+                    type="number"
+                    value={carbsTarget}
+                    onChange={(e) => setCarbsTarget(Number(e.target.value))}
+                    className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider pl-1">Fats (g)</label>
+                  <input
+                    type="number"
+                    value={fatsTarget}
+                    onChange={(e) => setFatsTarget(Number(e.target.value))}
+                    className="w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-3 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {message && (
+                <p className={`text-xs font-bold text-center ${message.includes('success') ? 'text-indigo-400' : 'text-red-500'}`}>
+                  {message}
+                </p>
+              )}
+
+              <button
+                onClick={saveTargets}
+                disabled={savingTargets}
+                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-3 rounded-2xl transition-all active:scale-[0.98] text-sm uppercase tracking-wider shadow-lg shadow-indigo-500/25 disabled:opacity-50"
+              >
+                {savingTargets ? 'Saving...' : 'Save Targets'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 

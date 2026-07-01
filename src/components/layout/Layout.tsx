@@ -32,7 +32,7 @@ export default function Layout() {
         <NavItem to="/" icon={<Home size={22} />} label="Home" />
         <NavItem to="/programs" icon={<Search size={22} />} label="Search" />
         <NavItem to="/history" icon={<BarChart2 size={22} />} label="Progress" />
-        <NavItem to="/nutrition" icon={<BookOpen size={22} />} label="Advice" />
+        <NavItem to="/nutrition" icon={<BookOpen size={22} />} label="Tracker" />
         <NavItem to="/profile" icon={<User size={22} />} label="Profile" />
       </nav>
     </div>
