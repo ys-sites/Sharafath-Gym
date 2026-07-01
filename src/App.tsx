@@ -56,14 +56,14 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return <div className="h-screen flex items-center justify-center bg-neutral-950 text-neutral-400">Loading TrainTrack...</div>;
+    return <div className="h-screen flex items-center justify-center bg-neutral-950 text-neutral-400">Loading Sharafath Gym...</div>;
   }
 
   // If Supabase is not configured, we should show a warning screen
   if (!supabase) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-orange-500">TrainTrack Setup</h1>
+        <h1 className="text-2xl font-bold mb-4 text-orange-500">Sharafath Gym Setup</h1>
         <p className="mb-6 text-neutral-400">
           Supabase environment variables are missing. Please add <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_URL</code> and <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">VITE_SUPABASE_ANON_KEY</code> to your <code className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-300">.env</code> file.
         </p>

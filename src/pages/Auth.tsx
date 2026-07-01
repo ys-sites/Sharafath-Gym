@@ -40,7 +40,7 @@ export default function Auth() {
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-neutral-950 text-white p-6">
       <div className="w-full max-w-sm">
-        <h1 className="text-3xl font-bold mb-2 text-center">TrainTrack</h1>
+        <h1 className="text-3xl font-bold mb-2 text-center">Sharafath Gym</h1>
         <p className="text-neutral-400 text-center mb-8">Log your gains, track your progress.</p>
         
         <form onSubmit={handleAuth} className="space-y-4">
