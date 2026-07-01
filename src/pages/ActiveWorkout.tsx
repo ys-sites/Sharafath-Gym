@@ -12,11 +12,11 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     exercises: [
       { name: 'Machine Chest Press', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'First set is warm up. Focus on feeling the muscle, not lifting heavy.' },
       { name: 'Incline Dumbbell Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=IP4oeKh1Sd4', tip: 'Control the tempo. Keep your lower back protected.' },
-      { name: 'Machine Pec Deck Fly', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Contract the chest at the peak. Do not let shoulders rotate forward.' },
+      { name: 'Machine Pec Deck Fly', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=JYmszQs-mRs', tip: 'Contract the chest at the peak. Do not let shoulders rotate forward.' },
       { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=PzsMitRdI_8', tip: 'Keep arms slightly bent. Lift with your elbows.' },
-      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Perform with controlled speed. Do not throw the weight.' },
-      { name: 'Tricep Pushdown', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Keep elbows locked at your side. Full range of motion.' },
-      { name: 'Overhead Rope Extension', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Stretch triceps at the bottom, brace core.' }
+      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=P6-N-VGCVxk', tip: 'Perform with controlled speed. Do not throw the weight.' },
+      { name: 'Tricep Pushdown (rope)', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=-zLyUAo1gMw', tip: 'Keep elbows locked at your side. Full range of motion.' },
+      { name: 'Overhead Rope Extension', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=1657VVZi0Ms', tip: 'Stretch triceps at the bottom, brace core.' }
     ]
   },
   pull_1: {
@@ -26,14 +26,14 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '300 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Wide-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=CAwf7n6Luuc', tip: 'Pull down to upper chest, squeeze shoulder blades.' },
-      { name: 'Close-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=8d22D_B0UeM', tip: 'Pull down focusing on lower lats activation.' },
-      { name: 'Seated Cable Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Keep back flat. Do not swing your upper body.' },
-      { name: 'Wide-Grip Row', reps: '3x8', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Target upper back thickness. Pull with elbows wide.' },
-      { name: 'Lat Pullover Machine', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=QdD8Jv2h_6U', tip: 'Isolate lats. Keep arms locked and control the stretch.' },
-      { name: 'Preacher Curl', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Keep armpits locked against pad. Focus on bicep peak.' },
-      { name: 'Incline Dumbbell Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Curl with palms facing up, control the eccentric phase.' },
-      { name: 'Hammer Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Target brachialis. Palms facing each other throughout.' }
+      { name: 'Wide-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=8hzVLzu-RJk', tip: 'Pull down to upper chest, squeeze shoulder blades.' },
+      { name: 'Close-Grip Lat Pulldown', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=8hzVLzu-RJk', tip: 'Pull down focusing on lower lats activation.' },
+      { name: 'Seated Cable Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=vwHG9Jfu4sw', tip: 'Keep back flat. Do not swing your upper body.' },
+      { name: 'Wide-Grip Row', reps: '3x8', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=1nRP8S_O6l0', tip: 'Target upper back thickness. Pull with elbows wide.' },
+      { name: 'Lat Pullover Machine', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=32auHIqgEoM', tip: 'Isolate lats. Keep arms locked and control the stretch.' },
+      { name: 'Preacher Curl', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=Gydpcouclx8', tip: 'Keep armpits locked against pad. Focus on bicep peak.' },
+      { name: 'Incline Dumbbell Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=HhHHBj3qTJ4', tip: 'Curl with palms facing up, control the eccentric phase.' },
+      { name: 'Hammer Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=BRVDS6HVR9Q', tip: 'Target brachialis. Palms facing each other throughout.' }
     ]
   },
   legs_1: {
@@ -43,13 +43,13 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '420 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Hack Squat', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=0p3_N1YvP0E', tip: 'Go deep, control speed, keep heels flat on platform.' },
-      { name: 'Leg Press', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=IZxyjW7MPJQ', tip: 'Do not lock out knees. Keep feet shoulder-width apart.' },
-      { name: 'Leg Extension', reps: '12-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=YyvSfV9Qp60', tip: 'Pause at the top extension to maximize quad loading.' },
-      { name: 'Dumbbell Romanian Deadlift', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=JGrD4N-_s44', tip: 'Push hips back. Lower weight along shins, protect lower back.' },
-      { name: 'Seated Leg Curl', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=Orxowest56U', tip: 'Flex hamstrings fully at the bottom. Hold for a split second.' },
-      { name: 'Standing Calf Raise', reps: '12-20', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=N38e_lE9e08', tip: 'Full range of motion. Go up on tiptoes, stretch down.' },
-      { name: 'Seated Leg Raise', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=HbbOplfPjB0', tip: 'Brace core, lift legs without shifting weight.' }
+      { name: 'Hack Squat', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=0tn5K9NlCfo', tip: 'Go deep, control speed, keep heels flat on platform.' },
+      { name: 'Leg Press', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=ETOAyWM6i6A', tip: 'Do not lock out knees. Keep feet shoulder-width apart.' },
+      { name: 'Leg Extension', reps: '12-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=swZQC689o9U', tip: 'Pause at the top extension to maximize quad loading.' },
+      { name: 'Dumbbell Romanian Deadlift', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=hQgFixeXdZo', tip: 'Push hips back. Lower weight along shins, protect lower back.' },
+      { name: 'Seated Leg Curl', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=IOufFLwNOTU', tip: 'Flex hamstrings fully at the bottom. Hold for a split second.' },
+      { name: 'Standing Calf Raise', reps: '12-20', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=SRUtMJ0tE2A', tip: 'Full range of motion. Go up on tiptoes, stretch down.' },
+      { name: 'Seated Leg Raise', reps: '10-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=l4kQd9eWclE', tip: 'Brace core, lift legs without shifting weight.' }
     ]
   },
   upper_1: {
@@ -59,17 +59,17 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
     calories: '380 kcal',
     difficulty: 'Beginner',
     exercises: [
-      { name: 'Incline Machine Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'Focus on upper chest muscle tension. Squeeze at peak.' },
+      { name: 'Incline Machine Press', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=VesHgJR14E8', tip: 'Focus on upper chest muscle tension. Squeeze at peak.' },
       { name: 'Machine Chest Press', reps: '8-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=pLofEAcfsO8', tip: 'Maintain a stable trunk. Retract shoulders.' },
-      { name: 'Assisted Pull-Up', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=eGo4IYtl4jO', tip: 'Pull chest to bar. Control descent fully.' },
-      { name: 'Chest-Supported Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=GZBFZst_kXg', tip: 'Keep chest glued to support. Squeeze middle back.' },
-      { name: 'Lat Pullover Machine', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=QdD8Jv2h_6U', tip: 'Slow stretch at the top. Drive down with elbows.' },
+      { name: 'Assisted Pull-Up', reps: '6-10', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=gx0RWT7WbmA', tip: 'Pull chest to bar. Control descent fully.' },
+      { name: 'Chest-Supported Row', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=vmX58YYK3-8', tip: 'Keep chest glued to support. Squeeze middle back.' },
+      { name: 'Lat Pullover Machine', reps: '10-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=32auHIqgEoM', tip: 'Slow stretch at the top. Drive down with elbows.' },
       { name: 'Dumbbell Lateral Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=PzsMitRdI_8', tip: 'Keep shoulders down. Isolate lateral deltoids.' },
-      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=4zV2Q1B5v6g', tip: 'Focus rear shoulders. Do not use momentum.' },
-      { name: 'Preacher Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Strict arm curls on preacher pad.' },
-      { name: 'Cable Curl', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=fIWP-FRFNU0', tip: 'Constant bicep tension throughout the motion.' },
-      { name: 'Rope Pushdown', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Flare rope outward at full extension.' },
-      { name: 'Overhead Cable Extension', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=2-LAMcpzODU', tip: 'Extend fully to load triceps long head.' }
+      { name: 'Reverse Pec Deck', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=P6-N-VGCVxk', tip: 'Focus rear shoulders. Do not use momentum.' },
+      { name: 'Preacher Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=Gydpcouclx8', tip: 'Strict arm curls on preacher pad.' },
+      { name: 'Cable Curl', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=NFzTWp2qpiE', tip: 'Constant bicep tension throughout the motion.' },
+      { name: 'Rope Pushdown', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=qHDrQglWgS4', tip: 'Flare rope outward at full extension.' },
+      { name: 'Overhead Cable Extension', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=1657VVZi0Ms', tip: 'Extend fully to load triceps long head.' }
     ]
   }
 };

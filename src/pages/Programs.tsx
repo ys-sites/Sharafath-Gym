@@ -113,8 +113,8 @@ export default function Programs() {
                   <img 
                     src={
                       program.id === 'push_1' ? 'https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg' :
-                      program.id === 'pull_1' ? 'https://img.youtube.com/vi/CAwf7n6Luuc/hqdefault.jpg' :
-                      program.id === 'legs_1' ? 'https://img.youtube.com/vi/0p3_N1YvP0E/hqdefault.jpg' :
+                      program.id === 'pull_1' ? 'https://img.youtube.com/vi/8hzVLzu-RJk/hqdefault.jpg' :
+                      program.id === 'legs_1' ? 'https://img.youtube.com/vi/0tn5K9NlCfo/hqdefault.jpg' :
                       'https://img.youtube.com/vi/rxD321l2svE/hqdefault.jpg'
                     } 
                     alt={program.name} 
