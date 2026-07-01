@@ -11,6 +11,7 @@ import WorkoutDetail from './pages/WorkoutDetail';
 import ActiveWorkout from './pages/ActiveWorkout';
 import GenerateWorkout from './pages/GenerateWorkout';
 import { supabase } from './lib/supabase';
+import { SessionResponseSchema } from './lib/zodSchemas';
 
 export default function App() {
   // Sign in silently in background — never block rendering
@@ -26,12 +27,15 @@ export default function App() {
         if (!res.ok) {
           throw new Error(`Failed to fetch session: status ${res.status}`);
         }
-        const data = await res.json();
-        if (data.access_token && data.refresh_token) {
+        const rawData = await res.json();
+        const parsed = SessionResponseSchema.safeParse(rawData);
+        if (parsed.success) {
           await supabase.auth.setSession({
-            access_token: data.access_token,
-            refresh_token: data.refresh_token,
+            access_token: parsed.data.access_token,
+            refresh_token: parsed.data.refresh_token,
           });
+        } else {
+          console.warn('Session response validation failed:', parsed.error);
         }
       } catch (err) {
         console.error('Session establishment error:', err);

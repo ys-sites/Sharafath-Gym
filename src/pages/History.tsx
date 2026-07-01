@@ -1,35 +1,28 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Clock, Calendar, ChevronRight, MoreVertical, Flame, Scale, Activity } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { WorkoutSession } from '../types';
 
 export default function History() {
-  const [sessions, setSessions] = useState<WorkoutSession[]>([]);
-  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<'daily'|'calendar'>('daily');
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
-    if (!supabase) return;
-    try {
+  const { data: sessions = [], isLoading: loading } = useQuery({
+    queryKey: ['workoutSessions'],
+    queryFn: async () => {
+      if (!supabase) return [];
       const { data, error } = await supabase
         .from('workout_sessions')
         .select('*')
         .order('created_at', { ascending: false });
-        
       if (error) throw error;
-      setSessions(data || []);
-    } catch (err) {
-      console.error('Error fetching history:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data || [];
+    },
+    staleTime: 30000,
+    retry: 1,
+  });
 
   const formatDuration = (seconds: number) => {
     const m = Math.floor(seconds / 60);

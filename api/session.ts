@@ -1,5 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import * as Sentry from "@sentry/node";
+
+const sentryDsn = process.env.SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    tracesSampleRate: 1.0,
+  });
+}
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 10;
@@ -42,7 +51,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const ownerPassword = process.env.OWNER_PASSWORD;
 
   if (!supabaseUrl || !supabaseAnonKey || !ownerEmail || !ownerPassword) {
-    console.error("Session error: missing required environment variables");
+    const err = new Error("Session error: missing required environment variables");
+    console.error(err.message);
+    if (sentryDsn) {
+      Sentry.captureException(err);
+    }
     return res.status(500).json({ error: "Unable to establish session" });
   }
 
@@ -57,7 +70,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (error || !data.session) {
-      console.error("Session error:", error?.message);
+      const err = new Error(error?.message || "Unable to establish session: no session returned");
+      console.error("Session error:", err.message);
+      if (sentryDsn) {
+        Sentry.captureException(err);
+      }
       return res.status(500).json({ error: "Unable to establish session" });
     }
 
@@ -67,6 +84,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (err) {
     console.error("Session error:", err);
+    if (sentryDsn) {
+      Sentry.captureException(err);
+    }
     return res.status(500).json({ error: "Unable to establish session" });
   }
 }

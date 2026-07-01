@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import * as Sentry from "@sentry/node";
 import {
   analyzeMeal,
   extractUserIdFromAuthHeader,
@@ -8,6 +9,14 @@ import {
   MealAnalysisValidationError,
   type AnalyzeMealInput,
 } from "../src/server/mealAnalysis";
+
+const sentryDsn = process.env.SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    tracesSampleRate: 1.0,
+  });
+}
 
 function getServiceClient() {
   const url = process.env.VITE_SUPABASE_URL;
@@ -72,6 +81,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("Meal analysis failed:", message);
+    if (sentryDsn) {
+      Sentry.captureException(err);
+    }
 
     if (err instanceof MealAnalysisConfigError) {
       await logScan({ userId, inputType, rawResponse: null, success: false, errorMessage: message, provider: null });

@@ -2,6 +2,7 @@ import { Play, TrendingUp, Bell, ChevronRight, Dumbbell, Heart, Activity, Drople
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTodayMetrics, getDailySeries } from '../lib/health';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 
@@ -15,61 +16,120 @@ export default function Home() {
     image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=600",
   };
 
-  const [todaySteps, setTodaySteps] = useState(0);
-  const [todayCalories, setTodayCalories] = useState(0);
-  const [chartData, setChartData] = useState<any[]>([]);
-  const [hasHealthData, setHasHealthData] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // Water tracking states
-  const [waterGoal, setWaterGoal] = useState(2500);
-  const [todayWater, setTodayWater] = useState(0);
-  const [lastWaterLogId, setLastWaterLogId] = useState<string | null>(null);
+  // 1. Fetch User Query
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const res = await supabase.auth.getUser();
+      return res.data.user;
+    },
+    staleTime: Infinity,
+  });
 
-  const fetchWaterData = async (userId: string) => {
-    if (!supabase) return;
-    try {
+  // 2. Fetch Health Data Query
+  const { data: healthData, isLoading: isHealthLoading } = useQuery({
+    queryKey: ['healthData', user?.id],
+    queryFn: async () => {
+      if (!user) return { hasHealthData: false, todaySteps: 0, todayCalories: 0, chartData: [] };
+
+      const todayObj = await getTodayMetrics(user.id);
+      const stepsData = await getDailySeries(user.id, 'steps', 14);
+      const energyData = await getDailySeries(user.id, 'active_energy', 14);
+
+      const hasSteps = stepsData.length > 0;
+      const hasEnergy = energyData.length > 0;
+      const hasToday = Object.keys(todayObj).length > 0;
+
+      if (hasSteps || hasEnergy || hasToday) {
+        const dateMap = new Map<string, { dateLabel: string; steps: number; calories: number }>();
+        for (let i = 13; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const key = d.toISOString().substring(0, 10);
+          const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          dateMap.set(key, { dateLabel: label, steps: 0, calories: 0 });
+        }
+
+        for (const s of stepsData) {
+          const key = s.day.substring(0, 10);
+          const existing = dateMap.get(key);
+          if (existing) {
+            existing.steps = Math.round(s.value);
+          }
+        }
+
+        for (const e of energyData) {
+          const key = e.day.substring(0, 10);
+          const existing = dateMap.get(key);
+          if (existing) {
+            existing.calories = Math.round(e.value);
+          }
+        }
+
+        return {
+          hasHealthData: true,
+          todaySteps: todayObj.steps || 0,
+          todayCalories: todayObj.active_energy || 0,
+          chartData: Array.from(dateMap.values())
+        };
+      }
+
+      return {
+        hasHealthData: false,
+        todaySteps: 0,
+        todayCalories: 0,
+        chartData: []
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
+
+  // 3. Fetch Water Data Query
+  const { data: waterData, isLoading: isWaterLoading } = useQuery({
+    queryKey: ['waterData', user?.id],
+    queryFn: async () => {
+      if (!user) return { waterGoal: 2500, todayWater: 0, lastWaterLogId: null };
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('water_goal_ml')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .maybeSingle();
-      if (profile && profile.water_goal_ml) {
-        setWaterGoal(profile.water_goal_ml);
-      }
+
+      const goal = profile?.water_goal_ml || 2500;
 
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
 
-      const { data: logs, error } = await supabase
+      const { data: logs } = await supabase
         .from('water_logs')
         .select('id, amount_ml')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .gte('logged_at', startOfDay.toISOString())
         .order('logged_at', { ascending: false });
 
-      if (error) throw error;
+      const total = logs ? logs.reduce((sum, item) => sum + item.amount_ml, 0) : 0;
+      const lastId = logs && logs.length > 0 ? logs[0].id : null;
 
-      if (logs) {
-        const total = logs.reduce((sum, item) => sum + item.amount_ml, 0);
-        setTodayWater(total);
-        if (logs.length > 0) {
-          setLastWaterLogId(logs[0].id);
-        } else {
-          setLastWaterLogId(null);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching water data:', err);
-    }
-  };
+      return {
+        waterGoal: goal,
+        todayWater: total,
+        lastWaterLogId: lastId
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
 
-  const handleAddWater = async (amount: number) => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-
+  // 4. Mutations
+  const addWaterMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      if (!user) throw new Error('No user authenticated');
       const { data, error } = await supabase
         .from('water_logs')
         .insert({
@@ -78,107 +138,47 @@ export default function Home() {
         })
         .select()
         .single();
-
       if (error) throw error;
-      
-      setTodayWater(prev => prev + amount);
-      if (data) {
-        setLastWaterLogId(data.id);
-      }
-    } catch (err) {
-      console.error('Error adding water:', err);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waterData', user?.id] });
     }
-  };
+  });
 
-  const handleUndoWater = async () => {
-    if (!supabase || !lastWaterLogId) return;
-    try {
+  const undoWaterMutation = useMutation({
+    mutationFn: async (logId: string) => {
       const { error } = await supabase
         .from('water_logs')
         .delete()
-        .eq('id', lastWaterLogId);
-
+        .eq('id', logId);
       if (error) throw error;
-
-      const user = (await supabase.auth.getUser()).data.user;
-      if (user) {
-        await fetchWaterData(user.id);
-      }
-    } catch (err) {
-      console.error('Error undoing water:', err);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['waterData', user?.id] });
     }
+  });
+
+  // Derived state values
+  const todaySteps = healthData?.todaySteps || 0;
+  const todayCalories = healthData?.todayCalories || 0;
+  const chartData = healthData?.chartData || [];
+  const hasHealthData = healthData?.hasHealthData || false;
+  const loading = isHealthLoading || isWaterLoading;
+
+  const waterGoal = waterData?.waterGoal || 2500;
+  const todayWater = waterData?.todayWater || 0;
+  const lastWaterLogId = waterData?.lastWaterLogId || null;
+
+  const handleAddWater = (amount: number) => {
+    addWaterMutation.mutate(amount);
   };
 
-  useEffect(() => {
-    let active = true;
-    const loadHealthData = async () => {
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const user = (await supabase.auth.getUser()).data.user;
-        if (!user) {
-          if (active) setLoading(false);
-          return;
-        }
-
-        fetchWaterData(user.id);
-
-        const todayObj = await getTodayMetrics(user.id);
-        const stepsData = await getDailySeries(user.id, 'steps', 14);
-        const energyData = await getDailySeries(user.id, 'active_energy', 14);
-
-        if (!active) return;
-
-        const hasSteps = stepsData.length > 0;
-        const hasEnergy = energyData.length > 0;
-        const hasToday = Object.keys(todayObj).length > 0;
-
-        if (hasSteps || hasEnergy || hasToday) {
-          setHasHealthData(true);
-          setTodaySteps(todayObj.steps || 0);
-          setTodayCalories(todayObj.active_energy || 0);
-
-          const dateMap = new Map<string, { dateLabel: string; steps: number; calories: number }>();
-          for (let i = 13; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const key = d.toISOString().substring(0, 10);
-            const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            dateMap.set(key, { dateLabel: label, steps: 0, calories: 0 });
-          }
-
-          for (const s of stepsData) {
-            const key = s.day.substring(0, 10);
-            const existing = dateMap.get(key);
-            if (existing) {
-              existing.steps = Math.round(s.value);
-            }
-          }
-
-          for (const e of energyData) {
-            const key = e.day.substring(0, 10);
-            const existing = dateMap.get(key);
-            if (existing) {
-              existing.calories = Math.round(e.value);
-            }
-          }
-
-          setChartData(Array.from(dateMap.values()));
-        } else {
-          setHasHealthData(false);
-        }
-      } catch (err) {
-        console.error('Error fetching health data:', err);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    loadHealthData();
-    return () => { active = false; };
-  }, []);
+  const handleUndoWater = () => {
+    if (lastWaterLogId) {
+      undoWaterMutation.mutate(lastWaterLogId);
+    }
+  };
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
 

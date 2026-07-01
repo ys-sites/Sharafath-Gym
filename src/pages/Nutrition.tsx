@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, subDays, isSameDay, startOfDay, endOfDay } from 'date-fns';
 import { 
   Plus, ChevronLeft, Calendar, Flame, X, Camera, 
@@ -44,19 +45,6 @@ function ShallowArc({ value, max }: { value: number; max: number }) {
 export default function Nutrition() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [meals, setMeals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loggedDays, setLoggedDays] = useState<Record<string, boolean>>({});
-
-  // Targets state loaded from Profiles
-  const [targets, setTargets] = useState({
-    calories: 2200,
-    protein: 160,
-    carbs: 300,
-    fats: 60
-  });
-
-  const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fats: 0 });
 
   // Favorites & Recent Meals
   const [activeTab, setActiveTab] = useState<'recent' | 'favorites'>('recent');
@@ -64,7 +52,6 @@ export default function Nutrition() {
     const saved = localStorage.getItem('favorite_meals');
     return saved ? JSON.parse(saved) : [];
   });
-  const [recentMeals, setRecentMeals] = useState<any[]>([]);
 
   // Manual Food Entry Form State
   const [showManualForm, setShowManualForm] = useState(false);
@@ -79,69 +66,78 @@ export default function Nutrition() {
   // Meal Detail Modal State
   const [activeMealDetail, setActiveMealDetail] = useState<any | null>(null);
 
-  // Targets loader
-  const fetchTargets = async () => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-      
-      const { data, error } = await supabase
+  const queryClient = useQueryClient();
+
+  // 1. Fetch User Query
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const res = await supabase.auth.getUser();
+      return res.data.user;
+    },
+    staleTime: Infinity,
+  });
+
+  // 2. Fetch targets query
+  const { data: targetsData } = useQuery({
+    queryKey: ['nutritionTargets', user?.id],
+    queryFn: async () => {
+      if (!user) return { calories: 2200, protein: 160, carbs: 300, fats: 60 };
+      const { data } = await supabase
         .from('profiles')
         .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g')
         .eq('user_id', user.id)
         .single();
-        
-      if (data) {
-        setTargets({
-          calories: data.daily_calorie_target || 2200,
-          protein: data.protein_target_g || 160,
-          carbs: data.carbs_target_g || 300,
-          fats: data.fats_target_g || 60
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      return {
+        calories: data?.daily_calorie_target || 2200,
+        protein: data?.protein_target_g || 160,
+        carbs: data?.carbs_target_g || 300,
+        fats: data?.fats_target_g || 60
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
 
-  // 7-Day Indicators
-  const fetchWeekLogs = async () => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
+  const targets = targetsData || { calories: 2200, protein: 160, carbs: 300, fats: 60 };
 
+  // 3. Fetch Week Logs Query
+  const { data: loggedDaysData } = useQuery({
+    queryKey: ['weekLogs', user?.id],
+    queryFn: async () => {
+      if (!user) return {};
       const startOfWeek = subDays(new Date(), 6);
       startOfWeek.setHours(0, 0, 0, 0);
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('meals')
         .select('logged_at')
         .eq('user_id', user.id)
         .gte('logged_at', startOfWeek.toISOString());
 
+      const logMap: Record<string, boolean> = {};
       if (data) {
-        const logMap: Record<string, boolean> = {};
         data.forEach(meal => {
           const dateStr = format(new Date(meal.logged_at), 'yyyy-MM-dd');
           logMap[dateStr] = true;
         });
-        setLoggedDays(logMap);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      return logMap;
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
 
-  // Recent meals
-  const fetchRecentMeals = async () => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
+  const loggedDays = loggedDaysData || {};
 
-      const { data, error } = await supabase
+  // 4. Fetch Recent Meals Query
+  const { data: recentMealsData } = useQuery({
+    queryKey: ['recentMeals', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase
         .from('meals')
         .select(`
           id, meal_type, logged_at, photo_url,
@@ -150,20 +146,20 @@ export default function Nutrition() {
         .eq('user_id', user.id)
         .order('logged_at', { ascending: false })
         .limit(5);
+      return data || [];
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
 
-      if (data) {
-        setRecentMeals(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const recentMeals = recentMealsData || [];
 
-  const fetchMeals = async () => {
-    if (!supabase) return;
-    setLoading(true);
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
+  // 5. Fetch Today's Meals Query
+  const { data: mealsData, isLoading: loading } = useQuery({
+    queryKey: ['meals', user?.id, selectedDate.toISOString()],
+    queryFn: async () => {
+      if (!user) return { meals: [], totals: { calories: 0, protein: 0, carbs: 0, fats: 0 } };
       
       const start = startOfDay(selectedDate);
       const end = endOfDay(selectedDate);
@@ -174,14 +170,12 @@ export default function Nutrition() {
           id, meal_type, logged_at, photo_url,
           meal_items ( id, name, portion, calories, protein_g, carbs_g, fats_g )
         `)
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .gte('logged_at', start.toISOString())
         .lte('logged_at', end.toISOString())
         .order('logged_at', { ascending: true });
 
       if (error) throw error;
-      
-      setMeals(data || []);
       
       let cal = 0, pro = 0, car = 0, fat = 0;
       data?.forEach(meal => {
@@ -192,70 +186,143 @@ export default function Nutrition() {
           fat += item.fats_g || 0;
         });
       });
-      setTotals({ calories: Math.round(cal), protein: Math.round(pro), carbs: Math.round(car), fats: Math.round(fat) });
+
+      return {
+        meals: data || [],
+        totals: { calories: Math.round(cal), protein: Math.round(pro), carbs: Math.round(car), fats: Math.round(fat) }
+      };
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
+
+  const meals = mealsData?.meals || [];
+  const totals = mealsData?.totals || { calories: 0, protein: 0, carbs: 0, fats: 0 };
+
+  const deleteMealItemMutation = useMutation({
+    mutationFn: async ({ itemId, mealId, isLast }: { itemId: string; mealId: string; isLast: boolean }) => {
+      const { error } = await supabase
+        .from('meal_items')
+        .delete()
+        .eq('id', itemId);
+      if (error) throw error;
+
+      if (isLast) {
+        const { error: mError } = await supabase.from('meals').delete().eq('id', mealId);
+        if (mError) throw mError;
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['weekLogs'] });
+      queryClient.invalidateQueries({ queryKey: ['recentMeals'] });
       
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+      if (variables.isLast) {
+        setActiveMealDetail(null);
+      } else {
+        if (activeMealDetail) {
+          setActiveMealDetail({
+            ...activeMealDetail,
+            meal_items: activeMealDetail.meal_items.filter((i: any) => i.id !== variables.itemId)
+          });
+        }
+      }
     }
-  };
+  });
 
-  useEffect(() => {
-    fetchTargets();
-    fetchWeekLogs();
-    fetchRecentMeals();
-  }, []);
+  const deleteMealMutation = useMutation({
+    mutationFn: async (mealId: string) => {
+      const { error } = await supabase
+        .from('meals')
+        .delete()
+        .eq('id', mealId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['weekLogs'] });
+      queryClient.invalidateQueries({ queryKey: ['recentMeals'] });
+      setActiveMealDetail(null);
+    }
+  });
 
-  useEffect(() => {
-    fetchMeals();
-  }, [selectedDate]);
+  const updateMealItemMutation = useMutation({
+    mutationFn: async ({ itemId, field, value }: { itemId: string; field: string; value: any }) => {
+      const { error } = await supabase
+        .from('meal_items')
+        .update({ [field]: value })
+        .eq('id', itemId);
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['recentMeals'] });
+      if (activeMealDetail) {
+        setActiveMealDetail({
+          ...activeMealDetail,
+          meal_items: activeMealDetail.meal_items.map((i: any) => 
+            i.id === variables.itemId ? { ...i, [variables.field]: variables.value } : i
+          )
+        });
+      }
+    }
+  });
 
-  // Re-log shortcut
-  const reLogMeal = async (meal: any) => {
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-
-      const { data: newMeal, error: mealError } = await supabase
+  const addManualMealMutation = useMutation({
+    mutationFn: async (payload: { meal_type: string; items: any[] }) => {
+      if (!user) throw new Error('No user authenticated');
+      
+      const { data: mealData, error: mealError } = await supabase
         .from('meals')
         .insert({
           user_id: user.id,
-          meal_type: meal.meal_type || 'snack',
-          logged_at: selectedDate.toISOString(),
-          photo_url: meal.photo_url
+          meal_type: payload.meal_type,
+          logged_at: selectedDate.toISOString()
         })
         .select()
         .single();
 
       if (mealError) throw mealError;
 
-      const itemsToInsert = meal.meal_items.map((item: any) => ({
-        meal_id: newMeal.id,
+      const itemsToInsert = payload.items.map(item => ({
+        meal_id: mealData.id,
+        name: item.name,
+        portion: item.portion,
+        calories: Number(item.calories) || 0,
+        protein_g: Number(item.protein_g) || 0,
+        carbs_g: Number(item.carbs_g) || 0,
+        fats_g: Number(item.fats_g) || 0
+      }));
+
+      const { error: itemError } = await supabase
+        .from('meal_items')
+        .insert(itemsToInsert);
+
+      if (itemError) throw itemError;
+      return mealData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['weekLogs'] });
+      queryClient.invalidateQueries({ queryKey: ['recentMeals'] });
+    }
+  });
+
+  const reLogMeal = (meal: any) => {
+    addManualMealMutation.mutate({
+      meal_type: meal.meal_type || 'snack',
+      items: meal.meal_items.map((item: any) => ({
         name: item.name,
         portion: item.portion || '1 serving',
         calories: item.calories || 0,
         protein_g: item.protein_g || 0,
         carbs_g: item.carbs_g || 0,
         fats_g: item.fats_g || 0
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('meal_items')
-        .insert(itemsToInsert);
-
-      if (itemsError) throw itemsError;
-
-      fetchMeals();
-      fetchWeekLogs();
-      fetchRecentMeals();
-    } catch (err) {
-      console.error(err);
-    }
+      }))
+    });
   };
 
-  // Star Toggle
   const toggleFavorite = (meal: any) => {
     let newFavs = [...favorites];
     const isFav = favorites.some(f => f.id === meal.id);
@@ -273,124 +340,47 @@ export default function Nutrition() {
     localStorage.setItem('favorite_meals', JSON.stringify(newFavs));
   };
 
-  // In-place edits & Deletions
-  const handleUpdateMealItem = async (itemId: string, field: string, value: any) => {
-    if (!supabase) return;
-    try {
-      const updatedItems = activeMealDetail.meal_items.map((i: any) => 
-        i.id === itemId ? { ...i, [field]: value } : i
-      );
-      
-      setActiveMealDetail({
-        ...activeMealDetail,
-        meal_items: updatedItems
-      });
-
-      const { error } = await supabase
-        .from('meal_items')
-        .update({ [field]: value })
-        .eq('id', itemId);
-
-      if (error) throw error;
-      fetchMeals();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleUpdateMealItem = (itemId: string, field: string, value: any) => {
+    updateMealItemMutation.mutate({ itemId, field, value });
   };
 
-  const handleDeleteMealItem = async (itemId: string) => {
-    if (!supabase) return;
-    try {
-      const { error } = await supabase
-        .from('meal_items')
-        .delete()
-        .eq('id', itemId);
-
-      if (error) throw error;
-
-      const remainingItems = activeMealDetail.meal_items.filter((i: any) => i.id !== itemId);
-      
-      if (remainingItems.length === 0) {
-        await supabase.from('meals').delete().eq('id', activeMealDetail.id);
-        setActiveMealDetail(null);
-      } else {
-        setActiveMealDetail({
-          ...activeMealDetail,
-          meal_items: remainingItems
-        });
-      }
-      
-      fetchMeals();
-      fetchWeekLogs();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleDeleteMealItem = (itemId: string) => {
+    if (!activeMealDetail) return;
+    const remainingItems = activeMealDetail.meal_items.filter((i: any) => i.id !== itemId);
+    deleteMealItemMutation.mutate({
+      itemId,
+      mealId: activeMealDetail.id,
+      isLast: remainingItems.length === 0
+    });
   };
 
-  const handleDeleteMeal = async (mealId: string) => {
-    if (!supabase) return;
-    try {
-      const { error } = await supabase
-        .from('meals')
-        .delete()
-        .eq('id', mealId);
-
-      if (error) throw error;
-      setActiveMealDetail(null);
-      fetchMeals();
-      fetchWeekLogs();
-    } catch (err) {
-      console.error(err);
-    }
+  const handleDeleteMeal = (mealId: string) => {
+    deleteMealMutation.mutate(mealId);
   };
 
-  const handleManualSave = async (e: React.FormEvent) => {
+  const handleManualSave = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!supabase) return;
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-
-      const { data: mealData, error: mealError } = await supabase
-        .from('meals')
-        .insert({
-          user_id: user.id,
-          meal_type: manualMealType,
-          logged_at: selectedDate.toISOString()
-        })
-        .select()
-        .single();
-
-      if (mealError) throw mealError;
-
-      const { error: itemError } = await supabase
-        .from('meal_items')
-        .insert({
-          meal_id: mealData.id,
-          name: manualName,
-          portion: manualPortion,
-          calories: Number(manualCalories) || 0,
-          protein_g: Number(manualProtein) || 0,
-          carbs_g: Number(manualCarbs) || 0,
-          fats_g: Number(manualFats) || 0
-        });
-
-      if (itemError) throw itemError;
-
-      setManualName('');
-      setManualPortion('1 serving');
-      setManualCalories('');
-      setManualProtein('');
-      setManualCarbs('');
-      setManualFats('');
-      setShowManualForm(false);
-      
-      fetchMeals();
-      fetchWeekLogs();
-      fetchRecentMeals();
-    } catch (err) {
-      console.error(err);
-    }
+    addManualMealMutation.mutate({
+      meal_type: manualMealType,
+      items: [{
+        name: manualName,
+        portion: manualPortion,
+        calories: manualCalories,
+        protein_g: manualProtein,
+        carbs_g: manualCarbs,
+        fats_g: manualFats
+      }]
+    }, {
+      onSuccess: () => {
+        setManualName('');
+        setManualPortion('1 serving');
+        setManualCalories('');
+        setManualProtein('');
+        setManualCarbs('');
+        setManualFats('');
+        setShowManualForm(false);
+      }
+    });
   };
 
   const today = new Date();
@@ -750,9 +740,9 @@ export default function Nutrition() {
           onClose={() => setIsModalOpen(false)} 
           onSave={() => {
             setIsModalOpen(false);
-            fetchMeals();
-            fetchWeekLogs();
-            fetchRecentMeals();
+            queryClient.invalidateQueries({ queryKey: ['meals'] });
+            queryClient.invalidateQueries({ queryKey: ['weekLogs'] });
+            queryClient.invalidateQueries({ queryKey: ['recentMeals'] });
           }} 
         />
       )}

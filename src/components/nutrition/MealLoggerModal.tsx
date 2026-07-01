@@ -2,6 +2,7 @@ import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { Camera, X, Check, ImageIcon, Barcode, Zap } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Html5Qrcode } from 'html5-qrcode';
+import { AIResponseSchema, OFFProductSchema } from '../../lib/zodSchemas';
 
 interface MealLoggerModalProps {
   onClose: () => void;
@@ -91,7 +92,17 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
       const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,serving_size,serving_quantity`);
       if (!res.ok) throw new Error("Product fetch failed");
       const data = await res.json();
-      if (data.status === 0 || !data.product) {
+      
+      const parsed = OFFProductSchema.safeParse(data);
+      if (!parsed.success) {
+        setBarcodeScanError("Failed to parse response from Open Food Facts.");
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const verifiedData = parsed.data;
+
+      if (verifiedData.status === 0 || !verifiedData.product) {
         setScannedProduct({
           barcode,
           notFound: true,
@@ -106,7 +117,7 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
         });
         setAmountEaten(100);
       } else {
-        const prod = data.product;
+        const prod = verifiedData.product;
         const nutriments = prod.nutriments || {};
         
         const calories100g = Number(nutriments['energy-kcal_100g'] ?? nutriments['energy-kcal'] ?? 0);
@@ -303,7 +314,14 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
       }
 
       const data = await response.json();
-      setAnalysisResult(data);
+      const parsed = AIResponseSchema.safeParse(data);
+      if (parsed.success) {
+        setAnalysisResult(parsed.data);
+      } else {
+        console.warn('AI Analysis Zod validation failed:', parsed.error);
+        setError("Couldn't read the analysis — retry");
+        setAnalysisResult(null);
+      }
     } catch (err: any) {
       console.error("Gemini analysis error:", err);
       setError("Couldn't analyze this photo — try again or enter it manually.");
@@ -349,26 +367,33 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
 
       if (!response.ok) throw new Error('Recalculation failed');
       const data = await response.json();
-      const updatedItem = data.items?.[0];
+      
+      const parsed = AIResponseSchema.safeParse(data);
+      if (parsed.success) {
+        const updatedItem = parsed.data.items?.[0];
 
-      if (updatedItem) {
-        const newItems = [...analysisResult.items];
-        newItems[index] = {
-          ...newItems[index],
-          calories: Number(updatedItem.calories) || 0,
-          protein: Number(updatedItem.protein) || 0,
-          carbs: Number(updatedItem.carbs) || 0,
-          fats: Number(updatedItem.fats) || 0
-        };
+        if (updatedItem) {
+          const newItems = [...analysisResult.items];
+          newItems[index] = {
+            ...newItems[index],
+            calories: Number(updatedItem.calories) || 0,
+            protein: Number(updatedItem.protein) || 0,
+            carbs: Number(updatedItem.carbs) || 0,
+            fats: Number(updatedItem.fats) || 0
+          };
 
-        const newTotal = newItems.reduce((acc, it) => ({
-          calories: acc.calories + (Number(it.calories) || 0),
-          protein: acc.protein + (Number(it.protein) || 0),
-          carbs: acc.carbs + (Number(it.carbs) || 0),
-          fats: acc.fats + (Number(it.fats) || 0)
-        }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+          const newTotal = newItems.reduce((acc, it) => ({
+            calories: acc.calories + (Number(it.calories) || 0),
+            protein: acc.protein + (Number(it.protein) || 0),
+            carbs: acc.carbs + (Number(it.carbs) || 0),
+            fats: acc.fats + (Number(it.fats) || 0)
+          }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
 
-        setAnalysisResult({ ...analysisResult, items: newItems, total: newTotal });
+          setAnalysisResult({ ...analysisResult, items: newItems, total: newTotal });
+        }
+      } else {
+        console.warn('AI Recalculation Zod validation failed:', parsed.error);
+        alert('Failed to parse recalculated macros. Please enter manually.');
       }
     } catch (err) {
       console.error(err);

@@ -47,6 +47,7 @@ const MOCK_LIBRARY = [
   { id: 'ex20', name: 'Seated Leg Curl', youtube_url: 'https://www.youtube.com/watch?v=IOufFLwNOTU' },
   { id: 'ex21', name: 'Standing Calf Raise', youtube_url: 'https://www.youtube.com/watch?v=SRUtMJ0tE2A' },
   { id: 'ex22', name: 'Seated Leg Raises', youtube_url: 'https://www.youtube.com/watch?v=l4kQd9eWclE' },
+  { id: 'ex_treadmill', name: 'Treadmill', youtube_url: 'https://www.youtube.com/watch?v=8i3VgdTxQGg' },
 ];
 
 export default function WorkoutLogger() {
@@ -252,8 +253,8 @@ export default function WorkoutLogger() {
                   {/* Headers */}
                   <div className="grid grid-cols-[30px_1fr_1fr_40px] gap-2 px-2 text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 text-center">
                     <div>Set</div>
-                    <div>lbs</div>
-                    <div>Reps</div>
+                    <div>{ex.name.toLowerCase().includes('treadmill') ? 'Speed (km/h)' : 'lbs'}</div>
+                    <div>{ex.name.toLowerCase().includes('treadmill') ? 'Elev (%)' : 'Reps'}</div>
                     <div><Check size={14} className="mx-auto" /></div>
                   </div>
 
@@ -273,6 +274,7 @@ export default function WorkoutLogger() {
                         <div>
                           <input 
                             type="number" 
+                            step="any"
                             inputMode="decimal"
                             value={set.weight}
                             onChange={(e) => updateSet(ex.id, set.id, 'weight', e.target.value)}
@@ -281,13 +283,14 @@ export default function WorkoutLogger() {
                               "w-full bg-neutral-800 rounded px-2 py-1.5 text-center font-bold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors",
                               set.completed && "bg-transparent text-green-500"
                             )}
-                            placeholder="-"
+                            placeholder={ex.name.toLowerCase().includes('treadmill') ? '0.0' : '-'}
                           />
                         </div>
                         <div>
                           <input 
                             type="number" 
-                            inputMode="numeric"
+                            step="any"
+                            inputMode="decimal"
                             value={set.reps}
                             onChange={(e) => updateSet(ex.id, set.id, 'reps', e.target.value)}
                             disabled={set.completed}
@@ -295,7 +298,7 @@ export default function WorkoutLogger() {
                               "w-full bg-neutral-800 rounded px-2 py-1.5 text-center font-bold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors",
                               set.completed && "bg-transparent text-green-500"
                             )}
-                            placeholder="-"
+                            placeholder={ex.name.toLowerCase().includes('treadmill') ? '0.0' : '-'}
                           />
                         </div>
                         <button

@@ -1,5 +1,6 @@
 import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart, Copy, ChevronDown, ChevronUp, ExternalLink, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 import { supabase } from '../lib/supabase';
 
@@ -14,88 +15,138 @@ export default function Profile() {
   const [proteinTarget, setProteinTarget] = useState(160);
   const [carbsTarget, setCarbsTarget] = useState(300);
   const [fatsTarget, setFatsTarget] = useState(60);
-  const [loadingTargets, setLoadingTargets] = useState(true);
-  const [savingTargets, setSavingTargets] = useState(false);
   const [message, setMessage] = useState('');
-
-  const [isAppleHealthConnected, setIsAppleHealthConnected] = useState(() => {
-    const saved = localStorage.getItem('apple_health_connected');
-    return saved === 'true';
-  });
-  const [showHealthKitPermissions, setShowHealthKitPermissions] = useState(false);
-  const [stepsSyncedToday, setStepsSyncedToday] = useState(0);
-  const [caloriesSyncedToday, setCaloriesSyncedToday] = useState(0);
-  const [lastHealthSync, setLastHealthSync] = useState('');
-  const [userId, setUserId] = useState('your-user-id');
-  const [syncToken, setSyncToken] = useState('loading-sync-token...');
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [pingLoading, setPingLoading] = useState(false);
   const [pingResult, setPingResult] = useState<string | null>(null);
   const [isShortcutAccordionOpen, setIsShortcutAccordionOpen] = useState(false);
+  const [showHealthKitPermissions, setShowHealthKitPermissions] = useState(false);
 
-  const formatLastSync = (timestamp: string) => {
-    if (!timestamp) return 'Never synced yet';
-    try {
-      const d = new Date(timestamp);
-      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    } catch (e) {
-      return 'Never synced yet';
-    }
-  };
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const getUid = async () => {
-      if (supabase) {
-        const user = (await supabase.auth.getUser()).data.user;
-        if (user) setUserId(user.id);
+  // 1. Fetch User Query
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const res = await supabase.auth.getUser();
+      return res.data.user;
+    },
+    staleTime: Infinity,
+  });
+
+  // 2. Fetch Profile targets query
+  const { data: profileData, isLoading: loadingTargets } = useQuery({
+    queryKey: ['profileTargets', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      let { data, error } = await supabase
+        .from('profiles')
+        .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token')
+        .eq('user_id', user.id)
+        .single();
+          
+      if (error && error.code === 'PGRST116') {
+        const { data: newProfile } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            daily_calorie_target: 2200,
+            protein_target_g: 160,
+            carbs_target_g: 300,
+            fats_target_g: 60
+          })
+          .select()
+          .single();
+        return newProfile;
       }
-    };
-    getUid();
-  }, []);
+      return data;
+    },
+    enabled: !!user?.id,
+    staleTime: 30000,
+    retry: 1,
+  });
+
+  // Load target inputs once fetched
+  useEffect(() => {
+    if (profileData) {
+      setCalorieTarget(profileData.daily_calorie_target);
+      setProteinTarget(profileData.protein_target_g);
+      setCarbsTarget(profileData.carbs_target_g);
+      setFatsTarget(profileData.fats_target_g);
+    }
+  }, [profileData]);
+
+  // Derived state values
+  const userId = user?.id || 'your-user-id';
+  const syncToken = profileData?.sync_token || 'loading-sync-token...';
+  const isAppleHealthConnected = !!profileData?.apple_health_connected;
+  const stepsSyncedToday = profileData?.steps_synced_today || 0;
+  const caloriesSyncedToday = profileData?.calories_synced_today || 0;
+  const lastHealthSync = profileData?.last_health_sync || '';
+
+  // 3. Mutations
+  const saveTargetsMutation = useMutation({
+    mutationFn: async (targets: { daily_calorie_target: number; protein_target_g: number; carbs_target_g: number; fats_target_g: number }) => {
+      if (!user) throw new Error('No user authenticated');
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          ...targets
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profileTargets', user?.id] });
+      setMessage('Targets saved successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    },
+    onError: () => {
+      setMessage('Failed to save targets.');
+    }
+  });
+
+  const updateAppleHealthMutation = useMutation({
+    mutationFn: async (payload: { apple_health_connected: boolean; steps_synced_today?: number; calories_synced_today?: number; last_health_sync?: string | null }) => {
+      if (!user) throw new Error('No user authenticated');
+      const { error } = await supabase
+        .from('profiles')
+        .update(payload)
+        .eq('user_id', user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profileTargets', user?.id] });
+    }
+  });
+
+  const saveTargets = () => {
+    saveTargetsMutation.mutate({
+      daily_calorie_target: Number(calorieTarget),
+      protein_target_g: Number(proteinTarget),
+      carbs_target_g: Number(carbsTarget),
+      fats_target_g: Number(fatsTarget)
+    });
+  };
 
   const handleConnectAppleHealth = async () => {
     if (isAppleHealthConnected) {
-      setIsAppleHealthConnected(false);
-      localStorage.setItem('apple_health_connected', 'false');
-      setStepsSyncedToday(0);
-      setCaloriesSyncedToday(0);
-      setLastHealthSync('');
-      if (supabase) {
-        try {
-          const user = (await supabase.auth.getUser()).data.user;
-          if (user) {
-            await supabase.from('profiles').update({
-              apple_health_connected: false,
-              steps_synced_today: 0,
-              calories_synced_today: 0,
-              last_health_sync: null
-            }).eq('user_id', user.id);
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      updateAppleHealthMutation.mutate({
+        apple_health_connected: false,
+        steps_synced_today: 0,
+        calories_synced_today: 0,
+        last_health_sync: null
+      });
     } else {
       setShowHealthKitPermissions(true);
     }
   };
 
-  const handleAllowHealthKit = async () => {
-    setIsAppleHealthConnected(true);
-    localStorage.setItem('apple_health_connected', 'true');
+  const handleAllowHealthKit = () => {
     setShowHealthKitPermissions(false);
-    if (supabase) {
-      try {
-        const user = (await supabase.auth.getUser()).data.user;
-        if (user) {
-          await supabase.from('profiles').update({
-            apple_health_connected: true
-          }).eq('user_id', user.id);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    updateAppleHealthMutation.mutate({
+      apple_health_connected: true
+    });
   };
 
   const handleCopyToClipboard = (text: string, field: string) => {
@@ -130,21 +181,7 @@ export default function Profile() {
       const data = await res.json();
       if (res.ok) {
         setPingResult(`Success! Processed: ${data.processed || 0} metrics.`);
-        if (supabase) {
-          const user = (await supabase.auth.getUser()).data.user;
-          if (user) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('steps_synced_today, calories_synced_today, last_health_sync')
-              .eq('user_id', user.id)
-              .single();
-            if (profile) {
-              setStepsSyncedToday(profile.steps_synced_today || 0);
-              setCaloriesSyncedToday(profile.calories_synced_today || 0);
-              setLastHealthSync(profile.last_health_sync || '');
-            }
-          }
-        }
+        queryClient.invalidateQueries({ queryKey: ['profileTargets', user?.id] });
       } else {
         setPingResult(`Error: ${data.error || 'Request failed'}`);
       }
@@ -155,89 +192,17 @@ export default function Profile() {
     }
   };
 
-
-  useEffect(() => {
-    const fetchTargets = async () => {
-      if (!supabase) return;
-      try {
-        const user = (await supabase.auth.getUser()).data.user;
-        if (!user) return;
-        
-        let { data, error } = await supabase
-          .from('profiles')
-          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token')
-          .eq('user_id', user.id)
-          .single();
-          
-        if (error && error.code === 'PGRST116') {
-          const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: user.id,
-              daily_calorie_target: 2200,
-              protein_target_g: 160,
-              carbs_target_g: 300,
-              fats_target_g: 60
-            })
-            .select()
-            .single();
-            
-          if (newProfile) {
-            setCalorieTarget(newProfile.daily_calorie_target);
-            setProteinTarget(newProfile.protein_target_g);
-            setCarbsTarget(newProfile.carbs_target_g);
-            setFatsTarget(newProfile.fats_target_g);
-            setSyncToken(newProfile.sync_token || 'no-token-found');
-          }
-        } else if (data) {
-          setCalorieTarget(data.daily_calorie_target);
-          setProteinTarget(data.protein_target_g);
-          setCarbsTarget(data.carbs_target_g);
-          setFatsTarget(data.fats_target_g);
-          setIsAppleHealthConnected(!!data.apple_health_connected);
-          setStepsSyncedToday(data.steps_synced_today || 0);
-          setCaloriesSyncedToday(data.calories_synced_today || 0);
-          setLastHealthSync(data.last_health_sync || '');
-          setSyncToken(data.sync_token || 'no-token-found');
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingTargets(false);
-      }
-    };
-    
-    fetchTargets();
-  }, []);
-
-  const saveTargets = async () => {
-    if (!supabase) return;
-    setSavingTargets(true);
-    setMessage('');
+  const formatLastSync = (timestamp: string) => {
+    if (!timestamp) return 'Never synced yet';
     try {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          daily_calorie_target: Number(calorieTarget),
-          protein_target_g: Number(proteinTarget),
-          carbs_target_g: Number(carbsTarget),
-          fats_target_g: Number(fatsTarget)
-        });
-
-      if (error) throw error;
-      setMessage('Targets saved successfully!');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err: any) {
-      console.error(err);
-      setMessage('Failed to save targets.');
-    } finally {
-      setSavingTargets(false);
+      const d = new Date(timestamp);
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } catch (e) {
+      return 'Never synced yet';
     }
   };
+
+  const savingTargets = saveTargetsMutation.isPending;
 
   return (
     <div className="p-6 pb-24 bg-[#0C0D12] min-h-screen text-white font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
