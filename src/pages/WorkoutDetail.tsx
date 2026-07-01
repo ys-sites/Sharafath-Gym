@@ -18,7 +18,7 @@ const ROUTINE_DETAILS: Record<string, {
     id: number;
     name: string;
     rounds: number;
-    exercises: Array<{ id: string; name: string; details: string; img: string }>
+    exercises: Array<{ id: string; name: string; target_sets: number; target_reps: string; img: string }>
   }>
 }> = {
   push_1: {
@@ -37,9 +37,9 @@ const ROUTINE_DETAILS: Record<string, {
         name: "CHEST CIRCUIT",
         rounds: 3,
         exercises: [
-          { id: "p1", name: "Machine Chest Press", details: "3 Sets x 6-10 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
-          { id: "p2", name: "Incline Dumbbell Press", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/IP4oeKh1Sd4" },
-          { id: "p3", name: "Machine Pec Deck Fly", details: "2 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g" }
+          { id: "p1", name: "Machine Chest Press", target_sets: 3, target_reps: "6-10", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
+          { id: "p2", name: "Incline Dumbbell Press", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/IP4oeKh1Sd4/hqdefault.jpg" },
+          { id: "p3", name: "Machine Pec Deck Fly", target_sets: 2, target_reps: "10-15", img: "https://img.youtube.com/vi/JYmszQs-mRs/hqdefault.jpg" }
         ]
       },
       {
@@ -47,10 +47,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "SHOULDERS & TRICEPS",
         rounds: 3,
         exercises: [
-          { id: "p4", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/PzsMitRdI_8" },
-          { id: "p5", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g" },
-          { id: "p6", name: "Tricep Pushdown", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU" },
-          { id: "p7", name: "Overhead Rope Extension", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU" }
+          { id: "p4", name: "Dumbbell Lateral Raise", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/PzsMitRdI_8/hqdefault.jpg" },
+          { id: "p5", name: "Reverse Pec Deck", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/P6-N-VGCVxk/hqdefault.jpg" },
+          { id: "p6", name: "Tricep Pushdown (rope)", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/-zLyUAo1gMw/hqdefault.jpg" },
+          { id: "p7", name: "Overhead Rope Extension", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/1657VVZi0Ms/hqdefault.jpg" }
         ]
       }
     ]
@@ -71,10 +71,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "BACK WIDTH & THICKNESS",
         rounds: 3,
         exercises: [
-          { id: "pl1", name: "Wide-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/CAwf7n6Luuc/hqdefault.jpg" },
-          { id: "pl2", name: "Close-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/8d22D_B0UeM/hqdefault.jpg" },
-          { id: "pl3", name: "Seated Cable Row", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" },
-          { id: "pl4", name: "Wide-Grip Row", details: "3 Sets x 8 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" }
+          { id: "pl1", name: "Wide-Grip Lat Pulldown", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/8hzVLzu-RJk/hqdefault.jpg" },
+          { id: "pl2", name: "Close-Grip Lat Pulldown", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/8hzVLzu-RJk/hqdefault.jpg" },
+          { id: "pl3", name: "Seated Cable Row", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/vwHG9Jfu4sw/hqdefault.jpg" },
+          { id: "pl4", name: "Wide-Grip Row", target_sets: 3, target_reps: "8", img: "https://img.youtube.com/vi/1nRP8S_O6l0/hqdefault.jpg" }
         ]
       },
       {
@@ -82,10 +82,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "ISOLATION & ARMS",
         rounds: 3,
         exercises: [
-          { id: "pl5", name: "Lat Pullover Machine", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/QdD8Jv2h_6U/hqdefault.jpg" },
-          { id: "pl6", name: "Preacher Curl", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
-          { id: "pl7", name: "Incline Dumbbell Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
-          { id: "pl8", name: "Hammer Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" }
+          { id: "pl5", name: "Lat Pullover Machine", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/32auHIqgEoM/hqdefault.jpg" },
+          { id: "pl6", name: "Preacher Curl", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/Gydpcouclx8/hqdefault.jpg" },
+          { id: "pl7", name: "Incline Dumbbell Curl", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/HhHHBj3qTJ4/hqdefault.jpg" },
+          { id: "pl8", name: "Hammer Curl", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/BRVDS6HVR9Q/hqdefault.jpg" }
         ]
       }
     ]
@@ -106,9 +106,9 @@ const ROUTINE_DETAILS: Record<string, {
         name: "QUADS & GLUTES",
         rounds: 3,
         exercises: [
-          { id: "l1", name: "Hack Squat", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/0p3_N1YvP0E/hqdefault.jpg" },
-          { id: "l2", name: "Leg Press", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/IZxyjW7MPJQ/hqdefault.jpg" },
-          { id: "l3", name: "Leg Extension", details: "2 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/YyvSfV9Qp60/hqdefault.jpg" }
+          { id: "l1", name: "Hack Squat", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/0tn5K9NlCfo/hqdefault.jpg" },
+          { id: "l2", name: "Leg Press", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/ETOAyWM6i6A/hqdefault.jpg" },
+          { id: "l3", name: "Leg Extension", target_sets: 2, target_reps: "12-15", img: "https://img.youtube.com/vi/swZQC689o9U/hqdefault.jpg" }
         ]
       },
       {
@@ -116,10 +116,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "HAMSTRINGS & CALVES",
         rounds: 3,
         exercises: [
-          { id: "l4", name: "Dumbbell Romanian Deadlift", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/JGrD4N-_s44/hqdefault.jpg" },
-          { id: "l5", name: "Seated Leg Curl", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/Orxowest56U/hqdefault.jpg" },
-          { id: "l6", name: "Standing Calf Raise", details: "3 Sets x 12-20 Reps", img: "https://img.youtube.com/vi/N38e_lE9e08/hqdefault.jpg" },
-          { id: "l7", name: "Seated Leg Raise", details: "3 Sets x 10-15 Reps", img: "https://img.youtube.com/vi/HbbOplfPjB0/hqdefault.jpg" }
+          { id: "l4", name: "Dumbbell Romanian Deadlift", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/hQgFixeXdZo/hqdefault.jpg" },
+          { id: "l5", name: "Seated Leg Curl", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/IOufFLwNOTU/hqdefault.jpg" },
+          { id: "l6", name: "Standing Calf Raise", target_sets: 3, target_reps: "12-20", img: "https://img.youtube.com/vi/SRUtMJ0tE2A/hqdefault.jpg" },
+          { id: "l7", name: "Seated Leg Raises (core)", target_sets: 3, target_reps: "10-15", img: "https://img.youtube.com/vi/l4kQd9eWclE/hqdefault.jpg" }
         ]
       }
     ]
@@ -140,10 +140,10 @@ const ROUTINE_DETAILS: Record<string, {
         name: "CHEST & BACK",
         rounds: 3,
         exercises: [
-          { id: "u1", name: "Incline Machine Press", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
-          { id: "u2", name: "Machine Chest Press", details: "2 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
-          { id: "u3", name: "Assisted Pull-Up", details: "3 Sets x 6-10 Reps", img: "https://img.youtube.com/vi/eGo4IYtl4jO/hqdefault.jpg" },
-          { id: "u4", name: "Chest-Supported Row", details: "3 Sets x 8-12 Reps", img: "https://img.youtube.com/vi/GZBFZst_kXg/hqdefault.jpg" }
+          { id: "u1", name: "Incline Machine Press", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/VesHgJR14E8/hqdefault.jpg" },
+          { id: "u2", name: "Machine Chest Press", target_sets: 2, target_reps: "8-12", img: "https://img.youtube.com/vi/pLofEAcfsO8/hqdefault.jpg" },
+          { id: "u3", name: "Pull-Ups / Assisted Pull-Ups", target_sets: 3, target_reps: "6-10", img: "https://img.youtube.com/vi/gx0RWT7WbmA/hqdefault.jpg" },
+          { id: "u4", name: "Chest-Supported Row", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/vmX58YYK3-8/hqdefault.jpg" }
         ]
       },
       {
@@ -151,18 +151,54 @@ const ROUTINE_DETAILS: Record<string, {
         name: "SHOULDERS & ARMS",
         rounds: 3,
         exercises: [
-          { id: "u5", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/PzsMitRdI_8/hqdefault.jpg" },
-          { id: "u6", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://img.youtube.com/vi/4zV2Q1B5v6g/hqdefault.jpg" },
-          { id: "u7", name: "Preacher Curl", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
-          { id: "u8", name: "Cable Curl", details: "2 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/fIWP-FRFNU0/hqdefault.jpg" },
-          { id: "u9", name: "Rope Pushdown", details: "3 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU/hqdefault.jpg" },
-          { id: "u10", name: "Overhead Cable Extension", details: "2 Sets x 10-12 Reps", img: "https://img.youtube.com/vi/2-LAMcpzODU/hqdefault.jpg" }
+          { id: "u5", name: "Dumbbell Lateral Raise", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/PzsMitRdI_8/hqdefault.jpg" },
+          { id: "u6", name: "Reverse Pec Deck", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/P6-N-VGCVxk/hqdefault.jpg" },
+          { id: "u7", name: "Preacher Curl", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/Gydpcouclx8/hqdefault.jpg" },
+          { id: "u8", name: "Cable Curl", target_sets: 2, target_reps: "10-12", img: "https://img.youtube.com/vi/NFzTWp2qpiE/hqdefault.jpg" },
+          { id: "u9", name: "Rope Pushdown", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/qHDrQglWgS4/hqdefault.jpg" },
+          { id: "u10", name: "Overhead Cable Extension", target_sets: 2, target_reps: "10-12", img: "https://img.youtube.com/vi/1657VVZi0Ms/hqdefault.jpg" }
+        ]
+      }
+    ]
+  },
+  lower_1: {
+    title: "Day 6: LOWER (Quads/Hamstrings/Core)",
+    category: "Strength",
+    duration: "50 Min",
+    difficulty: "Beginner",
+    calories: "400 kcal",
+    rating: "4.9",
+    reviews: "165 reviews",
+    image: "https://img.youtube.com/vi/HPXa3HdJQnc/hqdefault.jpg",
+    description: "Lower body developer focusing on deep control and core stabilization. Focus on form during squatting.",
+    circuits: [
+      {
+        id: 1,
+        name: "QUADS & GLUTES",
+        rounds: 3,
+        exercises: [
+          { id: "lw1", name: "Smith Machine Squat", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/HPXa3HdJQnc/hqdefault.jpg" },
+          { id: "lw2", name: "Walking Lunges", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/Pbmj6xPo-Hw/hqdefault.jpg" },
+          { id: "lw3", name: "Leg Extension", target_sets: 2, target_reps: "12-15", img: "https://img.youtube.com/vi/2lvdnQg04PM/hqdefault.jpg" }
+        ]
+      },
+      {
+        id: 2,
+        name: "HAMSTRINGS & CORE",
+        rounds: 3,
+        exercises: [
+          { id: "lw4", name: "Romanian Deadlift (barbell)", target_sets: 3, target_reps: "8-12", img: "https://img.youtube.com/vi/3VXmecChYYM/hqdefault.jpg" },
+          { id: "lw5", name: "Lying Leg Curl", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/SbSNUXPRkc8/hqdefault.jpg" },
+          { id: "lw6", name: "Hip Thrust", target_sets: 3, target_reps: "10-12", img: "https://img.youtube.com/vi/5S8SApGU_Lk/hqdefault.jpg" },
+          { id: "lw7", name: "Standing Calf Raise", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/SRUtMJ0tE2A/hqdefault.jpg" },
+          { id: "lw8", name: "Seated Calf Raise", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/3ZRe_QpvRPg/hqdefault.jpg" },
+          { id: "lw9", name: "Cable Crunch", target_sets: 3, target_reps: "12-15", img: "https://img.youtube.com/vi/b9FJ4hIK3pI/hqdefault.jpg" },
+          { id: "lw10", name: "Plank", target_sets: 3, target_reps: "1 Min", img: "https://img.youtube.com/vi/pvI5y1aq_JH/hqdefault.jpg" }
         ]
       }
     ]
   }
-};
-const getExerciseVideoUrl = (name: string, imgUrl?: string) => {
+};const getExerciseVideoUrl = (name: string, imgUrl?: string) => {
   if (imgUrl && imgUrl.includes('youtube.com/vi/')) {
     const parts = imgUrl.split('youtube.com/vi/');
     if (parts[1]) {
@@ -175,45 +211,45 @@ const getExerciseVideoUrl = (name: string, imgUrl?: string) => {
   const map: Record<string, string> = {
     'machine chest press': 'pLofEAcfsO8',
     'incline dumbbell press': 'IP4oeKh1Sd4',
-    'machine pec deck fly': '4zV2Q1B5v6g',
+    'machine pec deck fly': 'JYmszQs-mRs',
     'supported dips': '6lJ_s55V4rM',
     'supported dips (optional)': '6lJ_s55V4rM',
     'dumbbell lateral raise': 'PzsMitRdI_8',
-    'reverse pec deck': '7y4kY3U0-J4',
-    'tricep pushdown': '2-LAMcpzODU',
-    'tricep pushdown (rope)': '2-LAMcpzODU',
-    'overhead rope extension': 'hU5n69f-V0U',
-    'wide-grip lat pulldown': 'CAwf7n6Luuc',
-    'close-grip lat pulldown': '8d22D_B0UeM',
-    'seated cable row': 'GZBFZst_kXg',
+    'reverse pec deck': 'P6-N-VGCVxk',
+    'tricep pushdown': '-zLyUAo1gMw',
+    'tricep pushdown (rope)': '-zLyUAo1gMw',
+    'overhead rope extension': '1657VVZi0Ms',
+    'wide-grip lat pulldown': '8hzVLzu-RJk',
+    'close-grip lat pulldown': '8hzVLzu-RJk',
+    'seated cable row': 'vwHG9Jfu4sw',
     'wide-grip row': '1nRP8S_O6l0',
-    'lat pullover machine': 'QdD8Jv2h_6U',
-    'preacher curl': 'fIWP-FRFNU0',
-    'incline dumbbell curl': '7T-Z5h8VwSg',
-    'hammer curl': '8XLxfXROrTo',
-    'hack squat': '0p3_N1YvP0E',
-    'leg press': 'IZxyjW7MPJQ',
-    'leg extension': 'YyvSfV9Qp60',
-    'dumbbell romanian deadlift': 'JGrD4N-_s44',
-    'seated leg curl': 'Orxowest56U',
-    'standing calf raise': 'N38e_lE9e08',
-    'seated leg raise': 'HbbOplfPjB0',
-    'seated leg raises (core)': 'HbbOplfPjB0',
-    'incline machine press': 'nAvsTnhG-2Q',
-    'pull-up': 'eGo4IYtl4jO',
-    'pull-ups / assisted pull-ups': 'eGo4IYtl4jO',
-    'assisted pull-up': 'eGo4IYtl4jO',
-    'chest-supported row': '0UbPz-y-c2U',
-    'cable curl': 'As7Z21c4F4k',
-    'rope pushdown': '2-LAMcpzODU',
-    'overhead cable extension': 'hU5n69f-V0U',
-    'smith machine squat': 'B78W94n-e2k',
-    'walking lunges': 'D7KaRcUTQeY',
-    'romanian deadlift (barbell)': 'jcV72t_4sCY',
-    'lying leg curl': '1Tq3Q-4c8dI',
-    'hip thrust': 'LM8XHLYJoYs',
-    'seated calf raise': 'm9V_cZqP6c8',
-    'cable crunch': '2CcgLpG8M3Y',
+    'lat pullover machine': '32auHIqgEoM',
+    'preacher curl': 'Gydpcouclx8',
+    'incline dumbbell curl': 'HhHHBj3qTJ4',
+    'hammer curl': 'BRVDS6HVR9Q',
+    'hack squat': '0tn5K9NlCfo',
+    'leg press': 'ETOAyWM6i6A',
+    'leg extension': 'swZQC689o9U',
+    'dumbbell romanian deadlift': 'hQgFixeXdZo',
+    'seated leg curl': 'IOufFLwNOTU',
+    'standing calf raise': 'SRUtMJ0tE2A',
+    'seated leg raise': 'l4kQd9eWclE',
+    'seated leg raises (core)': 'l4kQd9eWclE',
+    'incline machine press': 'VesHgJR14E8',
+    'pull-up': 'gx0RWT7WbmA',
+    'pull-ups / assisted pull-ups': 'gx0RWT7WbmA',
+    'assisted pull-up': 'gx0RWT7WbmA',
+    'chest-supported row': 'vmX58YYK3-8',
+    'cable curl': 'NFzTWp2qpiE',
+    'rope pushdown': 'qHDrQglWgS4',
+    'overhead cable extension': '1657VVZi0Ms',
+    'smith machine squat': 'HPXa3HdJQnc',
+    'walking lunges': 'Pbmj6xPo-Hw',
+    'romanian deadlift (barbell)': '3VXmecChYYM',
+    'lying leg curl': 'SbSNUXPRkc8',
+    'hip thrust': '5S8SApGU_Lk',
+    'seated calf raise': '3ZRe_QpvRPg',
+    'cable crunch': 'b9FJ4hIK3pI',
     'plank': 'pvI5y1aq_JH',
   };
 
@@ -236,53 +272,51 @@ const getExerciseThumbnail = (name: string, imgUrl?: string) => {
   const map: Record<string, string> = {
     'machine chest press': 'pLofEAcfsO8',
     'incline dumbbell press': 'IP4oeKh1Sd4',
-    'machine pec deck fly': '4zV2Q1B5v6g',
+    'machine pec deck fly': 'JYmszQs-mRs',
     'supported dips': '6lJ_s55V4rM',
     'supported dips (optional)': '6lJ_s55V4rM',
     'dumbbell lateral raise': 'PzsMitRdI_8',
-    'reverse pec deck': '7y4kY3U0-J4',
-    'tricep pushdown': '2-LAMcpzODU',
-    'tricep pushdown (rope)': '2-LAMcpzODU',
-    'overhead rope extension': 'hU5n69f-V0U',
-    'wide-grip lat pulldown': 'CAwf7n6Luuc',
-    'close-grip lat pulldown': '8d22D_B0UeM',
-    'seated cable row': 'GZBFZst_kXg',
+    'reverse pec deck': 'P6-N-VGCVxk',
+    'tricep pushdown': '-zLyUAo1gMw',
+    'tricep pushdown (rope)': '-zLyUAo1gMw',
+    'overhead rope extension': '1657VVZi0Ms',
+    'wide-grip lat pulldown': '8hzVLzu-RJk',
+    'close-grip lat pulldown': '8hzVLzu-RJk',
+    'seated cable row': 'vwHG9Jfu4sw',
     'wide-grip row': '1nRP8S_O6l0',
-    'lat pullover machine': 'QdD8Jv2h_6U',
-    'preacher curl': 'fIWP-FRFNU0',
-    'incline dumbbell curl': '7T-Z5h8VwSg',
-    'hammer curl': '8XLxfXROrTo',
-    'hack squat': '0p3_N1YvP0E',
-    'leg press': 'IZxyjW7MPJQ',
-    'leg extension': 'YyvSfV9Qp60',
-    'dumbbell romanian deadlift': 'JGrD4N-_s44',
-    'seated leg curl': 'Orxowest56U',
-    'standing calf raise': 'N38e_lE9e08',
-    'seated leg raise': 'HbbOplfPjB0',
-    'seated leg raises (core)': 'HbbOplfPjB0',
-    'incline machine press': 'nAvsTnhG-2Q',
-    'pull-up': 'eGo4IYtl4jO',
-    'pull-ups / assisted pull-ups': 'eGo4IYtl4jO',
-    'assisted pull-up': 'eGo4IYtl4jO',
-    'chest-supported row': '0UbPz-y-c2U',
-    'cable curl': 'As7Z21c4F4k',
-    'rope pushdown': '2-LAMcpzODU',
-    'overhead cable extension': 'hU5n69f-V0U',
-    'smith machine squat': 'B78W94n-e2k',
-    'walking lunges': 'D7KaRcUTQeY',
-    'romanian deadlift (barbell)': 'jcV72t_4sCY',
-    'lying leg curl': '1Tq3Q-4c8dI',
-    'hip thrust': 'LM8XHLYJoYs',
-    'seated calf raise': 'm9V_cZqP6c8',
-    'cable crunch': '2CcgLpG8M3Y',
+    'lat pullover machine': '32auHIqgEoM',
+    'preacher curl': 'Gydpcouclx8',
+    'incline dumbbell curl': 'HhHHBj3qTJ4',
+    'hammer curl': 'BRVDS6HVR9Q',
+    'hack squat': '0tn5K9NlCfo',
+    'leg press': 'ETOAyWM6i6A',
+    'leg extension': 'swZQC689o9U',
+    'dumbbell romanian deadlift': 'hQgFixeXdZo',
+    'seated leg curl': 'IOufFLwNOTU',
+    'standing calf raise': 'SRUtMJ0tE2A',
+    'seated leg raise': 'l4kQd9eWclE',
+    'seated leg raises (core)': 'l4kQd9eWclE',
+    'incline machine press': 'VesHgJR14E8',
+    'pull-up': 'gx0RWT7WbmA',
+    'pull-ups / assisted pull-ups': 'gx0RWT7WbmA',
+    'assisted pull-up': 'gx0RWT7WbmA',
+    'chest-supported row': 'vmX58YYK3-8',
+    'cable curl': 'NFzTWp2qpiE',
+    'rope pushdown': 'qHDrQglWgS4',
+    'overhead cable extension': '1657VVZi0Ms',
+    'smith machine squat': 'HPXa3HdJQnc',
+    'walking lunges': 'Pbmj6xPo-Hw',
+    'romanian deadlift (barbell)': '3VXmecChYYM',
+    'lying leg curl': 'SbSNUXPRkc8',
+    'hip thrust': '5S8SApGU_Lk',
+    'seated calf raise': '3ZRe_QpvRPg',
+    'cable crunch': 'b9FJ4hIK3pI',
     'plank': 'pvI5y1aq_JH',
   };
 
   const id = map[cleanName] || 'rxD321l2svE';
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 };
-
-
 export default function WorkoutDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -385,8 +419,8 @@ export default function WorkoutDetail() {
                 template_id: templateData.id,
                 exercise_id: exerciseId,
                 order_index: orderIndex++,
-                target_sets: circuit.rounds,
-                target_reps: ex.details.match(/\d+(?:-\d+)?/)?.[0] || '10',
+                target_sets: ex.target_sets,
+                target_reps: ex.target_reps,
                 is_circuit: true
               });
           }
@@ -394,7 +428,7 @@ export default function WorkoutDetail() {
       }
 
       // Fetch template exercises
-      const { data: tempExercises, error: exError } = await supabase
+      let { data: tempExercises, error: exError } = await supabase
         .from('template_exercises')
         .select(`
           id, order_index, target_sets, target_reps, is_circuit,
@@ -404,6 +438,49 @@ export default function WorkoutDetail() {
         .order('order_index', { ascending: true });
 
       if (exError) throw exError;
+
+      // Self-healing database correction block
+      if (tempExercises && !isCustomTemplate) {
+        // Build a flat list of local exercises for this routine
+        const localExercises = activeDetails.circuits.flatMap(c => 
+          c.exercises.map(ex => ({ ...ex }))
+        );
+
+        for (const te of tempExercises) {
+          const exName = (te.exercises as any)?.name;
+          const localEx = localExercises.find(le => le.name.toLowerCase().trim() === exName?.toLowerCase().trim());
+          if (localEx) {
+            const expectedSets = localEx.target_sets;
+            const expectedReps = localEx.target_reps;
+            const expectedUrl = getExerciseVideoUrl(localEx.name);
+
+            // 1. Correct template_exercises sets/reps if wrong
+            if (te.target_sets !== expectedSets || te.target_reps !== expectedReps) {
+              await supabase
+                .from('template_exercises')
+                .update({
+                  target_sets: expectedSets,
+                  target_reps: expectedReps
+                })
+                .eq('id', te.id);
+              
+              te.target_sets = expectedSets;
+              te.target_reps = expectedReps;
+            }
+
+            // 2. Correct exercises table youtube_url if wrong or missing
+            const dbUrl = (te.exercises as any)?.youtube_url;
+            if (dbUrl !== expectedUrl) {
+              await supabase
+                .from('exercises')
+                .update({ youtube_url: expectedUrl })
+                .eq('id', (te.exercises as any)?.id);
+              
+              (te.exercises as any).youtube_url = expectedUrl;
+            }
+          }
+        }
+      }
 
       if (isCustomTemplate) {
         const loadedCircuits = [{
@@ -733,7 +810,7 @@ export default function WorkoutDetail() {
                                 <Play size={8} className="fill-indigo-400" /> Tutorial
                               </button>
                             </div>
-                            <p className="text-xs font-bold text-neutral-400 mt-1">{ex.details}</p>
+                            <p className="text-xs font-bold text-neutral-400 mt-1">{ex.details || `${ex.target_sets} Sets x ${ex.target_reps} Reps`}</p>
                           </div>
                           
                           <button 

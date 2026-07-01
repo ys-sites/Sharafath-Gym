@@ -71,6 +71,25 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
       { name: 'Rope Pushdown', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=qHDrQglWgS4', tip: 'Flare rope outward at full extension.' },
       { name: 'Overhead Cable Extension', reps: '10-12', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=1657VVZi0Ms', tip: 'Extend fully to load triceps long head.' }
     ]
+  },
+  lower_1: {
+    name: 'Day 6: LOWER (Quads/Hamstrings/Core)',
+    category: 'Strength',
+    duration: '50 Min',
+    calories: '400 kcal',
+    difficulty: 'Beginner',
+    exercises: [
+      { name: 'Smith Machine Squat', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=HPXa3HdJQnc', tip: 'Control the descent. Focus on knee tracking and depth.' },
+      { name: 'Walking Lunges', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=Pbmj6xPo-Hw', tip: 'Keep chest upright. Take controlled steps.' },
+      { name: 'Leg Extension', reps: '12-15', sets: 2, videoUrl: 'https://www.youtube.com/watch?v=2lvdnQg04PM', tip: 'Hold contraction at the top. Focus on quad squeeze.' },
+      { name: 'Romanian Deadlift (barbell)', reps: '8-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=3VXmecChYYM', tip: 'Hinge at the hips. Keep barbell close to body.' },
+      { name: 'Lying Leg Curl', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=SbSNUXPRkc8', tip: 'Keep hips down on pad. Squeeze hamstrings fully.' },
+      { name: 'Hip Thrust', reps: '10-12', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=5S8SApGU_Lk', tip: 'Tuck chin, drive through heels, full glute contraction.' },
+      { name: 'Standing Calf Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=SRUtMJ0tE2A', tip: 'Full range of motion. Slow eccentric contraction.' },
+      { name: 'Seated Calf Raise', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=3ZRe_QpvRPg', tip: 'Focus on soleus stretch and contraction.' },
+      { name: 'Cable Crunch', reps: '12-15', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=b9FJ4hIK3pI', tip: 'Pull with abs, not hands. Curl trunk down.' },
+      { name: 'Plank', reps: '1 Min', sets: 3, videoUrl: 'https://www.youtube.com/watch?v=pvI5y1aq_JH', tip: 'Keep body in straight line. Squeeze glutes and abs.' }
+    ]
   }
 };
 
