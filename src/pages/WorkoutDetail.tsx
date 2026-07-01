@@ -2,47 +2,174 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Share2, MoreHorizontal, ArrowDown, Play, Heart, RefreshCw, X, Edit2, ArrowLeftRight, Navigation, Trash2, Star, Dumbbell, Clock, Flame } from 'lucide-react';
 
+const ROUTINE_DETAILS: Record<string, {
+  title: string;
+  category: string;
+  duration: string;
+  difficulty: string;
+  calories: string;
+  image: string;
+  description: string;
+  rating: string;
+  reviews: string;
+  circuits: Array<{
+    id: number;
+    name: string;
+    rounds: number;
+    exercises: Array<{ id: string; name: string; details: string; img: string }>
+  }>
+}> = {
+  push_1: {
+    title: "Day 1: PUSH (Chest/Shoulders)",
+    category: "Strength",
+    duration: "45 Min",
+    difficulty: "Beginner",
+    calories: "320 kcal",
+    rating: "4.9",
+    reviews: "180 reviews",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800",
+    description: "Focus on chest expansion, upper back thickness, and shoulder stability. Start light for your first set.",
+    circuits: [
+      {
+        id: 1,
+        name: "CHEST CIRCUIT",
+        rounds: 3,
+        exercises: [
+          { id: "p1", name: "Machine Chest Press", details: "3 Sets x 6-10 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "p2", name: "Incline Dumbbell Press", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&q=80&w=200" },
+          { id: "p3", name: "Machine Pec Deck Fly", details: "2 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+        ]
+      },
+      {
+        id: 2,
+        name: "SHOULDERS & TRICEPS",
+        rounds: 3,
+        exercises: [
+          { id: "p4", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "p5", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "p6", name: "Tricep Pushdown", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "p7", name: "Overhead Rope Extension", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+        ]
+      }
+    ]
+  },
+  pull_1: {
+    title: "Day 2: PULL (Back/Biceps)",
+    category: "Strength",
+    duration: "40 Min",
+    difficulty: "Beginner",
+    calories: "300 kcal",
+    rating: "4.8",
+    reviews: "150 reviews",
+    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=800",
+    description: "Focus on pulling mechanics, width, and thickness. Ensure slow and controlled arm curls.",
+    circuits: [
+      {
+        id: 1,
+        name: "BACK WIDTH & THICKNESS",
+        rounds: 3,
+        exercises: [
+          { id: "pl1", name: "Wide-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl2", name: "Close-Grip Lat Pulldown", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl3", name: "Seated Cable Row", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl4", name: "Wide-Grip Row", details: "3 Sets x 8 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+        ]
+      },
+      {
+        id: 2,
+        name: "ISOLATION & ARMS",
+        rounds: 3,
+        exercises: [
+          { id: "pl5", name: "Lat Pullover Machine", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl6", name: "Preacher Curl", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl7", name: "Incline Dumbbell Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" },
+          { id: "pl8", name: "Hammer Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200" }
+        ]
+      }
+    ]
+  },
+  legs_1: {
+    title: "Day 3: LEGS (Quads/Hamstrings)",
+    category: "Strength",
+    duration: "50 Min",
+    difficulty: "Beginner",
+    calories: "420 kcal",
+    rating: "4.9",
+    reviews: "210 reviews",
+    image: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=800",
+    description: "Lower body developer with a focus on deep control. Protect your lower back during Romanian Deadlifts.",
+    circuits: [
+      {
+        id: 1,
+        name: "QUADS & GLUTES",
+        rounds: 3,
+        exercises: [
+          { id: "l1", name: "Hack Squat", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
+          { id: "l2", name: "Leg Press", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
+          { id: "l3", name: "Leg Extension", details: "2 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" }
+        ]
+      },
+      {
+        id: 2,
+        name: "HAMSTRINGS & CALVES",
+        rounds: 3,
+        exercises: [
+          { id: "l4", name: "Dumbbell Romanian Deadlift", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
+          { id: "l5", name: "Seated Leg Curl", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
+          { id: "l6", name: "Standing Calf Raise", details: "3 Sets x 12-20 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" },
+          { id: "l7", name: "Seated Leg Raise", details: "3 Sets x 10-15 Reps", img: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?auto=format&fit=crop&q=80&w=200" }
+        ]
+      }
+    ]
+  },
+  upper_1: {
+    title: "Day 5: UPPER (Hypertrophy)",
+    category: "Strength",
+    duration: "50 Min",
+    difficulty: "Beginner",
+    calories: "380 kcal",
+    rating: "4.9",
+    reviews: "195 reviews",
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=800",
+    description: "High-volume hypertrophy upper body day. Keep rest times moderate.",
+    circuits: [
+      {
+        id: 1,
+        name: "CHEST & BACK",
+        rounds: 3,
+        exercises: [
+          { id: "u1", name: "Incline Machine Press", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u2", name: "Machine Chest Press", details: "2 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u3", name: "Assisted Pull-Up", details: "3 Sets x 6-10 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u4", name: "Chest-Supported Row", details: "3 Sets x 8-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+        ]
+      },
+      {
+        id: 2,
+        name: "SHOULDERS & ARMS",
+        rounds: 3,
+        exercises: [
+          { id: "u5", name: "Dumbbell Lateral Raise", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u6", name: "Reverse Pec Deck", details: "3 Sets x 12-15 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u7", name: "Preacher Curl", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u8", name: "Cable Curl", details: "2 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u9", name: "Rope Pushdown", details: "3 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" },
+          { id: "u10", name: "Overhead Cable Extension", details: "2 Sets x 10-12 Reps", img: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200" }
+        ]
+      }
+    ]
+  }
+};
+
 export default function WorkoutDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Mock details for the workout
-  const programDetails = {
-    title: "Massive Upper Body",
-    rating: "4.9",
-    reviews: "240 reviews",
-    duration: "45 Min",
-    difficulty: "Advanced",
-    category: "Strength",
-    calories: "350 kcal",
-    image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=800",
-    description: "Build serious upper body strength and mass with this targeted dumbbell hypertrophy split. Focuses on chest expansion, upper back thickness, and shoulder stability through high-intensity circuits."
-  };
-
-  // Mock data for the circuits
-  const circuits = [
-    {
-      id: 1,
-      name: 'CIRCUIT 1 (Hypertrophy)',
-      rounds: 3,
-      exercises: [
-        { id: '1a', name: 'Dumbbell Bench Press', details: '12, 10, 8 Reps', img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200' },
-        { id: '1b', name: 'Dumbbell Chest Fly', details: '15, 12, 10 Reps', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=200' },
-        { id: '1c', name: 'Dumbbell Single Arm Row', details: '12 Reps Each Side', img: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=200' },
-        { id: '1d', name: 'Dumbbell Arnold Press', details: '12, 10 Reps', img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=200' },
-      ]
-    },
-    {
-      id: 2,
-      name: 'CIRCUIT 2 (Finisher)',
-      rounds: 2,
-      exercises: [
-        { id: '2a', name: 'Push-ups to Failure', details: 'Max Reps', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=200' }
-      ]
-    }
-  ];
+  const activeDetails = (id && ROUTINE_DETAILS[id]) || ROUTINE_DETAILS.push_1;
+  const programDetails = activeDetails;
+  const circuits = activeDetails.circuits;
 
   return (
     <div className="bg-[#0C0D12] min-h-screen text-white font-sans flex flex-col pb-36 relative">
