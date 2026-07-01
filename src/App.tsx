@@ -9,6 +9,7 @@ import WorkoutLogger from './pages/WorkoutLogger';
 import Nutrition from './pages/Nutrition';
 import WorkoutDetail from './pages/WorkoutDetail';
 import ActiveWorkout from './pages/ActiveWorkout';
+import GenerateWorkout from './pages/GenerateWorkout';
 import { supabase } from './lib/supabase';
 
 export default function App() {
@@ -16,16 +17,36 @@ export default function App() {
   useEffect(() => {
     if (!supabase) return;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) return; // already logged in
+    const performSessionMint = async (isRetry = false) => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) return; // Already has session
 
-      const email = import.meta.env.VITE_DEFAULT_EMAIL || 'sharafath2001@hotmail.com';
-      const password = import.meta.env.VITE_DEFAULT_PASSWORD || 'TrainTrackPassword123!';
+        const res = await fetch('/api/session', { method: 'POST' });
+        if (!res.ok) {
+          throw new Error(`Failed to fetch session: status ${res.status}`);
+        }
+        const data = await res.json();
+        if (data.access_token && data.refresh_token) {
+          await supabase.auth.setSession({
+            access_token: data.access_token,
+            refresh_token: data.refresh_token,
+          });
+        }
+      } catch (err) {
+        console.error('Session establishment error:', err);
+        if (!isRetry) {
+          setTimeout(() => {
+            performSessionMint(true).catch(console.error);
+          }, 3000);
+        }
+      }
+    };
 
-      supabase.auth.signInWithPassword({ email, password }).then(({ error }) => {
-        if (error) supabase.auth.signUp({ email, password });
-      });
-    });
+    performSessionMint().catch(console.error);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+    return () => subscription.unsubscribe();
   }, []);
 
   // Render the app immediately — no loading gate
@@ -40,6 +61,7 @@ export default function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="/logger" element={<WorkoutLogger />} />
+        <Route path="/generate-workout" element={<GenerateWorkout />} />
         <Route path="/workout/:id" element={<WorkoutDetail />} />
         <Route path="/active-workout/:id" element={<ActiveWorkout />} />
         <Route path="*" element={<Navigate to="/" replace />} />

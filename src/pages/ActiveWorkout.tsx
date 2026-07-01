@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize, Clock } from 'lucide-react';
 
 const ROUTINES: Record<string, { name: string; category: string; duration: string; calories: string; difficulty: string; exercises: Array<{ name: string; reps: string; sets: number; videoUrl?: string; tip?: string }> }> = {
   push_1: {
@@ -98,6 +98,29 @@ export default function ActiveWorkout() {
   // Fullscreen states
   const [isFullscreenVideo, setIsFullscreenVideo] = useState(false);
   const [isFullscreenMuted, setIsFullscreenMuted] = useState(true);
+
+  // Rest Timer State
+  const [restTimerSeconds, setRestTimerSeconds] = useState(0);
+  const [isRestTimerActive, setIsRestTimerActive] = useState(false);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isRestTimerActive && restTimerSeconds > 0) {
+      interval = setInterval(() => {
+        setRestTimerSeconds((prev) => {
+          if (prev <= 1) {
+            setIsRestTimerActive(false);
+            if (navigator.vibrate) {
+              navigator.vibrate([200, 100, 200]);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRestTimerActive, restTimerSeconds]);
 
   useEffect(() => {
     let interval: any = null;
@@ -212,6 +235,33 @@ export default function ActiveWorkout() {
       {/* Bottom control panel */}
       <div className="relative z-20 flex-1 flex flex-col bg-[#0C0D12] px-6">
         
+        {isRestTimerActive && restTimerSeconds > 0 && (
+          <div className="bg-indigo-650/90 border border-indigo-500/30 p-4 rounded-[1.5rem] mb-6 flex items-center justify-between text-white shadow-xl animate-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center gap-2.5">
+              <Clock size={18} className="text-indigo-350 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-200">Rest:</span>
+              <span className="text-lg font-black tracking-tight">{Math.floor(restTimerSeconds / 60)}:{(restTimerSeconds % 60) < 10 ? '0' : ''}{restTimerSeconds % 60}</span>
+            </div>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setRestTimerSeconds(prev => prev + 30)}
+                className="px-3.5 py-1.5 bg-white/10 hover:bg-white/20 active:scale-95 text-[10px] font-extrabold uppercase rounded-lg border border-white/5 transition-transform"
+              >
+                +30s
+              </button>
+              <button 
+                onClick={() => {
+                  setRestTimerSeconds(0);
+                  setIsRestTimerActive(false);
+                }}
+                className="px-3.5 py-1.5 bg-white text-black hover:bg-neutral-200 active:scale-95 text-[10px] font-extrabold uppercase rounded-lg transition-transform"
+              >
+                Skip
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Coach tip box (Double bezel) */}
         <div className="bg-white/5 border border-white/10 p-1 rounded-[2rem] shadow-xl mb-6">
           <div className="bg-[#13141C] border border-neutral-850 rounded-[calc(2rem-0.25rem)] pt-8 pb-5 px-5 relative">
@@ -334,7 +384,12 @@ export default function ActiveWorkout() {
                 </div>
 
                 <button 
-                  onClick={() => setShowLogSheet(false)}
+                  onClick={() => {
+                    const restTime = (currentExercise as any).rest || 90;
+                    setRestTimerSeconds(restTime);
+                    setIsRestTimerActive(true);
+                    setShowLogSheet(false);
+                  }}
                   className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-4 rounded-xl text-sm transition-all active:scale-[0.98] uppercase tracking-wider shadow-lg shadow-indigo-500/25"
                 >
                   Save Set

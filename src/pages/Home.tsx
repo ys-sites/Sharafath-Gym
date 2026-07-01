@@ -1,5 +1,9 @@
-import { Play, TrendingUp, Bell, ChevronRight, Dumbbell } from 'lucide-react';
+import { Play, TrendingUp, Bell, ChevronRight, Dumbbell, Heart, Activity, Droplet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { getTodayMetrics, getDailySeries } from '../lib/health';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -10,6 +14,171 @@ export default function Home() {
     stats: "5 week • 4x/week",
     image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=600",
   };
+
+  const [todaySteps, setTodaySteps] = useState(0);
+  const [todayCalories, setTodayCalories] = useState(0);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [hasHealthData, setHasHealthData] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Water tracking states
+  const [waterGoal, setWaterGoal] = useState(2500);
+  const [todayWater, setTodayWater] = useState(0);
+  const [lastWaterLogId, setLastWaterLogId] = useState<string | null>(null);
+
+  const fetchWaterData = async (userId: string) => {
+    if (!supabase) return;
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('water_goal_ml')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (profile && profile.water_goal_ml) {
+        setWaterGoal(profile.water_goal_ml);
+      }
+
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const { data: logs, error } = await supabase
+        .from('water_logs')
+        .select('id, amount_ml')
+        .eq('user_id', userId)
+        .gte('logged_at', startOfDay.toISOString())
+        .order('logged_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (logs) {
+        const total = logs.reduce((sum, item) => sum + item.amount_ml, 0);
+        setTodayWater(total);
+        if (logs.length > 0) {
+          setLastWaterLogId(logs[0].id);
+        } else {
+          setLastWaterLogId(null);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching water data:', err);
+    }
+  };
+
+  const handleAddWater = async (amount: number) => {
+    if (!supabase) return;
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('water_logs')
+        .insert({
+          user_id: user.id,
+          amount_ml: amount
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setTodayWater(prev => prev + amount);
+      if (data) {
+        setLastWaterLogId(data.id);
+      }
+    } catch (err) {
+      console.error('Error adding water:', err);
+    }
+  };
+
+  const handleUndoWater = async () => {
+    if (!supabase || !lastWaterLogId) return;
+    try {
+      const { error } = await supabase
+        .from('water_logs')
+        .delete()
+        .eq('id', lastWaterLogId);
+
+      if (error) throw error;
+
+      const user = (await supabase.auth.getUser()).data.user;
+      if (user) {
+        await fetchWaterData(user.id);
+      }
+    } catch (err) {
+      console.error('Error undoing water:', err);
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+    const loadHealthData = async () => {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const user = (await supabase.auth.getUser()).data.user;
+        if (!user) {
+          if (active) setLoading(false);
+          return;
+        }
+
+        fetchWaterData(user.id);
+
+        const todayObj = await getTodayMetrics(user.id);
+        const stepsData = await getDailySeries(user.id, 'steps', 14);
+        const energyData = await getDailySeries(user.id, 'active_energy', 14);
+
+        if (!active) return;
+
+        const hasSteps = stepsData.length > 0;
+        const hasEnergy = energyData.length > 0;
+        const hasToday = Object.keys(todayObj).length > 0;
+
+        if (hasSteps || hasEnergy || hasToday) {
+          setHasHealthData(true);
+          setTodaySteps(todayObj.steps || 0);
+          setTodayCalories(todayObj.active_energy || 0);
+
+          const dateMap = new Map<string, { dateLabel: string; steps: number; calories: number }>();
+          for (let i = 13; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = d.toISOString().substring(0, 10);
+            const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            dateMap.set(key, { dateLabel: label, steps: 0, calories: 0 });
+          }
+
+          for (const s of stepsData) {
+            const key = s.day.substring(0, 10);
+            const existing = dateMap.get(key);
+            if (existing) {
+              existing.steps = Math.round(s.value);
+            }
+          }
+
+          for (const e of energyData) {
+            const key = e.day.substring(0, 10);
+            const existing = dateMap.get(key);
+            if (existing) {
+              existing.calories = Math.round(e.value);
+            }
+          }
+
+          setChartData(Array.from(dateMap.values()));
+        } else {
+          setHasHealthData(false);
+        }
+      } catch (err) {
+        console.error('Error fetching health data:', err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    loadHealthData();
+    return () => { active = false; };
+  }, []);
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
 
@@ -57,42 +226,145 @@ export default function Home() {
         ))}
       </section>
 
-      {/* Calories / Activity Widget (Double-Bezel Card) */}
-      <section className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] mb-8 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-indigo-500/5 to-transparent"></div>
-        
-        <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30 relative z-10">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2 text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-full">
-              <TrendingUp size={14} />
-              <span className="font-bold text-xs uppercase tracking-wider">Calories burned</span>
+      {/* Apple Health Activity Section */}
+      <section className="mb-8 text-left">
+        {loading ? (
+          <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] shadow-xl">
+            <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-8 border border-neutral-800/30 flex justify-center items-center">
+              <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <button className="flex items-center gap-1 text-xs text-neutral-400 font-bold hover:text-white active:scale-95 transition-all">
-              This Week <ChevronRight size={14} className="text-indigo-400" />
-            </button>
           </div>
-          
-          {/* Mock Bar Chart */}
-          <div className="flex items-end justify-between h-36 pb-2 relative">
-            {[40, 55, 85, 30, 20, 60, 45].map((height, i) => {
-              const isToday = i === 2;
-              return (
-                <div key={i} className="flex flex-col items-center gap-2.5 z-10 flex-1">
-                  {isToday && (
-                    <div className="bg-indigo-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg absolute top-0 -translate-y-2 shadow-lg shadow-indigo-500/30 border border-indigo-400/40">
-                      236 kcal
-                    </div>
-                  )}
-                  <div 
-                    className={`w-7 rounded-lg transition-all duration-500 cursor-pointer ${isToday ? 'bg-indigo-500 shadow-[0_0_20px_rgba(136,98,255,0.6)] border border-indigo-400/50' : 'bg-neutral-800 hover:bg-neutral-700'}`} 
-                    style={{ height: `${height}%` }}
-                  />
-                  <span className={`text-[10px] font-bold ${isToday ? 'text-indigo-400 font-extrabold' : 'text-neutral-500'}`}>
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}
-                  </span>
+        ) : !hasHealthData ? (
+          /* Empty State linking to Profile */
+          <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] shadow-xl">
+            <div 
+              onClick={() => navigate('/profile')}
+              className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30 text-center cursor-pointer hover:border-indigo-500/20 transition-colors group"
+            >
+              <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform duration-300">
+                <Heart size={22} className="fill-red-500" />
+              </div>
+              <h4 className="font-extrabold text-base text-white mb-1.5 group-hover:text-indigo-300 transition-colors">Connect Apple Health</h4>
+              <p className="text-xs text-neutral-400 max-w-xs mx-auto leading-relaxed">
+                Sync steps, workouts, and nutrition automatically. Tap here to configure connection.
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* Health Data Dashboard */
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Steps Card */}
+              <div className="bg-white/5 border border-white/10 p-1.5 rounded-[2rem] shadow-xl">
+                <div className="bg-[#13141C] rounded-[calc(2rem-0.375rem)] p-5 border border-neutral-800/30 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/5 rounded-full blur-xl"></div>
+                  <span className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase block mb-1">Steps Today</span>
+                  <p className="text-2xl font-extrabold text-white">{todaySteps.toLocaleString()}</p>
+                  <span className="text-[10px] text-teal-400 font-extrabold mt-1.5 block">Daily Goal: 10,000</span>
                 </div>
-              );
-            })}
+              </div>
+
+              {/* Active Energy Card */}
+              <div className="bg-white/5 border border-white/10 p-1.5 rounded-[2rem] shadow-xl">
+                <div className="bg-[#13141C] rounded-[calc(2rem-0.375rem)] p-5 border border-neutral-800/30 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-orange-500/5 rounded-full blur-xl"></div>
+                  <span className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase block mb-1">Calories Burned</span>
+                  <p className="text-2xl font-extrabold text-white">{todayCalories} kcal</p>
+                  <span className="text-[10px] text-orange-400 font-extrabold mt-1.5 block">Active energy</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 14-day Trend Chart */}
+            <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] shadow-2xl">
+              <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-5 border border-neutral-800/30">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-[11px] font-extrabold text-neutral-400 tracking-wide uppercase">14-Day Activity Trends</span>
+                </div>
+                <div className="h-40 w-full text-[10px] font-medium text-neutral-400">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorSteps" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="dateLabel" stroke="#404040" tickLine={false} axisLine={false} />
+                      <YAxis stroke="#404040" tickLine={false} axisLine={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#13141C', borderColor: '#262626', borderRadius: '12px' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                      />
+                      <Area type="monotone" dataKey="steps" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorSteps)" name="Steps" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Water Tracker Card */}
+      <section className="mb-8 text-left">
+        <div className="bg-white/5 border border-white/10 p-2 rounded-[2.2rem] shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-teal-500/5 to-transparent"></div>
+          
+          <div className="bg-[#13141C] rounded-[calc(2.2rem-0.5rem)] p-6 border border-neutral-800/30 relative z-10">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-2 text-teal-400 bg-teal-500/10 border border-teal-500/20 px-3 py-1.5 rounded-full">
+                <Droplet size={14} className="fill-teal-400" />
+                <span className="font-bold text-xs uppercase tracking-wider">Water Intake</span>
+              </div>
+              {lastWaterLogId && (
+                <button 
+                  onClick={handleUndoWater}
+                  className="text-xs text-neutral-400 font-bold hover:text-white hover:underline transition-colors active:scale-95"
+                >
+                  Undo Last
+                </button>
+              )}
+            </div>
+
+            <div className="flex justify-between items-end mb-3">
+              <div>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase block tracking-wider">Today's Total</span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-3xl font-extrabold text-white">{todayWater}</span>
+                  <span className="text-xs font-bold text-neutral-400">/ {waterGoal} ml</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-extrabold text-teal-400 uppercase tracking-widest bg-teal-500/10 px-2 py-1 rounded-lg">
+                {Math.round(Math.min((todayWater / waterGoal) * 100, 100))}%
+              </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full h-2 bg-neutral-900 border border-neutral-800/60 rounded-full overflow-hidden mb-6">
+              <div 
+                className="h-full bg-gradient-to-r from-teal-500 to-indigo-500 rounded-full transition-all duration-500 ease-out" 
+                style={{ width: `${Math.min((todayWater / waterGoal) * 100, 100)}%` }}
+              />
+            </div>
+
+            {/* Quick Add Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => handleAddWater(250)}
+                className="py-3 bg-neutral-900 border border-neutral-800/80 hover:border-teal-500/30 rounded-2xl text-xs font-bold text-neutral-300 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+              >
+                <Droplet size={12} className="text-teal-400 fill-teal-400" />
+                +250 ml
+              </button>
+              <button 
+                onClick={() => handleAddWater(500)}
+                className="py-3 bg-neutral-900 border border-neutral-800/80 hover:border-teal-500/30 rounded-2xl text-xs font-bold text-neutral-300 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+              >
+                <Droplet size={12} className="text-teal-400 fill-teal-400" />
+                +500 ml
+              </button>
+            </div>
           </div>
         </div>
       </section>

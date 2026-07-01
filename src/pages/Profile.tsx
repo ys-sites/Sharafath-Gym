@@ -1,4 +1,4 @@
-import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart } from 'lucide-react';
+import { Trophy, Clock, Calendar, ChevronRight, Activity, TrendingUp, TrendingDown, Target, Settings, Crown, LogOut, Heart, Copy, ChevronDown, ChevronUp, ExternalLink, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import WeightLoggerModal from '../components/profile/WeightLoggerModal';
 import { supabase } from '../lib/supabase';
@@ -27,6 +27,11 @@ export default function Profile() {
   const [caloriesSyncedToday, setCaloriesSyncedToday] = useState(0);
   const [lastHealthSync, setLastHealthSync] = useState('');
   const [userId, setUserId] = useState('your-user-id');
+  const [syncToken, setSyncToken] = useState('loading-sync-token...');
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [pingLoading, setPingLoading] = useState(false);
+  const [pingResult, setPingResult] = useState<string | null>(null);
+  const [isShortcutAccordionOpen, setIsShortcutAccordionOpen] = useState(false);
 
   const formatLastSync = (timestamp: string) => {
     if (!timestamp) return 'Never synced yet';
@@ -93,6 +98,64 @@ export default function Profile() {
     }
   };
 
+  const handleCopyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    }).catch(console.error);
+  };
+
+  const handleSendTestPing = async () => {
+    setPingLoading(true);
+    setPingResult(null);
+    const functionUrl = 'https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync';
+    try {
+      const res = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+          'x-sync-token': syncToken
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          sync_token: syncToken,
+          type: 'steps',
+          value: 0,
+          unit: 'count',
+          start_date: new Date().toISOString(),
+          end_date: new Date().toISOString()
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPingResult(`Success! Processed: ${data.processed || 0} metrics.`);
+        if (supabase) {
+          const user = (await supabase.auth.getUser()).data.user;
+          if (user) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('steps_synced_today, calories_synced_today, last_health_sync')
+              .eq('user_id', user.id)
+              .single();
+            if (profile) {
+              setStepsSyncedToday(profile.steps_synced_today || 0);
+              setCaloriesSyncedToday(profile.calories_synced_today || 0);
+              setLastHealthSync(profile.last_health_sync || '');
+            }
+          }
+        }
+      } else {
+        setPingResult(`Error: ${data.error || 'Request failed'}`);
+      }
+    } catch (err: any) {
+      setPingResult(`Network Error: ${err.message}`);
+    } finally {
+      setPingLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     const fetchTargets = async () => {
       if (!supabase) return;
@@ -102,7 +165,7 @@ export default function Profile() {
         
         let { data, error } = await supabase
           .from('profiles')
-          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync')
+          .select('daily_calorie_target, protein_target_g, carbs_target_g, fats_target_g, apple_health_connected, steps_synced_today, calories_synced_today, last_health_sync, sync_token')
           .eq('user_id', user.id)
           .single();
           
@@ -124,6 +187,7 @@ export default function Profile() {
             setProteinTarget(newProfile.protein_target_g);
             setCarbsTarget(newProfile.carbs_target_g);
             setFatsTarget(newProfile.fats_target_g);
+            setSyncToken(newProfile.sync_token || 'no-token-found');
           }
         } else if (data) {
           setCalorieTarget(data.daily_calorie_target);
@@ -134,6 +198,7 @@ export default function Profile() {
           setStepsSyncedToday(data.steps_synced_today || 0);
           setCaloriesSyncedToday(data.calories_synced_today || 0);
           setLastHealthSync(data.last_health_sync || '');
+          setSyncToken(data.sync_token || 'no-token-found');
         }
       } catch (err) {
         console.error(err);
@@ -329,7 +394,7 @@ export default function Profile() {
           </div>
 
           {isAppleHealthConnected && (
-            <div className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 mt-4 space-y-3.5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300 text-left">
               <div className="flex justify-between text-xs font-bold text-neutral-400">
                 <span>Last Sync</span>
                 <span className="text-indigo-400 font-extrabold">{formatLastSync(lastHealthSync)}</span>
@@ -343,26 +408,129 @@ export default function Profile() {
                 <span className="text-white font-extrabold">{caloriesSyncedToday} kcal</span>
               </div>
 
-              <div className="border-t border-neutral-800/60 pt-3.5 space-y-2 text-left">
-                <span className="text-[11px] font-extrabold text-neutral-400 block tracking-wide uppercase">Setup iOS Auto-Sync Guide</span>
-                <p className="text-[11px] text-neutral-500 leading-normal font-medium">
-                  To sync actual steps and workouts automatically, configure a Shortcut on your iPhone:
+              {/* Health Auto Export Guide & Inputs */}
+              <div className="border-t border-neutral-800/60 pt-4 space-y-3">
+                <span className="text-[11px] font-extrabold text-indigo-400 block tracking-wide uppercase">Setup Health Auto Export (iOS App)</span>
+                <p className="text-[11px] text-neutral-400 leading-relaxed font-medium">
+                  Configure dynamic automatic health backups from your iPhone:
                 </p>
-                <ol className="list-decimal pl-4 text-[10px] text-neutral-400 space-y-1 font-medium">
-                  <li>Open the <strong>Shortcuts</strong> app on iOS.</li>
-                  <li>Create a new shortcut. Find <strong>"Steps"</strong> and <strong>"Active Energy"</strong> for Today.</li>
-                  <li>Add <strong>"Get contents of URL"</strong> action, set it to <strong>POST</strong>.</li>
-                  <li>Set the request URL to:
-                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[9px] text-indigo-400 break-all select-all font-bold">
-                      {window.location.origin}/api/sync-health
-                    </code>
-                  </li>
-                  <li>Set Request Body as JSON, mapping your parameters:
-                    <code className="block bg-neutral-900 border border-neutral-800 rounded p-1.5 mt-1 font-mono text-[8.5px] text-neutral-300 break-all select-all">
-                      {"{"} "user_id": "{userId}", "steps": {"{"}Steps{"}"}, "calories": {"{"}Active Energy{"}"} {"}"}
-                    </code>
-                  </li>
-                </ol>
+                <ul className="list-disc pl-4 text-[10px] text-neutral-500 space-y-1 font-medium">
+                  <li>Install <strong>Health Auto Export</strong> from the App Store.</li>
+                  <li>Go to <strong>Automated Exports</strong> &rarr; <strong>New Automation</strong> &rarr; select <strong>REST API</strong>.</li>
+                  <li>Export format: <strong>JSON</strong>. Select metrics: <strong>Steps</strong>, <strong>Active Energy</strong>, <strong>Weight</strong>.</li>
+                </ul>
+
+                {/* API URL and Header Credentials Inputs */}
+                <div className="space-y-2.5 pt-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block">Endpoint URL</label>
+                    <div className="flex gap-2">
+                      <input 
+                        readOnly 
+                        value="https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync" 
+                        className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-[10px] font-mono text-neutral-300 focus:outline-none"
+                      />
+                      <button 
+                        onClick={() => handleCopyToClipboard("https://mnhwaljzcqfqtnfaivso.supabase.co/functions/v1/health-sync", "url")}
+                        className="px-3 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700/50 rounded-xl flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {copiedField === 'url' ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block">Header: x-user-id</label>
+                    <div className="flex gap-2">
+                      <input 
+                        readOnly 
+                        value={userId} 
+                        className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-[10px] font-mono text-neutral-300 focus:outline-none"
+                      />
+                      <button 
+                        onClick={() => handleCopyToClipboard(userId, "userId")}
+                        className="px-3 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700/50 rounded-xl flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {copiedField === 'userId' ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block">Header: x-sync-token</label>
+                    <div className="flex gap-2">
+                      <input 
+                        readOnly 
+                        value={syncToken} 
+                        className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-[10px] font-mono text-neutral-300 focus:outline-none"
+                      />
+                      <button 
+                        onClick={() => handleCopyToClipboard(syncToken, "syncToken")}
+                        className="px-3 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700/50 rounded-xl flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+                      >
+                        {copiedField === 'syncToken' ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-[9px] text-neutral-500 italic leading-relaxed">
+                  Note: The endpoint only accepts POST requests. Opening this URL in a browser will show a method error, which is expected.
+                </p>
+
+                {/* Test Connection Button */}
+                <div className="pt-2">
+                  <button 
+                    disabled={pingLoading}
+                    onClick={handleSendTestPing}
+                    className="w-full py-2.5 bg-[#15161E] hover:bg-neutral-800/40 border border-neutral-800/80 rounded-xl text-xs font-bold text-neutral-300 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-50"
+                  >
+                    {pingLoading ? <RefreshCw size={14} className="animate-spin text-indigo-400" /> : null}
+                    Send test ping (steps=0)
+                  </button>
+                  {pingResult && (
+                    <div className={`mt-2 p-2.5 rounded-xl text-[10px] font-mono leading-normal ${pingResult.startsWith('Success') ? 'bg-emerald-950/40 border border-emerald-500/20 text-emerald-400' : 'bg-red-950/40 border border-red-500/20 text-red-400'}`}>
+                      {pingResult}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* iOS Shortcuts Accordion */}
+              <div className="border-t border-neutral-800/60 pt-4">
+                <button 
+                  onClick={() => setIsShortcutAccordionOpen(!isShortcutAccordionOpen)}
+                  className="w-full flex items-center justify-between text-[11px] font-extrabold text-neutral-400 uppercase tracking-wide hover:text-white transition-colors"
+                >
+                  <span>Advanced: iOS Shortcuts Integration</span>
+                  <ChevronDown size={14} className={`transform transition-transform ${isShortcutAccordionOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isShortcutAccordionOpen && (
+                  <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="text-[10px] text-neutral-500 leading-relaxed font-medium">
+                      Configure a custom Shortcut to sync steps and energy metrics with this JSON payload format:
+                    </p>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center pl-1">
+                        <span className="text-[9px] font-bold text-neutral-500 uppercase">Shortcuts JSON body</span>
+                        <button 
+                          onClick={() => handleCopyToClipboard(JSON.stringify({ user_id: userId, sync_token: syncToken, steps: 0, calories: 0 }), "shortcutJson")}
+                          className="text-[9px] font-bold text-indigo-400 hover:underline flex items-center gap-1"
+                        >
+                          {copiedField === 'shortcutJson' ? 'Copied!' : 'Copy Schema'}
+                        </button>
+                      </div>
+                      <pre className="bg-neutral-950 border border-neutral-850 rounded-xl p-3 text-[9px] font-mono text-neutral-400 overflow-x-auto">
+{`{
+  "user_id": "${userId}",
+  "sync_token": "${syncToken}",
+  "steps": 10000,
+  "calories": 450
+}`}
+                      </pre>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -467,9 +635,9 @@ export default function Profile() {
   );
 }
 
-function Check({ size }: { size: number }) {
+function Check({ size, className }: { size: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <polyline points="20 6 9 17 4 12"></polyline>
     </svg>
   );

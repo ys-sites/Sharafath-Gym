@@ -62,3 +62,8 @@ Then run the backup script:
 npm run backup
 ```
 The export will be saved as a timestamped SQL file inside the local `/backups` directory (which is ignored by Git).
+
+## Acknowledgements
+
+- **SHREDDED Exercise Generator**: The workout generator implementation, muscle split concepts, and goal-based rep schemes were inspired by the open-source MIT-licensed [SHREDDED project](https://github.com/aridepai17/SHREDDED-EXERCISE-GENERATOR).
+
