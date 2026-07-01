@@ -91,13 +91,10 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
         payload.description = description;
       }
 
-      const { data: { session } } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
-
       const response = await fetch('/api/analyze-meal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
         },
         body: JSON.stringify(payload),
       });
@@ -145,14 +142,9 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
         payload.mimeType = image.type;
       }
 
-      const { data: { session } } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
-
       const response = await fetch('/api/analyze-meal', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
