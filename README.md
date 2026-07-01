@@ -31,8 +31,11 @@ APP_URL=http://localhost:3000
 | `VITE_SUPABASE_ANON_KEY` | Client + Server | Supabase anon/public key |
 | `OWNER_EMAIL` | Server only | Owner account email, used by `/api/session` to sign in server-side |
 | `OWNER_PASSWORD` | Server only | Owner account password, used by `/api/session` to sign in server-side |
-| `GEMINI_API_KEY` | Server only | Optional, for AI meal analysis |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Optional, for privileged sync operations |
+| `OPENAI_API_KEY` | Server only | Optional, for AI meal analysis (highest priority) |
+| `ANTHROPIC_API_KEY` | Server only | Optional, for AI meal analysis (2nd priority) |
+| `GEMINI_API_KEY` | Server only | Optional, for AI meal analysis (3rd priority) |
+| `AI_MEAL_PROVIDER` | Server only | Optional — force meal analysis to `openai`, `anthropic`, or `gemini` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only | Optional, for privileged sync operations and meal scan logging |
 | `APP_URL` | Server only | Optional, used for CORS/self-referential links |
 
 ## Running Locally

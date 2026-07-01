@@ -2,11 +2,16 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 import postgres from "postgres";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import {
+  analyzeMeal,
+  extractUserIdFromAuthHeader,
+  validateAndSanitizeInput,
+  MealAnalysisConfigError,
+  MealAnalysisValidationError,
+  type AnalyzeMealInput,
+} from "./src/server/mealAnalysis";
 
 const SESSION_RATE_LIMIT_WINDOW_MS = 60_000;
 const SESSION_RATE_LIMIT_MAX = 10;
@@ -77,52 +82,57 @@ async function startServer() {
     }
   });
 
-  // API route for meal analysis
+  // API route for meal analysis (mirrors api/analyze-meal.ts)
   app.post("/api/analyze-meal", async (req, res) => {
+    let input: AnalyzeMealInput;
     try {
-      const { image, mimeType, description } = req.body;
-      let promptParts: any[] = [];
-      const promptText = `Analyze this meal. Provide a response strictly in JSON format.
-Identify food items and estimate: food name, estimated portion size, calories, protein (g), carbs (g), fats (g).
-Respond ONLY in this exact JSON schema:
-{
-  "items": [
-    { "name": "grilled chicken breast", "portion": "150g", "calories": 250, "protein": 46, "carbs": 0, "fats": 6 }
-  ],
-  "total": { "calories": 250, "protein": 46, "carbs": 0, "fats": 6 },
-  "confidence": "medium"
-}`;
+      input = validateAndSanitizeInput(req.body);
+    } catch (err: any) {
+      if (err instanceof MealAnalysisValidationError) {
+        return res.status(err.status).json({ error: err.message });
+      }
+      return res.status(400).json({ error: "Invalid request." });
+    }
 
-      promptParts.push(promptText);
+    const userId = extractUserIdFromAuthHeader(req.headers.authorization);
+    const inputType = input.correctedItem ? "correction" : input.image ? "image" : "description";
+    const supabaseUrl = process.env.VITE_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const logClient = supabaseUrl && serviceRoleKey
+      ? createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } })
+      : null;
 
-      if (image && mimeType) {
-        promptParts.push({
-          inlineData: {
-            mimeType,
-            data: image,
-          }
+    const logScan = async (success: boolean, rawResponse: any, errorMessage: string | null, provider: string | null) => {
+      if (!logClient) return;
+      try {
+        await logClient.from("meal_scan_logs").insert({
+          user_id: userId,
+          input_type: inputType,
+          raw_ai_response: rawResponse,
+          success,
+          error_message: errorMessage,
+          provider,
         });
-      } else if (description) {
-        promptParts.push(`\nMeal description: ${description}`);
-      } else {
-        return res.status(400).json({ error: "Please provide an image or description." });
+      } catch (err) {
+        console.error("Failed to write meal_scan_logs entry:", err);
+      }
+    };
+
+    try {
+      const { data, provider, fallbackUsed } = await analyzeMeal(input);
+      await logScan(true, data, null, provider);
+      return res.status(200).json({ ...data, provider, fallback_used: fallbackUsed });
+    } catch (error: any) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error("Meal analysis failed:", message);
+
+      if (error instanceof MealAnalysisConfigError) {
+        await logScan(false, null, message, null);
+        return res.status(500).json({ error: `AI configuration error: ${message}` });
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: promptParts,
-        config: {
-          responseMimeType: "application/json"
-        }
-      });
-
-      const jsonText = response.text || "{}";
-      const parsedData = JSON.parse(jsonText);
-
-      res.json(parsedData);
-    } catch (error: any) {
-      console.error("Analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze meal." });
+      await logScan(false, null, message, null);
+      return res.status(500).json({ error: "Analysis failed, try again." });
     }
   });
 
