@@ -1,38 +1,46 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Sharafath Gym
 
-# Run and deploy your AI Studio app
+Premium fitness and workout tracking web application styled to support user program routines, AI-assisted meal logging, database-persistent logs, and Apple Health synchronization.
 
-This contains everything you need to run your app locally.
+## Tech Stack
+- **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, Framer Motion, Recharts
+- **Backend & Database**: Supabase (PostgreSQL, Auth, Storage)
+- **Local Dev Server**: Express (Node.js)
 
-View your app in AI Studio: https://ai.studio/apps/0f3cd4a5-e863-4b9b-b950-9c536a08f54d
+## Environment Variables
+Create a local `.env` file in the root directory and configure the following parameters:
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://mnhwaljzcqfqtnfaivso.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-## Run Locally
+# Optional: Server-side integrations for AI analysis / sync
+GEMINI_API_KEY=your_gemini_api_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+APP_URL=http://localhost:3000
+```
 
-**Prerequisites:**  Node.js
+## Running Locally
 
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+2. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+   The app will boot locally at [http://localhost:3000](http://localhost:3000).
 
 ## Database Backups
 
-You can run automated timestamped SQL schema/data exports locally.
-
-### Setup DB Password
-Create or set `SUPABASE_DB_PASSWORD` in your local `.env` file or environment:
+Ensure you set the database direct connection password in your terminal/environment:
 ```bash
-SUPABASE_DB_PASSWORD=your_supabase_db_password
+$env:SUPABASE_DB_PASSWORD="your_database_password"
 ```
-
-### Run Backup
-Run the backup script:
+Then run the backup script:
 ```bash
 npm run backup
 ```
-The output file will be generated in `/backups` under the project root (ignored by Git).
-
+The export will be saved as a timestamped SQL file inside the local `/backups` directory (which is ignored by Git).

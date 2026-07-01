@@ -1,16 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
-import History from './pages/History';
-import Programs from './pages/Programs';
 import Profile from './pages/Profile';
 import WorkoutLogger from './pages/WorkoutLogger';
 import Auth from './pages/Auth';
-import Nutrition from './pages/Nutrition';
 import WorkoutDetail from './pages/WorkoutDetail';
-import ActiveWorkout from './pages/ActiveWorkout';
 import { supabase } from './lib/supabase';
+
+// Route-level code splitting with React.lazy
+const History = lazy(() => import('./pages/History'));
+const Programs = lazy(() => import('./pages/Programs'));
+const Nutrition = lazy(() => import('./pages/Nutrition'));
+const ActiveWorkout = lazy(() => import('./pages/ActiveWorkout'));
 
 export default function App() {
   const [session, setSession] = useState<any>(null);
@@ -22,34 +24,18 @@ export default function App() {
       return;
     }
     
-    const autoLogin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setSession(session);
-        setLoading(false);
-      } else {
-        // Try to login with default personal credentials to bypass auth screen
-        const email = 'sharafath2001@hotmail.com';
-        const password = 'TrainTrackPassword123!';
-        
-        let { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          // If login fails, try signing up the personal account
-          const signUpRes = await supabase.auth.signUp({ email, password });
-          setSession(signUpRes.data?.session);
-        } else {
-          setSession(data.session);
-        }
-        setLoading(false);
-      }
+    const checkSession = async () => {
+      const { data: { session: activeSession } } = await supabase.auth.getSession();
+      setSession(activeSession);
+      setLoading(false);
     };
     
-    autoLogin();
+    checkSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
     });
 
     return () => subscription.unsubscribe();
@@ -74,20 +60,47 @@ export default function App() {
     );
   }
 
+  // Security Hardening: Gate access via Auth screen if session is not active
+  if (!session) {
+    return <Auth />;
+  }
+
+  const LoadingPlaceholder = (
+    <div className="h-screen flex items-center justify-center bg-[#0C0D12] text-neutral-400">
+      <div className="animate-pulse font-bold text-sm">Loading...</div>
+    </div>
+  );
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="history" element={<History />} />
-          <Route path="nutrition" element={<Nutrition />} />
-          <Route path="programs" element={<Programs />} />
+          <Route path="history" element={
+            <Suspense fallback={LoadingPlaceholder}>
+              <History />
+            </Suspense>
+          } />
+          <Route path="nutrition" element={
+            <Suspense fallback={LoadingPlaceholder}>
+              <Nutrition />
+            </Suspense>
+          } />
+          <Route path="programs" element={
+            <Suspense fallback={LoadingPlaceholder}>
+              <Programs />
+            </Suspense>
+          } />
           <Route path="profile" element={<Profile />} />
         </Route>
         {/* Logger is outside the standard layout (no bottom nav during workout) */}
         <Route path="/logger" element={<WorkoutLogger />} />
         <Route path="/workout/:id" element={<WorkoutDetail />} />
-        <Route path="/active-workout/:id" element={<ActiveWorkout />} />
+        <Route path="/active-workout/:id" element={
+          <Suspense fallback={LoadingPlaceholder}>
+            <ActiveWorkout />
+          </Suspense>
+        } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

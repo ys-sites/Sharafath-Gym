@@ -65,79 +65,65 @@ Respond ONLY in this exact JSON schema:
   // API route for Apple Health sync
   app.post("/api/sync-health", async (req, res) => {
     try {
-      const { user_id, steps, calories } = req.body;
-      if (!user_id) {
-        return res.status(400).json({ error: "Missing user_id parameter in body" });
+      const { user_id, sync_token, steps, calories } = req.body;
+      if (!user_id || !sync_token) {
+        return res.status(400).json({ error: "Missing required user_id or sync_token in request body" });
       }
 
-      const stepsVal = Number(steps || 0);
-      const caloriesVal = Number(calories || 0);
-      const now = new Date().toISOString();
+      const stepsNum = Number(steps);
+      const caloriesNum = Number(calories);
 
+      if (!Number.isFinite(stepsNum) || stepsNum < 0 || stepsNum >= 500000) {
+        return res.status(400).json({ error: "Invalid steps: must be a finite number between 0 and 500,000" });
+      }
+
+      if (!Number.isFinite(caloriesNum) || caloriesNum < 0 || caloriesNum >= 500000) {
+        return res.status(400).json({ error: "Invalid calories: must be a finite number between 0 and 500,000" });
+      }
+
+      const now = new Date().toISOString();
       const supabaseUrl = process.env.VITE_SUPABASE_URL || "";
       const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-      const dbPassword = process.env.SUPABASE_DB_PASSWORD || "";
-
-      if (supabaseUrl && serviceRoleKey) {
-        const supabase = createClient(supabaseUrl, serviceRoleKey, {
-          auth: { persistSession: false }
-        });
-
-        const { error } = await supabase
-          .from("profiles")
-          .update({
-            apple_health_connected: true,
-            steps_synced_today: stepsVal,
-            calories_synced_today: caloriesVal,
-            last_health_sync: now
-          })
-          .eq("user_id", user_id);
-
-        if (!error) {
-          return res.json({ success: true, method: "Supabase Service Client" });
-        }
-      }
-
-      if (dbPassword) {
-        const connectionString = `postgresql://postgres:${dbPassword}@db.mnhwaljzcqfqtnfaivso.supabase.co:5432/postgres`;
-        const sql = postgres(connectionString);
-
-        await sql`
-          UPDATE profiles 
-          SET 
-            apple_health_connected = true,
-            steps_synced_today = ${stepsVal},
-            calories_synced_today = ${caloriesVal},
-            last_health_sync = ${now}
-          WHERE user_id = ${user_id};
-        `;
-
-        await sql.end();
-        return res.json({ success: true, method: "Direct PG Database Update" });
-      }
-
       const anonKey = process.env.VITE_SUPABASE_ANON_KEY || "";
-      if (supabaseUrl && anonKey) {
-        const supabase = createClient(supabaseUrl, anonKey, {
-          auth: { persistSession: false }
-        });
 
-        const { error } = await supabase
-          .from("profiles")
-          .update({
-            apple_health_connected: true,
-            steps_synced_today: stepsVal,
-            calories_synced_today: caloriesVal,
-            last_health_sync: now
-          })
-          .eq("user_id", user_id);
-
-        if (!error) {
-          return res.json({ success: true, method: "Supabase Anon Client" });
-        }
+      // Initialize Supabase client (try service role, then fallback to anon key in dev)
+      const key = serviceRoleKey || anonKey;
+      if (!supabaseUrl || !key) {
+        return res.status(500).json({ error: "Supabase environment variables not configured" });
       }
 
-      res.status(500).json({ error: "No database credentials configured on Express server." });
+      const supabase = createClient(supabaseUrl, key, {
+        auth: { persistSession: false }
+      });
+
+      // Verify sync token
+      const { data: profile, error: selectError } = await supabase
+        .from("profiles")
+        .select("user_id, sync_token")
+        .eq("user_id", user_id)
+        .eq("sync_token", sync_token)
+        .maybeSingle();
+
+      if (selectError || !profile) {
+        return res.status(401).json({ error: "Unauthorized: Invalid user_id or sync_token" });
+      }
+
+      // Update values
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          apple_health_connected: true,
+          steps_synced_today: stepsNum,
+          calories_synced_today: caloriesNum,
+          last_health_sync: now
+        })
+        .eq("user_id", user_id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return res.json({ success: true, method: "Supabase Client" });
     } catch (error: any) {
       console.error("Health sync error:", error);
       res.status(500).json({ error: error.message || "Failed to sync Health data." });
