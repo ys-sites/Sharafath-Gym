@@ -16,10 +16,10 @@ export default function Home() {
 
   useEffect(() => {
     const loadHealthData = async () => {
-      if (!supabase) return;
+      if (!supabase) { setLoadingHealth(false); return; }
       try {
         const user = (await supabase.auth.getUser()).data.user;
-        if (!user) return;
+        if (!user) { setLoadingHealth(false); return; }
 
         const [today, stepsA, calA, stepsS, calS] = await Promise.all([
           getTodayMetrics(user.id),
