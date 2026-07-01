@@ -28,6 +28,7 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
 
   // Scanning animation states
   const [scanStatusIndex, setScanStatusIndex] = useState(0);
+  const [recalculatingIndex, setRecalculatingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     let interval: any = null;
@@ -104,15 +105,77 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
 
       const data = await response.json();
       setAnalysisResult(data);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to analyze meal. You can still enter details manually.');
-      setAnalysisResult({
-        items: [{ name: '', portion: '', calories: 0, protein: 0, carbs: 0, fats: 0 }],
-        total: { calories: 0, protein: 0, carbs: 0, fats: 0 }
-      });
+    } catch (err: any) {
+      console.error("Gemini analysis error:", err);
+      setError("Couldn't analyze this photo — try again or enter it manually.");
+      setAnalysisResult(null);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleAddManualItem = () => {
+    setAnalysisResult({
+      items: [{ name: 'Custom Item', portion: '1 serving', calories: 0, protein: 0, carbs: 0, fats: 0 }],
+      total: { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    });
+    setError('');
+  };
+
+  const recalculateItem = async (index: number) => {
+    if (!analysisResult) return;
+    const item = analysisResult.items[index];
+    if (!item.name || !item.portion) return;
+
+    setRecalculatingIndex(index);
+    try {
+      const payload: { image?: string; mimeType?: string; correctedItem: { name: string; portion: string } } = {
+        correctedItem: {
+          name: item.name,
+          portion: item.portion
+        }
+      };
+
+      if (image) {
+        const base64Data = await fileToBase64(image);
+        payload.image = base64Data;
+        payload.mimeType = image.type;
+      }
+
+      const response = await fetch('/api/analyze-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error('Recalculation failed');
+      const data = await response.json();
+      const updatedItem = data.items?.[0];
+
+      if (updatedItem) {
+        const newItems = [...analysisResult.items];
+        newItems[index] = {
+          ...newItems[index],
+          calories: Number(updatedItem.calories) || 0,
+          protein: Number(updatedItem.protein) || 0,
+          carbs: Number(updatedItem.carbs) || 0,
+          fats: Number(updatedItem.fats) || 0
+        };
+
+        const newTotal = newItems.reduce((acc, it) => ({
+          calories: acc.calories + (Number(it.calories) || 0),
+          protein: acc.protein + (Number(it.protein) || 0),
+          carbs: acc.carbs + (Number(it.carbs) || 0),
+          fats: acc.fats + (Number(it.fats) || 0)
+        }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
+        setAnalysisResult({ ...analysisResult, items: newItems, total: newTotal });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to recalculate macros. Please enter manually.');
+    } finally {
+      setRecalculatingIndex(null);
     }
   };
 
@@ -385,9 +448,17 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                 onClick={analyzeMeal}
                 className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold py-4 rounded-full active:scale-[0.98] transition-transform text-base uppercase tracking-wider shadow-lg shadow-indigo-500/20"
               >
-                Scan & Analyze
+                Retry Scan
               </button>
-              {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
+              
+              <button
+                onClick={handleAddManualItem}
+                className="w-full bg-neutral-900 border border-neutral-850 hover:bg-neutral-800 text-neutral-300 font-extrabold py-4 rounded-full active:scale-[0.98] transition-transform text-xs uppercase tracking-wider"
+              >
+                Enter Details Manually
+              </button>
+
+              {error && <p className="text-red-500 text-xs font-bold text-center mt-2 leading-relaxed">{error}</p>}
             </div>
           )}
 
@@ -421,30 +492,37 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                   <div className="space-y-4">
                     {analysisResult.items.map((item: any, i: number) => (
                       <div key={i} className="bg-black/30 border border-neutral-800/50 rounded-2xl p-4 space-y-3">
-                        <input 
-                          value={item.name}
-                          onChange={(e) => updateItem(i, 'name', e.target.value)}
-                          className="w-full bg-transparent text-base font-extrabold text-white focus:outline-none"
-                        />
                         <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500 col-span-2">
+                             <span className="text-[9px] text-neutral-500 uppercase block font-bold">Food Name</span>
+                             <input 
+                               value={item.name}
+                               onChange={(e) => updateItem(i, 'name', e.target.value)}
+                               className="w-full bg-transparent text-sm text-white focus:outline-none mt-0.5"
+                               placeholder="E.g. Grilled Chicken"
+                             />
+                          </div>
+
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500">
                              <span className="text-[9px] text-neutral-500 uppercase block font-bold">Portion</span>
                              <input 
                                value={item.portion}
                                onChange={(e) => updateItem(i, 'portion', e.target.value)}
-                               className="w-full bg-transparent text-xs text-white focus:outline-none"
+                               className="w-full bg-transparent text-xs text-white focus:outline-none mt-0.5"
                              />
                           </div>
+
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500">
                              <span className="text-[9px] text-neutral-500 uppercase block font-bold">Calories</span>
                              <input 
                                type="number"
                                value={item.calories}
                                onChange={(e) => updateItem(i, 'calories', Number(e.target.value))}
-                               className="w-full bg-transparent text-xs text-white focus:outline-none"
+                               className="w-full bg-transparent text-xs text-white focus:outline-none mt-0.5"
                              />
                           </div>
                         </div>
+
                         <div className="grid grid-cols-3 gap-2">
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500">
                              <span className="text-[9px] text-neutral-500 uppercase block font-bold">Prot (g)</span>
@@ -452,7 +530,7 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                                type="number"
                                value={item.protein || 0}
                                onChange={(e) => updateItem(i, 'protein', Number(e.target.value))}
-                               className="w-full bg-transparent text-xs text-white focus:outline-none"
+                               className="w-full bg-transparent text-xs text-white focus:outline-none mt-0.5"
                              />
                           </div>
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500">
@@ -461,7 +539,7 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                                type="number"
                                value={item.carbs || 0}
                                onChange={(e) => updateItem(i, 'carbs', Number(e.target.value))}
-                               className="w-full bg-transparent text-xs text-white focus:outline-none"
+                               className="w-full bg-transparent text-xs text-white focus:outline-none mt-0.5"
                              />
                           </div>
                           <div className="bg-neutral-900/60 rounded-xl p-2 px-3 border border-neutral-850 focus-within:border-indigo-500">
@@ -470,9 +548,29 @@ export default function MealLoggerModal({ onClose, onSave }: MealLoggerModalProp
                                type="number"
                                value={item.fats || 0}
                                onChange={(e) => updateItem(i, 'fats', Number(e.target.value))}
-                               className="w-full bg-transparent text-xs text-white focus:outline-none"
+                               className="w-full bg-transparent text-xs text-white focus:outline-none mt-0.5"
                              />
                           </div>
+                        </div>
+
+                        {/* Recalculate button overlay trigger */}
+                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-neutral-850/60">
+                          <span className="text-[10px] text-neutral-500 font-medium">Edits name or portion?</span>
+                          <button
+                            type="button"
+                            disabled={recalculatingIndex !== null}
+                            onClick={() => recalculateItem(i)}
+                            className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider hover:text-indigo-300 disabled:opacity-50 flex items-center gap-1.5 focus:outline-none active:scale-95 transition-transform"
+                          >
+                            {recalculatingIndex === i ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                                Recalculating...
+                              </>
+                            ) : (
+                              "Recalculate Macros"
+                            )}
+                          </button>
                         </div>
                       </div>
                     ))}
