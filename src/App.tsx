@@ -1,74 +1,27 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import Layout from './components/layout/Layout';
+import WebsiteLayout from './components/layout/WebsiteLayout';
 import Home from './pages/Home';
-import History from './pages/History';
-import Programs from './pages/Programs';
-import Profile from './pages/Profile';
+import ProgressAnalytics from './pages/ProgressAnalytics';
+import BlueprintPortal from './pages/BlueprintPortal';
 import WorkoutLogger from './pages/WorkoutLogger';
-import Nutrition from './pages/Nutrition';
-import WorkoutDetail from './pages/WorkoutDetail';
-import ActiveWorkout from './pages/ActiveWorkout';
-import GenerateWorkout from './pages/GenerateWorkout';
-import { supabase } from './lib/supabase';
-import { SessionResponseSchema } from './lib/zodSchemas';
+import WeightTracker from './pages/WeightTracker';
+import NutritionLogPage from './pages/NutritionLogPage';
+import DataHub from './pages/DataHub';
 
 export default function App() {
-  // Sign in silently in background — never block rendering
-  useEffect(() => {
-    if (!supabase) return;
-
-    const performSessionMint = async (isRetry = false) => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) return; // Already has session
-
-        const res = await fetch('/api/session', { method: 'POST' });
-        if (!res.ok) {
-          throw new Error(`Failed to fetch session: status ${res.status}`);
-        }
-        const rawData = await res.json();
-        const parsed = SessionResponseSchema.safeParse(rawData);
-        if (parsed.success) {
-          await supabase.auth.setSession({
-            access_token: parsed.data.access_token,
-            refresh_token: parsed.data.refresh_token,
-          });
-        } else {
-          console.warn('Session response validation failed:', parsed.error);
-        }
-      } catch (err) {
-        console.error('Session establishment error:', err);
-        if (!isRetry) {
-          setTimeout(() => {
-            performSessionMint(true).catch(console.error);
-          }, 3000);
-        }
-      }
-    };
-
-    performSessionMint().catch(console.error);
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Render the app immediately — no loading gate
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<WebsiteLayout />}>
           <Route index element={<Home />} />
-          <Route path="history" element={<History />} />
-          <Route path="nutrition" element={<Nutrition />} />
-          <Route path="programs" element={<Programs />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="progression" element={<ProgressAnalytics />} />
+          <Route path="blueprint" element={<BlueprintPortal />} />
+          <Route path="logger" element={<WorkoutLogger />} />
+          <Route path="weight" element={<WeightTracker />} />
+          <Route path="nutrition" element={<NutritionLogPage />} />
+          <Route path="data-hub" element={<DataHub />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
-        <Route path="/logger" element={<WorkoutLogger />} />
-        <Route path="/generate-workout" element={<GenerateWorkout />} />
-        <Route path="/workout/:id" element={<WorkoutDetail />} />
-        <Route path="/active-workout/:id" element={<ActiveWorkout />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,9 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { X, Play, Pause, Check, Plus, Volume2, VolumeX, Maximize, Clock, Trophy } from 'lucide-react';
+import { X, Play, Pause, Check, Plus, Clock, Trophy, Dumbbell, Info, ExternalLink, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import { calculate1RM, getPastSetsForExercise, getExercisePRs, PastSet } from '../utils/prs';
+
+function getYoutubeId(url?: string): string | null {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
 
 const ROUTINES: Record<string, { name: string; category: string; duration: string; calories: string; difficulty: string; exercises: Array<{ name: string; reps: string; sets: number; videoUrl?: string; tip?: string }> }> = {
   push_1: {
@@ -96,11 +104,7 @@ const ROUTINES: Record<string, { name: string; category: string; duration: strin
   }
 };
 
-function getYoutubeId(url?: string) {
-  if (!url) return null;
-  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
-  return match ? match[1] : null;
-}
+type ExerciseMedia = { image_urls: string[] | null; instructions: string[] | null };
 
 export default function ActiveWorkout() {
   const navigate = useNavigate();
@@ -117,13 +121,15 @@ export default function ActiveWorkout() {
   const [weight, setWeight] = useState('');
   const [feeling, setFeeling] = useState(1); // 0 = Too easy, 1 = Just right, 2 = Too hard
   
-  // Fullscreen states
-  const [isFullscreenVideo, setIsFullscreenVideo] = useState(false);
-  const [isFullscreenMuted, setIsFullscreenMuted] = useState(true);
+  // Exercise header / tutorial sheet state
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   // Rest Timer State
   const [restTimerSeconds, setRestTimerSeconds] = useState(0);
   const [isRestTimerActive, setIsRestTimerActive] = useState(false);
+  const [isFullscreenVideo, setIsFullscreenVideo] = useState(false);
+  const [isFullscreenMuted, setIsFullscreenMuted] = useState(true);
 
   // Live session tracking state
   const [userId, setUserId] = useState<string | null>(null);
@@ -139,6 +145,49 @@ export default function ActiveWorkout() {
   const sessionInitRef = useRef(false);
 
   const currentSets = loggedSetsByExercise[currentExercise.name] || [];
+
+  // Demo image + tutorial instructions for the current exercise, matched by name against the
+  // exercises table (seeded from free-exercise-db). Cached per exercise name for the session.
+  const { data: exerciseMedia } = useQuery<ExerciseMedia | null>({
+    queryKey: ['exerciseMedia', currentExercise.name],
+    queryFn: async () => {
+      const name = currentExercise.name;
+      const { data: exact } = await supabase
+        .from('exercises')
+        .select('image_urls, instructions')
+        .ilike('name', name)
+        .limit(1)
+        .maybeSingle();
+      if (exact) return exact as ExerciseMedia;
+
+      const { data: fuzzy } = await supabase
+        .from('exercises')
+        .select('image_urls, instructions')
+        .ilike('name', `%${name}%`)
+        .limit(1)
+        .maybeSingle();
+      return (fuzzy as ExerciseMedia) || null;
+    },
+    staleTime: Infinity,
+  });
+
+  const demoImageUrl = exerciseMedia?.image_urls?.[0] || null;
+  const demoInstructions = exerciseMedia?.instructions || [];
+  const demoImages = exerciseMedia?.image_urls || [];
+
+  // Reset the broken-image flag whenever the exercise (and thus the image URL) changes
+  useEffect(() => {
+    setImgError(false);
+  }, [currentExercise.name]);
+
+  // Lock background scroll while the tutorial sheet is open
+  useEffect(() => {
+    if (showTutorial) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prevOverflow; };
+    }
+  }, [showTutorial]);
 
   // Create the workout session and resolve/create exercise + session_exercise rows once on mount
   useEffect(() => {
