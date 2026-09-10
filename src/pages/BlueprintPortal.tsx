@@ -59,39 +59,42 @@ export default function BlueprintPortal() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-16">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 p-6 md:p-8">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold">
-                Master Blueprint & Dossier
-              </span>
-              <span className="text-xs text-zinc-400 font-mono">
-                Mousa Ghanem Coaching File
-              </span>
+      <div className="double-bezel-outer p-1.5 sm:p-2 rounded-[2rem] transition-all">
+        <div className="double-bezel-inner p-6 sm:p-8 rounded-[calc(2rem-0.5rem)] relative overflow-hidden">
+          <div className="absolute -right-24 -top-24 w-80 h-80 rounded-full bg-amber-500/[0.04] blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold">
+                  Master Blueprint & Dossier
+                </span>
+                <span className="text-xs text-zinc-400 font-mono">
+                  Mousa Ghanem Coaching File
+                </span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white">
+                Ascension Master Blueprint
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed font-light">
+                Complete, comprehensive reproduction of Sharafath’s 19-page Fitness & Performance plan. 
+                Review program architecture, daily routines, progression models, nutrition protocols, and micronutrient guidelines.
+              </p>
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white">
-              Ascension Master Blueprint
-            </h1>
-            <p className="text-sm text-zinc-300 max-w-2xl leading-relaxed">
-              Complete, comprehensive reproduction of Sharafath’s 19-page Fitness & Performance plan. 
-              Review program architecture, daily routines, progression models, nutrition protocols, and micronutrient guidelines.
-            </p>
-          </div>
 
-          <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 space-y-2 max-w-xs shadow-inner">
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold font-serif uppercase tracking-wider">
-              <Award size={16} />
-              <span>Certified Coaching</span>
+            <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800/80 space-y-2 max-w-xs shadow-inner backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold font-serif uppercase tracking-wider">
+                <Award size={16} />
+                <span>Certified Coaching</span>
+              </div>
+              <p className="text-xs text-zinc-300 font-medium">
+                Made by {SHARAFATH_PROFILE.coach}
+              </p>
+              <p className="text-[11px] text-zinc-500 font-light">
+                {SHARAFATH_PROFILE.motto}
+              </p>
             </div>
-            <p className="text-xs text-zinc-300 font-medium">
-              Made by {SHARAFATH_PROFILE.coach}
-            </p>
-            <p className="text-[11px] text-zinc-500">
-              {SHARAFATH_PROFILE.motto}
-            </p>
           </div>
         </div>
       </div>
