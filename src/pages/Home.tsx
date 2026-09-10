@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Dumbbell, 
@@ -8,33 +7,24 @@ import {
   UtensilsCrossed, 
   Award, 
   ArrowRight, 
-  Plus, 
   Sparkles, 
   Flame, 
   Calendar, 
   Clock, 
   CheckCircle2, 
-  Database,
-  ChevronRight,
-  ShieldAlert
+  ChevronRight
 } from 'lucide-react';
-import { getGymStore, ManualWorkoutSession } from '../lib/manualStorage';
-import { SHARAFATH_PROFILE, PHASE_2_WORKOUTS, NUTRITION_BLUEPRINT } from '../data/blueprintData';
+import { GYM_DATA, WorkoutSession } from '../data/gymHistoryData';
+import { SHARAFATH_PROFILE, PHASE_2_WORKOUTS } from '../data/blueprintData';
 
 export default function Home() {
-  const [store, setStore] = useState(getGymStore());
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleUpdate = () => setStore(getGymStore());
-    window.addEventListener('sharafath-gym-data-updated', handleUpdate);
-    return () => window.removeEventListener('sharafath-gym-data-updated', handleUpdate);
-  }, []);
-
-  const latestWorkout: ManualWorkoutSession | undefined = store.workouts[0];
+  const latestWorkout: WorkoutSession | undefined = GYM_DATA.workouts[0];
   const startingWeight = SHARAFATH_PROFILE.startingWeightKg; // 82.0
   const targetWeight = SHARAFATH_PROFILE.goalWeightKg; // 75.0
-  const currentWeight = store.weights.length > 0 ? store.weights[store.weights.length - 1].weightKg : startingWeight;
+  const latestWeightEntry = GYM_DATA.weights[GYM_DATA.weights.length - 1];
+  const currentWeight = latestWeightEntry ? latestWeightEntry.weightKg : 80.1;
   const lostKg = Math.max(0, startingWeight - currentWeight);
   const progressPct = Math.min(100, Math.round((lostKg / (startingWeight - targetWeight)) * 100));
 
@@ -42,7 +32,6 @@ export default function Home() {
     <div className="space-y-10 animate-in fade-in duration-300">
       {/* Editorial Luxury Hero Section */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-zinc-900 via-[#0E1017] to-zinc-950 border border-zinc-800/80 p-8 sm:p-12 shadow-2xl">
-        {/* Subtle background sculpture / luxury motif */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-500/10 via-amber-500/5 to-transparent blur-3xl pointer-events-none" />
         
         <div className="relative z-10 max-w-3xl space-y-6">
@@ -66,34 +55,26 @@ export default function Home() {
           </div>
 
           <p className="text-sm sm:text-base text-zinc-300 max-w-xl leading-relaxed">
-            Welcome to your bespoke performance and physique transformation dashboard, <strong>{SHARAFATH_PROFILE.name}</strong>. 
-            Track working weights session-by-session, maintain your 2,200 kcal nutrition targets, 
-            and execute Coach Mousa's progression cycle with consistency.
+            Welcome to your bespoke performance and physique transformation portal, <strong>{SHARAFATH_PROFILE.name}</strong>. 
+            Review your weekly workout loads, fat loss progress toward 75.0 kg, 
+            and Coach Mousa's master training and nutrition blueprint.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <button
-              onClick={() => navigate('/logger')}
+              onClick={() => navigate('/progression')}
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 font-bold text-xs shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:brightness-110 active:scale-[0.98] transition-all"
             >
-              <Plus size={16} className="stroke-[2.5]" />
-              <span>Log Today's Workout</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/progression')}
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-200 hover:text-amber-300 hover:border-amber-400/50 font-semibold text-xs transition-all active:scale-[0.98]"
-            >
-              <TrendingUp size={16} />
-              <span>View Progression Charts</span>
+              <TrendingUp size={16} className="stroke-[2.5]" />
+              <span>Inspect Progression Charts</span>
             </button>
 
             <button
               onClick={() => navigate('/blueprint')}
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-zinc-900/40 border border-zinc-800 text-zinc-400 hover:text-white font-medium text-xs transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-200 hover:text-amber-300 hover:border-amber-400/50 font-semibold text-xs transition-all active:scale-[0.98]"
             >
               <BookOpen size={16} />
-              <span>Full PDF Blueprint</span>
+              <span>Master PDF Blueprint</span>
             </button>
           </div>
         </div>
@@ -204,7 +185,7 @@ export default function Home() {
                           <span className="font-medium text-zinc-200 truncate">{ex.name}</span>
                           <span className="font-mono text-zinc-400 text-[11px]">
                             {ex.isSkipped ? (
-                              <span className="text-zinc-400">Skipped</span>
+                              <span className="text-zinc-500">Skipped</span>
                             ) : (
                               <span className="text-amber-300 font-semibold">{maxW > 0 ? `${maxW}kg` : 'BW'} ({reps || 'Done'})</span>
                             )}
@@ -288,7 +269,7 @@ export default function Home() {
             Progression Charts
           </h4>
           <p className="text-xs text-zinc-400">
-            Daily, weekly, and monthly chart comparisons organized by exercise.
+            Daily, weekly, and monthly chart comparisons organized by exercise day.
           </p>
         </div>
 
@@ -306,28 +287,28 @@ export default function Home() {
         </div>
 
         <div 
-          onClick={() => navigate('/nutrition')}
+          onClick={() => navigate('/weight')}
           className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-amber-500/50 cursor-pointer transition-all group space-y-2"
         >
-          <UtensilsCrossed className="text-cyan-400 mb-2" size={24} />
+          <Scale className="text-cyan-400 mb-2" size={24} />
           <h4 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-            2,200 kcal Nutrition
+            Weight Analytics
           </h4>
           <p className="text-xs text-zinc-400">
-            170g Protein • 60g Fat • 245g Carbs with Halal and low-oxalate swaps.
+            Trajectory toward 75.0 kg with rolling weekly averages.
           </p>
         </div>
 
         <div 
-          onClick={() => navigate('/data-hub')}
+          onClick={() => navigate('/nutrition')}
           className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-amber-500/50 cursor-pointer transition-all group space-y-2"
         >
-          <Database className="text-rose-400 mb-2" size={24} />
+          <UtensilsCrossed className="text-rose-400 mb-2" size={24} />
           <h4 className="text-sm font-bold text-white group-hover:text-rose-300 transition-colors">
-            Data Upload & Backup
+            2,200 kcal Nutrition
           </h4>
           <p className="text-xs text-zinc-400">
-            Import/upload your gym data or export instant JSON backups.
+            170g Protein • 60g Fat • 245g Carbs with Halal and low-oxalate swaps.
           </p>
         </div>
       </div>

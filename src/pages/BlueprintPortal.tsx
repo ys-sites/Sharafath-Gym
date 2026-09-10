@@ -275,15 +275,6 @@ export default function BlueprintPortal() {
                   {currentPhaseDayWorkout.subtitle} • Target: {currentPhaseDayWorkout.focusMuscles}
                 </p>
               </div>
-
-              <button
-                onClick={() => navigate(`/logger?day=${currentPhaseDayWorkout.dayNumber}`)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 text-zinc-950 text-xs font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-amber-500/10 self-start sm:self-auto"
-              >
-                <Dumbbell size={16} />
-                <span>Log This Session Today</span>
-                <ArrowRight size={14} />
-              </button>
             </div>
 
             {/* Warmup */}

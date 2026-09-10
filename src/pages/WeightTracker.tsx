@@ -1,53 +1,27 @@
-import { useState, useEffect, useMemo, FormEvent } from 'react';
+import { useMemo } from 'react';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area 
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, AreaChart, Area 
 } from 'recharts';
 import { 
   Scale, 
-  Plus, 
-  Trash2, 
   TrendingDown, 
   Sparkles, 
   Award, 
   Calendar, 
   Moon, 
   Zap, 
-  Info,
-  Check
+  Info
 } from 'lucide-react';
-import { 
-  getGymStore, 
-  saveWeightEntry, 
-  deleteWeightEntry, 
-  ManualWeightEntry 
-} from '../lib/manualStorage';
+import { GYM_DATA } from '../data/gymHistoryData';
 import { SHARAFATH_PROFILE } from '../data/blueprintData';
 
 export default function WeightTracker() {
-  const [store, setStore] = useState(getGymStore());
-  const [showInputForm, setShowInputForm] = useState(false);
-
-  // Form states
-  const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10));
-  const [weightKg, setWeightKg] = useState<number | ''>(80.0);
-  const [sleepHours, setSleepHours] = useState<number>(7.5);
-  const [stressLevel, setStressLevel] = useState<number>(2);
-  const [energyLevel, setEnergyLevel] = useState<number>(8);
-  const [waistCm, setWaistCm] = useState<number | ''>(90.0);
-  const [notes, setNotes] = useState<string>('');
-
-  useEffect(() => {
-    const handleUpdate = () => setStore(getGymStore());
-    window.addEventListener('sharafath-gym-data-updated', handleUpdate);
-    return () => window.removeEventListener('sharafath-gym-data-updated', handleUpdate);
-  }, []);
-
   const startingWeight = SHARAFATH_PROFILE.startingWeightKg; // 82.0
   const targetWeight = SHARAFATH_PROFILE.goalWeightKg; // 75.0
 
   const sortedWeights = useMemo(() => {
-    return [...store.weights].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [store.weights]);
+    return [...GYM_DATA.weights].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, []);
 
   const currentWeight = sortedWeights.length > 0 ? sortedWeights[sortedWeights.length - 1].weightKg : startingWeight;
   const lostKg = Math.max(0, startingWeight - currentWeight);
@@ -62,24 +36,6 @@ export default function WeightTracker() {
     const sum = last3.reduce((acc, curr) => acc + curr.weightKg, 0);
     return (sum / last3.length).toFixed(1);
   }, [sortedWeights, currentWeight]);
-
-  const handleSave = (e: FormEvent) => {
-    e.preventDefault();
-    if (weightKg === '' || Number(weightKg) <= 0) return;
-
-    saveWeightEntry({
-      date,
-      weightKg: Number(weightKg),
-      sleepHours,
-      stressLevel,
-      energyLevel,
-      waistCm: waistCm === '' ? undefined : Number(waistCm),
-      notes: notes.trim() || undefined
-    });
-
-    setShowInputForm(false);
-    setNotes('');
-  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
@@ -99,18 +55,15 @@ export default function WeightTracker() {
               Body Weight & Metric Trajectory
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 max-w-2xl leading-relaxed">
-              Tracking your path from 82.0 kg down to 75.0 kg. Monitor 3–4 morning weigh-ins per week 
-              and review rolling weekly averages as prescribed by coach Mousa.
+              Tracking your path from 82.0 kg down to 75.0 kg. Morning weigh-in trends 
+              and rolling weekly averages as prescribed by coach Mousa Ghanem.
             </p>
           </div>
 
-          <button
-            onClick={() => setShowInputForm(true)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 text-xs font-bold shadow-lg shadow-amber-500/10 hover:brightness-110 active:scale-[0.98] transition-all self-start md:self-auto"
-          >
-            <Plus size={16} />
-            <span>Record Weigh-In</span>
-          </button>
+          <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-right self-start md:self-auto">
+            <span className="text-[10px] uppercase font-mono text-zinc-500 block">Status</span>
+            <span className="text-emerald-400 font-bold font-mono text-sm">On Track (-1.9 kg)</span>
+          </div>
         </div>
       </div>
 
@@ -206,127 +159,6 @@ export default function WeightTracker() {
         </div>
       </div>
 
-      {/* Manual Input Modal / Drawer */}
-      {showInputForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg p-6 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-              <div className="flex items-center gap-2">
-                <Scale size={18} className="text-amber-400" />
-                <h3 className="text-base font-bold text-white">Record Morning Weigh-In</h3>
-              </div>
-              <button 
-                onClick={() => setShowInputForm(false)}
-                className="text-zinc-500 hover:text-white text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-mono text-zinc-400 block mb-1">Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={date}
-                    onChange={e => setDate(e.target.value)}
-                    className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2.5 font-mono focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-mono text-zinc-400 block mb-1">Weight (kg)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    required
-                    placeholder="e.g. 80.2"
-                    value={weightKg}
-                    onChange={e => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full bg-zinc-950 text-xs text-amber-300 font-bold border border-zinc-800 rounded-xl px-3 py-2.5 font-mono focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-[11px] font-mono text-zinc-400 block mb-1">Sleep (Hours)</label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={sleepHours}
-                    onChange={e => setSleepHours(Number(e.target.value))}
-                    className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2 font-mono focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-mono text-zinc-400 block mb-1">Stress (1–5)</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={5}
-                    value={stressLevel}
-                    onChange={e => setStressLevel(Number(e.target.value))}
-                    className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2 font-mono focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-mono text-zinc-400 block mb-1">Energy (1–10)</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={energyLevel}
-                    onChange={e => setEnergyLevel(Number(e.target.value))}
-                    className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2 font-mono focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-mono text-zinc-400 block mb-1">Waist Measurement (cm, optional)</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  placeholder="e.g. 90.5"
-                  value={waistCm}
-                  onChange={e => setWaistCm(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2 font-mono focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-mono text-zinc-400 block mb-1">Observations / Notes</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Feeling rested, consistent meals yesterday"
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  className="w-full bg-zinc-950 text-xs text-white border border-zinc-800 rounded-xl px-3 py-2 focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setShowInputForm(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 text-zinc-950 text-xs font-bold hover:brightness-110"
-                >
-                  Save Entry
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Historical Log Table */}
       <div className="rounded-2xl bg-zinc-900/80 border border-zinc-800 p-6 space-y-4">
         <h3 className="text-base font-bold text-white">Weigh-In History</h3>
@@ -340,7 +172,6 @@ export default function WeightTracker() {
                 <th className="py-2.5 px-3">Energy / Stress</th>
                 <th className="py-2.5 px-3">Waist (cm)</th>
                 <th className="py-2.5 px-3">Notes</th>
-                <th className="py-2.5 px-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
@@ -354,15 +185,6 @@ export default function WeightTracker() {
                   </td>
                   <td className="py-3 px-3 font-mono text-zinc-400">{item.waistCm ? `${item.waistCm} cm` : '—'}</td>
                   <td className="py-3 px-3 text-zinc-400 max-w-xs truncate">{item.notes || '—'}</td>
-                  <td className="py-3 px-3 text-right">
-                    <button
-                      onClick={() => deleteWeightEntry(item.id)}
-                      className="text-zinc-600 hover:text-rose-400 p-1 transition-colors"
-                      title="Delete entry"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>

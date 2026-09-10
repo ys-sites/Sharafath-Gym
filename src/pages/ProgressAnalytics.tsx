@@ -18,26 +18,20 @@ import {
   Flame
 } from 'lucide-react';
 import { 
-  getGymStore, 
+  GYM_DATA, 
   getExerciseProgression, 
   getDistinctExercises, 
-  ManualWorkoutSession 
-} from '../lib/manualStorage';
+  WorkoutSession 
+} from '../data/gymHistoryData';
 import { PHASE_2_WORKOUTS } from '../data/blueprintData';
 
 type TimeFrame = 'daily' | 'weekly' | 'monthly';
 
 export default function ProgressAnalytics() {
-  const [store, setStore] = useState(getGymStore());
+  const store = GYM_DATA;
   const [selectedDay, setSelectedDay] = useState<string>('All');
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('daily');
   const [selectedExercise, setSelectedExercise] = useState<string>('Smith machine squat');
-
-  useEffect(() => {
-    const handleUpdate = () => setStore(getGymStore());
-    window.addEventListener('sharafath-gym-data-updated', handleUpdate);
-    return () => window.removeEventListener('sharafath-gym-data-updated', handleUpdate);
-  }, []);
 
   const dayOptions = [
     { key: 'All', label: 'All Workouts' },

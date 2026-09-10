@@ -1,62 +1,43 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Dumbbell, 
   TrendingUp, 
   BookOpen, 
   Scale, 
   UtensilsCrossed, 
-  Database, 
-  Plus, 
   Menu, 
   X, 
   Sparkles,
   Award,
   ChevronRight
 } from 'lucide-react';
-import { getGymStore, ManualWeightEntry } from '../../lib/manualStorage';
+import { GYM_DATA } from '../../data/gymHistoryData';
 import { SHARAFATH_PROFILE } from '../../data/blueprintData';
 
 export default function WebsiteLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentWeight, setCurrentWeight] = useState<number>(80.1);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const updateWeightFromStore = () => {
-    const store = getGymStore();
-    if (store.weights.length > 0) {
-      const latest = store.weights[store.weights.length - 1];
-      setCurrentWeight(latest.weightKg);
-    }
-  };
-
-  useEffect(() => {
-    updateWeightFromStore();
-    const handleUpdate = () => updateWeightFromStore();
-    window.addEventListener('sharafath-gym-data-updated', handleUpdate);
-    return () => window.removeEventListener('sharafath-gym-data-updated', handleUpdate);
-  }, []);
+  const startingWeight = SHARAFATH_PROFILE.startingWeightKg; // 82.0
+  const targetWeight = SHARAFATH_PROFILE.goalWeightKg; // 75.0
+  const latestWeightEntry = GYM_DATA.weights[GYM_DATA.weights.length - 1];
+  const currentWeight = latestWeightEntry ? latestWeightEntry.weightKg : 80.1;
+  const totalToLose = startingWeight - targetWeight; // 7.0
+  const lostSoFar = Math.max(0, startingWeight - currentWeight); // 1.9
+  const progressPct = Math.min(100, Math.round((lostSoFar / totalToLose) * 100));
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const startingWeight = SHARAFATH_PROFILE.startingWeightKg; // 82.0
-  const targetWeight = SHARAFATH_PROFILE.goalWeightKg; // 75.0
-  const totalToLose = startingWeight - targetWeight; // 7.0
-  const lostSoFar = Math.max(0, startingWeight - currentWeight); // e.g. 1.9
-  const progressPct = Math.min(100, Math.round((lostSoFar / totalToLose) * 100));
-
   const navLinks = [
     { to: '/', label: 'Overview', icon: Sparkles },
     { to: '/progression', label: 'Progression Charts', icon: TrendingUp },
     { to: '/blueprint', label: 'Master Blueprint', icon: BookOpen },
-    { to: '/logger', label: 'Log Workout', icon: Dumbbell },
     { to: '/weight', label: 'Weight & Body', icon: Scale },
     { to: '/nutrition', label: 'Nutrition & Macros', icon: UtensilsCrossed },
-    { to: '/data-hub', label: 'Data Hub', icon: Database },
   ];
 
   return (
@@ -86,13 +67,13 @@ export default function WebsiteLayout() {
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400 tracking-wider">
-                  Mohamed Sharafath • Performance File
+                  Mohamed Sharafath • Performance Portal
                 </p>
               </div>
             </button>
 
             {/* Desktop Center Goal Tracker Pill */}
-            <div className="hidden xl:flex items-center gap-3 px-4 py-2 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs shadow-inner">
+            <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs shadow-inner">
               <div className="flex items-center gap-1.5 text-zinc-400 font-medium">
                 <Award size={14} className="text-amber-400" />
                 <span>Goal:</span>
@@ -116,7 +97,7 @@ export default function WebsiteLayout() {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1">
+            <nav className="hidden lg:flex items-center gap-1.5">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 return (
@@ -124,7 +105,7 @@ export default function WebsiteLayout() {
                     key={link.to}
                     to={link.to}
                     className={({ isActive }) => `
-                      flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200
+                      flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200
                       ${isActive 
                         ? 'bg-zinc-800/90 text-amber-300 border border-zinc-700/60 shadow-sm' 
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'}
@@ -136,17 +117,6 @@ export default function WebsiteLayout() {
                 );
               })}
             </nav>
-
-            {/* Right Action Button */}
-            <div className="hidden sm:flex items-center gap-3">
-              <button
-                onClick={() => navigate('/logger')}
-                className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 text-xs font-bold shadow-[0_2px_12px_rgba(245,158,11,0.25)] hover:brightness-110 active:scale-[0.98] transition-all"
-              >
-                <Plus size={15} className="stroke-[2.5]" />
-                <span>Log Session</span>
-              </button>
-            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -196,16 +166,6 @@ export default function WebsiteLayout() {
                 </NavLink>
               );
             })}
-
-            <div className="pt-2">
-              <button
-                onClick={() => navigate('/logger')}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500 text-zinc-950 text-sm font-bold shadow-lg"
-              >
-                <Plus size={18} />
-                <span>Log New Session</span>
-              </button>
-            </div>
           </div>
         )}
       </header>
@@ -234,7 +194,7 @@ export default function WebsiteLayout() {
               onClick={() => navigate('/blueprint')}
               className="hover:text-amber-300 transition-colors"
             >
-              PDF Blueprint
+              Master PDF Blueprint
             </button>
             <span className="text-zinc-700">•</span>
             <button 
@@ -245,10 +205,17 @@ export default function WebsiteLayout() {
             </button>
             <span className="text-zinc-700">•</span>
             <button 
-              onClick={() => navigate('/data-hub')}
+              onClick={() => navigate('/weight')}
               className="hover:text-amber-300 transition-colors"
             >
-              Manual Data Backup / Upload
+              Weight Tracker
+            </button>
+            <span className="text-zinc-700">•</span>
+            <button 
+              onClick={() => navigate('/nutrition')}
+              className="hover:text-amber-300 transition-colors"
+            >
+              Nutrition Blueprint
             </button>
           </div>
         </div>
