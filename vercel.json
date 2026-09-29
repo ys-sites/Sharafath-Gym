@@ -1,1 +1,1 @@
-{"$schema":"https://openapi.vercel.sh/vercel.json","buildCommand":"echo 'static site — skipping build'","framework":null,"installCommand":"echo 'static site — skipping install'","outputDirectory":null}
+{"$schema": "https://openapi.vercel.sh/vercel.json", "buildCommand": "echo 'static site \u2014 skipping build'", "framework": null, "installCommand": "echo 'static site \u2014 skipping install'", "outputDirectory": "."}
