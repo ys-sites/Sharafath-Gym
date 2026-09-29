@@ -1,25 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>ASCENSION — Sharafath's Gym & Performance Portal</title>
-    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gym Progress — Mohamed</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="app-header">
+  <div class="wrap">
+    <h1>🏋️ Gym Progress</h1>
+    <p class="subtitle" id="dataRange">Loading…</p>
+  </div>
+</header>
 
-    <!-- PWA & Mobile Optimization -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Sharafath Gym" />
-    <link rel="apple-touch-icon" href="/icons/icon.svg" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<main class="wrap">
+  <div id="loadError" class="error hidden"></div>
+
+  <!-- Stats -->
+  <section class="cards" id="statsSection">
+    <div class="card stat-card">
+      <h2>This week <span class="range" id="weekRange"></span></h2>
+      <div class="stat-row">
+        <div class="stat"><span class="num" id="weekSessions">–</span><span class="lbl">sessions</span></div>
+        <div class="stat"><span class="num" id="weekVolume">–</span><span class="lbl">volume</span></div>
+        <div class="stat"><span class="num" id="weekSets">–</span><span class="lbl">sets</span></div>
+      </div>
+    </div>
+    <div class="card stat-card">
+      <h2>This month <span class="range" id="monthRange"></span></h2>
+      <div class="stat-row">
+        <div class="stat"><span class="num" id="monthSessions">–</span><span class="lbl">sessions</span></div>
+        <div class="stat"><span class="num" id="monthVolume">–</span><span class="lbl">volume</span></div>
+        <div class="stat"><span class="num" id="monthSets">–</span><span class="lbl">sets</span></div>
+      </div>
+    </div>
+  </section>
+  <p class="footnote">Volume = weight × reps, summed per session. Weights are shown exactly as logged — units are mixed (some kg, some lb, some unitless).</p>
+
+  <!-- Calendar + session detail -->
+  <section class="card">
+    <div class="cal-head">
+      <button id="calPrev" aria-label="Previous month">‹</button>
+      <h2 id="calTitle">–</h2>
+      <button id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-grid cal-dow">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="daySessions" class="day-sessions"></div>
+  </section>
+
+  <section class="card" id="sessionDetail">
+    <h2 id="detailTitle">Session</h2>
+    <p class="detail-meta" id="detailMeta"></p>
+    <div class="table-wrap">
+      <table class="ex-table">
+        <thead><tr><th>Exercise</th><th>Weight</th><th>Sets</th><th>Vol</th></tr></thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+    <p class="detail-totals" id="detailTotals"></p>
+  </section>
+
+  <!-- Volume chart -->
+  <section class="card">
+    <h2>Volume per session</h2>
+    <p class="hint">Tap a bar to open that session.</p>
+    <div class="chart-box"><canvas id="volumeChart"></canvas></div>
+  </section>
+
+  <!-- Per-exercise progression -->
+  <section class="card">
+    <h2>Exercise progression</h2>
+    <label class="select-label" for="exerciseSelect">Exercise</label>
+    <select id="exerciseSelect"></select>
+    <div class="chart-box"><canvas id="progressChart"></canvas></div>
+    <p class="footnote">Top weight per session (line) and total reps (bars). Sessions without logged weight are skipped.</p>
+  </section>
+
+  <!-- PRs -->
+  <section class="card">
+    <h2>Personal records</h2>
+    <p class="hint">Heaviest weight logged per exercise, grouped by unit as logged.</p>
+    <ul class="pr-list" id="prList"></ul>
+  </section>
+</main>
+
+<footer class="wrap foot">Built from workout-log.md · static site, no backend</footer>
+
+<script src="app.js"></script>
+</body>
 </html>
