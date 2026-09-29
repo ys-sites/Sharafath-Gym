@@ -68,8 +68,8 @@ async function init() {
     });
 
     if (window.Chart) {
-      Chart.defaults.color = '#8b96a8';
-      Chart.defaults.borderColor = 'rgba(38,48,65,0.7)';
+      Chart.defaults.color = '#6d7684';
+      Chart.defaults.borderColor = 'rgba(160,150,125,0.55)';
       Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
     }
 
@@ -240,8 +240,8 @@ function renderVolumeChart() {
       labels: state.sessions.map(shortLabel),
       datasets: [{
         data: state.sessions.map(sessionVolume),
-        backgroundColor: 'rgba(184,241,74,0.75)',
-        hoverBackgroundColor: 'rgba(184,241,74,1)',
+        backgroundColor: 'rgba(62,125,41,0.8)',
+        hoverBackgroundColor: 'rgba(62,125,41,1)',
         borderRadius: 6,
         borderSkipped: false,
       }],
@@ -295,8 +295,8 @@ function renderProgressChart() {
           type: 'line',
           label: 'Top weight' + (units.length === 1 ? ' (' + units[0] + ')' : ' (mixed units)'),
           data: pts.map((p) => p.e.weight),
-          borderColor: '#b8f14a',
-          backgroundColor: '#b8f14a',
+          borderColor: '#3e7d29',
+          backgroundColor: '#3e7d29',
           tension: 0.25,
           pointRadius: 4,
           yAxisID: 'y',

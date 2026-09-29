@@ -1,13 +1,13 @@
 :root {
-  --bg: #0b0e13;
-  --card: #141922;
-  --card2: #1a212c;
-  --border: #263041;
-  --text: #e8edf4;
-  --muted: #8b96a8;
-  --accent: #b8f14a;
-  --accent-dim: rgba(184, 241, 74, 0.14);
-  --danger: #f87171;
+  --bg: #f5f1e8;
+  --card: #fffdf7;
+  --card2: #ece5d2;
+  --border: #ddd2b8;
+  --text: #232a35;
+  --muted: #6d7684;
+  --accent: #3e7d29;
+  --accent-dim: rgba(62, 125, 41, 0.12);
+  --danger: #c93a3a;
 }
 * { box-sizing: border-box; }
 body {
@@ -31,6 +31,7 @@ body {
   border-radius: 14px;
   padding: 16px;
   margin: 12px 0;
+  box-shadow: 0 2px 10px rgba(120, 105, 70, 0.08);
 }
 .card h2 { margin: 0 0 10px; font-size: 17px; }
 .range { color: var(--muted); font-weight: 400; font-size: 13px; }
@@ -40,7 +41,7 @@ body {
 .stat .lbl { font-size: 12px; color: var(--muted); }
 .footnote { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; line-height: 1.5; }
 .hint { color: var(--muted); font-size: 13px; margin: -4px 0 10px; }
-.error { background: #3a1414; border: 1px solid var(--danger); color: #fecaca; border-radius: 10px; padding: 12px; margin: 12px 0; }
+.error { background: #fdecec; border: 1px solid var(--danger); color: #a02a2a; border-radius: 10px; padding: 12px; margin: 12px 0; }
 .hidden { display: none; }
 
 /* Calendar */
@@ -62,7 +63,7 @@ body {
 .cal-day.other { visibility: hidden; }
 .cal-day .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .cal-day .tag { font-size: 9px; color: var(--accent); line-height: 1.1; text-align: center; }
-.cal-day.has { background: var(--accent-dim); border-color: rgba(184,241,74,.35); }
+.cal-day.has { background: var(--accent-dim); border-color: rgba(62,125,41,.4); }
 .cal-day.selected { border-color: var(--accent); background: var(--accent-dim); }
 .day-sessions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .day-sessions:empty { display: none; }
@@ -76,7 +77,7 @@ body {
 .detail-meta { color: var(--muted); font-size: 13px; margin: -4px 0 10px; line-height: 1.6; }
 .badge {
   display: inline-block; background: var(--accent-dim); color: var(--accent);
-  border: 1px solid rgba(184,241,74,.4); border-radius: 999px;
+  border: 1px solid rgba(62,125,41,.45); border-radius: 999px;
   font-size: 11px; padding: 2px 8px; margin-left: 6px; vertical-align: middle;
 }
 .table-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
