@@ -9,11 +9,13 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const state = {
   sessions: [],
   byDate: new Map(),
+  steps: [],
   selectedId: null,
   viewY: null,
   viewM: null,
   volChart: null,
   progChart: null,
+  stepsChart: null,
 };
 
 function parseDate(s) {
@@ -88,6 +90,19 @@ async function init() {
     renderVolumeChart();
     renderProgressChart();
     renderPRs();
+
+    try {
+      const sres = await fetch('data/steps.json');
+      if (sres.ok) {
+        state.steps = (await sres.json()).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+        if (state.steps.length) renderSteps();
+        else $('stepsSection').classList.add('hidden');
+      } else {
+        $('stepsSection').classList.add('hidden');
+      }
+    } catch (e) {
+      $('stepsSection').classList.add('hidden');
+    }
 
     $('calPrev').addEventListener('click', () => shiftMonth(-1));
     $('calNext').addEventListener('click', () => shiftMonth(1));
@@ -316,6 +331,43 @@ function renderProgressChart() {
       scales: {
         y: { beginAtZero: true, title: { display: true, text: 'Weight' } },
         y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Reps' } },
+      },
+    },
+  });
+}
+
+/* ---------- steps ---------- */
+
+function renderSteps() {
+  const days = state.steps;
+  const last7 = days.slice(-7);
+  const total = last7.reduce((t, d) => t + d.steps, 0);
+  $('stepsTotal').textContent = fmtNum(total);
+  $('stepsAvg').textContent = fmtNum(total / last7.length);
+  if (!window.Chart) return;
+  if (state.stepsChart) state.stepsChart.destroy();
+  const ctx = $('stepsChart').getContext('2d');
+  state.stepsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: days.map((d) => {
+        const dt = parseDate(d.date);
+        return DAYS[dt.getDay()] + ' ' + (dt.getMonth() + 1) + '/' + dt.getDate();
+      }),
+      datasets: [{
+        data: days.map((d) => d.steps),
+        backgroundColor: 'rgba(62,125,41,0.8)',
+        hoverBackgroundColor: 'rgba(62,125,41,1)',
+        borderRadius: 6,
+        borderSkipped: false,
+      }],
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { maxRotation: 45, minRotation: 0 } },
+        y: { beginAtZero: true, title: { display: true, text: 'Steps' } },
       },
     },
   });

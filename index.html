@@ -65,6 +65,17 @@
     <p class="detail-totals" id="detailTotals"></p>
   </section>
 
+  <!-- Daily steps -->
+  <section class="card" id="stepsSection">
+    <h2>Daily steps</h2>
+    <p class="hint">From Apple Health · updates each time the site is pushed.</p>
+    <div class="stat-row">
+      <div class="stat"><span class="num" id="stepsTotal">–</span><span class="lbl">steps, last 7 days</span></div>
+      <div class="stat"><span class="num" id="stepsAvg">–</span><span class="lbl">avg / day</span></div>
+    </div>
+    <div class="chart-box"><canvas id="stepsChart"></canvas></div>
+  </section>
+
   <!-- Volume chart -->
   <section class="card">
     <h2>Volume per session</h2>
