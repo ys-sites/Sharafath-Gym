@@ -1,107 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Gym Progress — Mohamed</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sharafath | Gym Progress & Performance Dashboard</title>
+  <meta name="description" content="Personal athletic training journal, volume progression, workout calendar, and personal records for Mohamed Sharafath.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6.5 6.5 11 11'/%3E%3Cpath d='m21 21-1-1'/%3E%3Cpath d='m3 3 1 1'/%3E%3Cpath d='m18 22 4-4'/%3E%3Cpath d='m2 6 4-4'/%3E%3Cpath d='m3 10 7-7'/%3E%3Cpath d='m14 21 7-7'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-<header class="app-header">
-  <div class="wrap">
-    <h1>🏋️ Gym Progress</h1>
-    <p class="subtitle" id="dataRange">Loading…</p>
-  </div>
-</header>
 
-<main class="wrap">
-  <div id="loadError" class="error hidden"></div>
+  <!-- Sticky App Header -->
+  <header class="app-header">
+    <div class="wrap">
+      <div class="header-inner">
+        <div class="brand-block">
+          <div class="brand-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6.5 6.5 11 11"/>
+              <path d="m21 21-1-1"/>
+              <path d="m3 3 1 1"/>
+              <path d="m18 22 4-4"/>
+              <path d="m2 6 4-4"/>
+              <path d="m3 10 7-7"/>
+              <path d="m14 21 7-7"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>Sharafath's Training Protocol</h1>
+            <div class="brand-meta">
+              <span class="status-badge"><span class="pulse-dot"></span> Phase 2 Active</span>
+              <span class="subtitle mono" id="dataRange">Syncing...</span>
+            </div>
+          </div>
+        </div>
 
-  <!-- Stats -->
-  <section class="cards" id="statsSection">
-    <div class="card stat-card">
-      <h2>This week <span class="range" id="weekRange"></span></h2>
-      <div class="stat-row">
-        <div class="stat"><span class="num" id="weekSessions">–</span><span class="lbl">sessions</span></div>
-        <div class="stat"><span class="num" id="weekVolume">–</span><span class="lbl">volume</span></div>
-        <div class="stat"><span class="num" id="weekSets">–</span><span class="lbl">sets</span></div>
+        <div class="header-actions">
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme">
+            <!-- Sun / Moon icons swapped via JS -->
+            <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="card stat-card">
-      <h2>This month <span class="range" id="monthRange"></span></h2>
-      <div class="stat-row">
-        <div class="stat"><span class="num" id="monthSessions">–</span><span class="lbl">sessions</span></div>
-        <div class="stat"><span class="num" id="monthVolume">–</span><span class="lbl">volume</span></div>
-        <div class="stat"><span class="num" id="monthSets">–</span><span class="lbl">sets</span></div>
+
+    <!-- Segmented Navigation Tabs -->
+    <nav class="nav-tabs-wrapper" aria-label="Dashboard views">
+      <div class="nav-tabs">
+        <button class="nav-tab-btn active" data-target="heroSection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Overview
+        </button>
+        <button class="nav-tab-btn" data-target="consoleSection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Sessions & Calendar
+        </button>
+        <button class="nav-tab-btn" data-target="analyticsSection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Volume & Health
+        </button>
+        <button class="nav-tab-btn" data-target="progressionSection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Progression Explorer
+        </button>
+        <button class="nav-tab-btn" data-target="prSection">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          PR Cabinet
+        </button>
       </div>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div id="loadError" class="error-banner hidden" role="alert"></div>
+
+    <!-- Executive Overview Banner & KPI Cards -->
+    <section class="hero-section content-section" id="heroSection">
+      <div class="hero-banner">
+        <div class="hero-header-row">
+          <div class="hero-title-group">
+            <h2>Performance Overview</h2>
+            <p>Phase 2 Hypertrophy & Strength Split &bull; Muscle group workload and health tracking</p>
+          </div>
+          <div class="split-pills" id="splitPills">
+            <span class="split-pill push">Push <span class="mono" id="pushCount">0</span></span>
+            <span class="split-pill pull">Pull <span class="mono" id="pullCount">0</span></span>
+            <span class="split-pill legs">Legs <span class="mono" id="legsCount">0</span></span>
+            <span class="split-pill upper">Upper <span class="mono" id="upperCount">0</span></span>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <!-- This Week -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">This Week</span>
+              <div class="kpi-icon-wrap" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+            </div>
+            <div class="kpi-main-val" id="weekVolume">0 <span style="font-size:14px;color:var(--text-muted);font-weight:500;">kg</span></div>
+            <div class="kpi-meta">
+              <span class="highlight" id="weekSessions">0</span> sessions &bull; <span id="weekSets">0</span> sets
+            </div>
+          </div>
+
+          <!-- This Month -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">This Month</span>
+              <div class="kpi-icon-wrap" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-main-val" id="monthVolume">0 <span style="font-size:14px;color:var(--text-muted);font-weight:500;">kg</span></div>
+            <div class="kpi-meta">
+              <span class="highlight" id="monthSessions">0</span> sessions &bull; <span id="monthSets">0</span> sets
+            </div>
+          </div>
+
+          <!-- All-Time Tonnage -->
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">All-Time Cumulative</span>
+              <div class="kpi-icon-wrap" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-main-val" id="totalVolume">0 <span style="font-size:14px;color:var(--text-muted);font-weight:500;">kg</span></div>
+            <div class="kpi-meta">
+              <span class="highlight" id="totalSessions">0</span> total workouts &bull; <span id="totalSets">0</span> total sets
+            </div>
+          </div>
+
+          <!-- Daily Steps (Apple Health) -->
+          <div class="kpi-card" id="stepKpiCard">
+            <div class="kpi-top">
+              <span class="kpi-label">Daily Steps (7D Avg)</span>
+              <div class="kpi-icon-wrap" aria-hidden="true">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </div>
+            </div>
+            <div class="kpi-main-val" id="stepsAvg">0</div>
+            <div class="kpi-meta">
+              <span class="highlight" id="stepsTotal">0</span> total steps last 7 days
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Console Section: Interactive Calendar & Session Inspector -->
+    <section class="content-section" id="consoleSection">
+      <div class="section-head">
+        <div class="section-title">
+          <div>
+            <h2>Training Console</h2>
+            <p>Select any calendar date or workout chip to inspect sets, prescribed weights, and coach notes</p>
+          </div>
+        </div>
+        <button id="jumpLatestBtn" class="filter-pill active" style="font-size:12px;">Jump to Latest Session</button>
+      </div>
+
+      <div class="workout-console-grid">
+        <!-- Left: Calendar & Quick Selector -->
+        <div class="panel-card calendar-widget">
+          <div class="cal-header">
+            <h3 id="calTitle">Month Year</h3>
+            <div class="cal-nav-btns">
+              <button id="calPrev" class="cal-nav-btn" aria-label="Previous month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button id="calNext" class="cal-nav-btn" aria-label="Next month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="cal-weekdays">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+
+          <div class="cal-grid" id="calGrid"></div>
+
+          <!-- Quick Session Picker List -->
+          <div class="quick-sessions-wrap">
+            <div class="quick-sessions-label">
+              <span>All Logged Sessions</span>
+              <span class="mono" id="sessionCountBadge">13</span>
+            </div>
+            <div class="quick-session-list" id="quickSessionList"></div>
+          </div>
+        </div>
+
+        <!-- Right: Session Inspector -->
+        <div class="panel-card session-inspector" id="sessionDetail">
+          <div class="session-top-header">
+            <div class="session-title-wrap">
+              <div class="session-title-row">
+                <h3 id="detailTitle">Select a Session</h3>
+                <span id="detailSplitBadge" class="split-pill push">Split</span>
+              </div>
+              <span class="session-date-tag" id="detailDate">Date</span>
+            </div>
+            <div class="session-stats-strip">
+              <div class="session-stat-pill">Volume: <strong id="detailVolume">0 kg</strong></div>
+              <div class="session-stat-pill">Sets: <strong id="detailSets">0</strong></div>
+              <div class="session-stat-pill">Exercises: <strong id="detailExCount">0</strong></div>
+            </div>
+          </div>
+
+          <!-- Callouts (Cardio & Coach Notes) -->
+          <div class="session-callouts" id="sessionCallouts">
+            <div class="callout-box cardio hidden" id="cardioBox">
+              <div class="callout-icon" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              </div>
+              <div class="callout-text">
+                <strong>Cardio & Warmup</strong>
+                <span id="cardioText"></span>
+              </div>
+            </div>
+
+            <div class="callout-box" id="notesBox">
+              <div class="callout-icon" aria-hidden="true">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <div class="callout-text">
+                <strong>Session Reflection & Coach Advice</strong>
+                <span id="notesText"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Exercises Breakdown Cards -->
+          <div class="exercise-cards-list" id="exerciseCardsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics Section: Session Volume & Apple Health Daily Steps -->
+    <section class="content-section" id="analyticsSection">
+      <div class="section-head">
+        <div class="section-title">
+          <div>
+            <h2>Volume & Step Analytics</h2>
+            <p>Workload progression per workout and active recovery tracking synced from Apple Health</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <!-- Volume Chart -->
+        <div class="panel-card chart-container-card">
+          <div class="chart-head-info">
+            <div class="chart-title-wrap">
+              <h3>Volume Load per Session</h3>
+              <p>Total calculated tonnage (kg &bull; reps) &bull; Tap a bar to jump to that session</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="volumeChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Apple Health Steps Chart -->
+        <div class="panel-card chart-container-card" id="stepsSection">
+          <div class="chart-head-info">
+            <div class="chart-title-wrap">
+              <h3>Daily Step Count (Apple Health)</h3>
+              <p>Activity level tracking with 10,000 steps baseline</p>
+            </div>
+          </div>
+          <div class="chart-box">
+            <canvas id="stepsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Exercise Progression Explorer -->
+    <section class="content-section" id="progressionSection">
+      <div class="section-head">
+        <div class="section-title">
+          <div>
+            <h2>Exercise Progression Explorer</h2>
+            <p>Analyze strength curves, top weights lifted, and volume endurance per exercise</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card progression-card">
+        <!-- Muscle Category Filters -->
+        <div class="filter-bar" id="categoryFilterBar">
+          <button class="filter-pill active" data-cat="all">All Movements</button>
+          <button class="filter-pill" data-cat="Chest">Chest</button>
+          <button class="filter-pill" data-cat="Back">Back</button>
+          <button class="filter-pill" data-cat="Legs">Legs</button>
+          <button class="filter-pill" data-cat="Shoulders">Shoulders</button>
+          <button class="filter-pill" data-cat="Arms">Arms</button>
+          <button class="filter-pill" data-cat="Core">Core</button>
+        </div>
+
+        <!-- Exercise Dropdown Selector -->
+        <div class="custom-select-wrap">
+          <label for="exerciseSelect">Select Target Exercise</label>
+          <select id="exerciseSelect" class="styled-select"></select>
+        </div>
+
+        <!-- Exercise KPI Banner -->
+        <div class="exercise-kpi-banner" id="exerciseKpiBanner">
+          <div class="ex-kpi-item">
+            <span class="ex-kpi-label">Personal Record</span>
+            <span class="ex-kpi-val accent" id="exKpiPr">–</span>
+          </div>
+          <div class="ex-kpi-item">
+            <span class="ex-kpi-label">Sessions Tracked</span>
+            <span class="ex-kpi-val" id="exKpiSessions">–</span>
+          </div>
+          <div class="ex-kpi-item">
+            <span class="ex-kpi-label">Total Volume Lifted</span>
+            <span class="ex-kpi-val" id="exKpiTotalVol">–</span>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <canvas id="progressChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PR Trophy Cabinet -->
+    <section class="content-section" id="prSection">
+      <div class="section-head">
+        <div class="section-title">
+          <div>
+            <h2>Personal Records Cabinet</h2>
+            <p>Heaviest weights lifted across all movements, categorized and searchable</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card pr-section-card">
+        <!-- Search & Category Filters -->
+        <div class="pr-controls-row">
+          <div class="pr-search-box">
+            <svg class="pr-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="prSearchInput" placeholder="Search exercises (e.g. Squat, Press)...">
+          </div>
+          <div class="filter-bar" id="prCategoryFilters">
+            <button class="filter-pill active" data-pr-cat="all">All</button>
+            <button class="filter-pill" data-pr-cat="Chest">Chest</button>
+            <button class="filter-pill" data-pr-cat="Back">Back</button>
+            <button class="filter-pill" data-pr-cat="Legs">Legs</button>
+            <button class="filter-pill" data-pr-cat="Shoulders">Shoulders</button>
+            <button class="filter-pill" data-pr-cat="Arms">Arms</button>
+            <button class="filter-pill" data-pr-cat="Core">Core</button>
+          </div>
+        </div>
+
+        <!-- Top 3 Podium Highlights -->
+        <div class="pr-podium-grid" id="prPodiumGrid"></div>
+
+        <!-- PR Grid -->
+        <div class="pr-grid" id="prGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap app-footer">
+    <div class="footer-content">
+      <p><strong>Mohamed Sharafath &bull; Phase 2 Strength & Hypertrophy Log</strong></p>
+      <p>Static Architecture &bull; Local data store synced via GitHub & Vercel</p>
     </div>
-  </section>
-  <p class="footnote">Volume = weight × reps, summed per session. Weights are shown exactly as logged — units are mixed (some kg, some lb, some unitless).</p>
+  </footer>
 
-  <!-- Calendar + session detail -->
-  <section class="card">
-    <div class="cal-head">
-      <button id="calPrev" aria-label="Previous month">‹</button>
-      <h2 id="calTitle">–</h2>
-      <button id="calNext" aria-label="Next month">›</button>
-    </div>
-    <div class="cal-grid cal-dow">
-      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-    </div>
-    <div class="cal-grid" id="calGrid"></div>
-    <div id="daySessions" class="day-sessions"></div>
-  </section>
-
-  <section class="card" id="sessionDetail">
-    <h2 id="detailTitle">Session</h2>
-    <p class="detail-meta" id="detailMeta"></p>
-    <div class="table-wrap">
-      <table class="ex-table">
-        <thead><tr><th>Exercise</th><th>Weight</th><th>Sets</th><th>Vol</th></tr></thead>
-        <tbody id="detailBody"></tbody>
-      </table>
-    </div>
-    <p class="detail-totals" id="detailTotals"></p>
-  </section>
-
-  <!-- Daily steps -->
-  <section class="card" id="stepsSection">
-    <h2>Daily steps</h2>
-    <p class="hint">From Apple Health · updates each time the site is pushed.</p>
-    <div class="stat-row">
-      <div class="stat"><span class="num" id="stepsTotal">–</span><span class="lbl">steps, last 7 days</span></div>
-      <div class="stat"><span class="num" id="stepsAvg">–</span><span class="lbl">avg / day</span></div>
-    </div>
-    <div class="chart-box"><canvas id="stepsChart"></canvas></div>
-  </section>
-
-  <!-- Volume chart -->
-  <section class="card">
-    <h2>Volume per session</h2>
-    <p class="hint">Tap a bar to open that session.</p>
-    <div class="chart-box"><canvas id="volumeChart"></canvas></div>
-  </section>
-
-  <!-- Per-exercise progression -->
-  <section class="card">
-    <h2>Exercise progression</h2>
-    <label class="select-label" for="exerciseSelect">Exercise</label>
-    <select id="exerciseSelect"></select>
-    <div class="chart-box"><canvas id="progressChart"></canvas></div>
-    <p class="footnote">Top weight per session (line) and total reps (bars). Sessions without logged weight are skipped.</p>
-  </section>
-
-  <!-- PRs -->
-  <section class="card">
-    <h2>Personal records</h2>
-    <p class="hint">Heaviest weight logged per exercise, grouped by unit as logged.</p>
-    <ul class="pr-list" id="prList"></ul>
-  </section>
-</main>
-
-<footer class="wrap foot">Built from workout-log.md · static site, no backend</footer>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
