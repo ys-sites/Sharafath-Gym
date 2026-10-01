@@ -5,7 +5,7 @@
     "label": "Day 6 Lower",
     "cycle": null,
     "cardio": "Steps logged throughout day",
-    "notes": "Phase 2 Day 6 Lower \u2014 First baseline testing on smith machine squat and walking lunge combination.",
+    "notes": "Phase 2 Day 6 Lower — First baseline testing on smith machine squat and walking lunge combination.",
     "exercises": [
       {
         "name": "Smith machine squat",
@@ -18,7 +18,7 @@
         ],
         "setWeights": null,
         "volume": 360,
-        "detail": "3 \u00d7 6\u201310",
+        "detail": "3 × 6–10",
         "skipped": false
       },
       {
@@ -31,7 +31,7 @@
         ],
         "setWeights": null,
         "volume": 400,
-        "detail": "2 \u00d7 10\u201312 each leg",
+        "detail": "2 × 10–12 each leg",
         "skipped": false
       },
       {
@@ -44,7 +44,7 @@
         ],
         "setWeights": null,
         "volume": 720,
-        "detail": "2 \u00d7 12\u201315",
+        "detail": "2 × 12–15",
         "skipped": false
       },
       {
@@ -58,7 +58,7 @@
         ],
         "setWeights": null,
         "volume": 600,
-        "detail": "3 \u00d7 8\u201310",
+        "detail": "3 × 8–10",
         "skipped": false
       },
       {
@@ -72,7 +72,7 @@
         ],
         "setWeights": null,
         "volume": 600,
-        "detail": "3 \u00d7 10\u201315",
+        "detail": "3 × 10–15",
         "skipped": false
       }
     ]
@@ -83,7 +83,7 @@
     "label": "Day 1 Push",
     "cycle": null,
     "cardio": "15 min incline treadmill walk at 10% incline, 4.0 km/h",
-    "notes": "Phase 2 Day 1 Push \u2014 Felt strong on chest press. Kept dips skipped for shoulder comfort per coach Mousa's advice.",
+    "notes": "Phase 2 Day 1 Push — Felt strong on chest press. Kept dips skipped for shoulder comfort per coach Mousa's advice.",
     "exercises": [
       {
         "name": "Machine chest press",
@@ -96,7 +96,7 @@
         ],
         "setWeights": null,
         "volume": 805,
-        "detail": "3 \u00d7 6\u201310",
+        "detail": "3 × 6–10",
         "skipped": false
       },
       {
@@ -110,7 +110,7 @@
         ],
         "setWeights": null,
         "volume": 432,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -123,7 +123,7 @@
         ],
         "setWeights": null,
         "volume": 621,
-        "detail": "2 \u00d7 10\u201315",
+        "detail": "2 × 10–15",
         "skipped": false
       },
       {
@@ -133,7 +133,7 @@
         "sets": [],
         "setWeights": null,
         "volume": 0,
-        "detail": "3 \u00d7 10",
+        "detail": "3 × 10",
         "skipped": true
       },
       {
@@ -147,7 +147,7 @@
         ],
         "setWeights": null,
         "volume": 312,
-        "detail": "3 \u00d7 12\u201315",
+        "detail": "3 × 12–15",
         "skipped": false
       },
       {
@@ -161,7 +161,7 @@
         ],
         "setWeights": null,
         "volume": 814,
-        "detail": "3 \u00d7 12\u201315",
+        "detail": "3 × 12–15",
         "skipped": false
       },
       {
@@ -175,7 +175,7 @@
         ],
         "setWeights": null,
         "volume": 630,
-        "detail": "3 \u00d7 10\u201315",
+        "detail": "3 × 10–15",
         "skipped": false
       },
       {
@@ -189,7 +189,7 @@
         ],
         "setWeights": null,
         "volume": 462,
-        "detail": "3 \u00d7 10\u201315",
+        "detail": "3 × 10–15",
         "skipped": false
       }
     ]
@@ -200,7 +200,7 @@
     "label": "Day 2 Pull",
     "cycle": null,
     "cardio": "15 mins on StairMaster easy pace, level 5",
-    "notes": "Phase 2 Day 2 Pull \u2014 Lats felt very engaged. Focused on pulling toward lower ribs on seated cable row.",
+    "notes": "Phase 2 Day 2 Pull — Lats felt very engaged. Focused on pulling toward lower ribs on seated cable row.",
     "exercises": [
       {
         "name": "Wide-grip lat pulldown",
@@ -213,7 +213,7 @@
         ],
         "setWeights": null,
         "volume": 1160,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -227,7 +227,7 @@
         ],
         "setWeights": null,
         "volume": 1215,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -241,7 +241,7 @@
         ],
         "setWeights": null,
         "volume": 1140,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -255,7 +255,7 @@
         ],
         "setWeights": null,
         "volume": 768,
-        "detail": "3 \u00d7 8",
+        "detail": "3 × 8",
         "skipped": false
       },
       {
@@ -269,7 +269,7 @@
         ],
         "setWeights": null,
         "volume": 875,
-        "detail": "3 \u00d7 10\u201315",
+        "detail": "3 × 10–15",
         "skipped": false
       },
       {
@@ -283,7 +283,7 @@
         ],
         "setWeights": null,
         "volume": 405,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -297,7 +297,7 @@
         ],
         "setWeights": null,
         "volume": 310,
-        "detail": "3 \u00d7 10\u201312",
+        "detail": "3 × 10–12",
         "skipped": false
       },
       {
@@ -311,7 +311,7 @@
         ],
         "setWeights": null,
         "volume": 372,
-        "detail": "3 \u00d7 10\u201312",
+        "detail": "3 × 10–12",
         "skipped": false
       }
     ]
@@ -322,7 +322,7 @@
     "label": "Day 5 Upper",
     "cycle": null,
     "cardio": "Step routine maintained across the day",
-    "notes": "Phase 2 Day 5 Upper \u2014 High pump throughout chest and back. Incline machine press reached top rep range.",
+    "notes": "Phase 2 Day 5 Upper — High pump throughout chest and back. Incline machine press reached top rep range.",
     "exercises": [
       {
         "name": "Incline machine press",
@@ -335,7 +335,7 @@
         ],
         "setWeights": null,
         "volume": 1320,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -348,7 +348,7 @@
         ],
         "setWeights": null,
         "volume": 722,
-        "detail": "2 \u00d7 8\u201312",
+        "detail": "2 × 8–12",
         "skipped": false
       },
       {
@@ -362,7 +362,7 @@
         ],
         "setWeights": null,
         "volume": 525,
-        "detail": "3 \u00d7 6\u201310",
+        "detail": "3 × 6–10",
         "skipped": false
       },
       {
@@ -376,7 +376,7 @@
         ],
         "setWeights": null,
         "volume": 870,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": false
       },
       {
@@ -389,7 +389,7 @@
         ],
         "setWeights": null,
         "volume": 648,
-        "detail": "2 \u00d7 10\u201315",
+        "detail": "2 × 10–15",
         "skipped": false
       },
       {
@@ -403,7 +403,7 @@
         ],
         "setWeights": null,
         "volume": 333,
-        "detail": "3 \u00d7 12\u201315",
+        "detail": "3 × 12–15",
         "skipped": false
       },
       {
@@ -417,7 +417,7 @@
         ],
         "setWeights": null,
         "volume": 925,
-        "detail": "3 \u00d7 12\u201315",
+        "detail": "3 × 12–15",
         "skipped": false
       },
       {
@@ -431,7 +431,7 @@
         ],
         "setWeights": null,
         "volume": 465,
-        "detail": "3 \u00d7 10\u201312",
+        "detail": "3 × 10–12",
         "skipped": false
       },
       {
@@ -444,7 +444,7 @@
         ],
         "setWeights": null,
         "volume": 378,
-        "detail": "2 \u00d7 10\u201312",
+        "detail": "2 × 10–12",
         "skipped": false
       },
       {
@@ -458,7 +458,7 @@
         ],
         "setWeights": null,
         "volume": 620,
-        "detail": "3 \u00d7 10\u201312",
+        "detail": "3 × 10–12",
         "skipped": false
       },
       {
@@ -471,7 +471,7 @@
         ],
         "setWeights": null,
         "volume": 336,
-        "detail": "2 \u00d7 10\u201312",
+        "detail": "2 × 10–12",
         "skipped": false
       }
     ]
@@ -482,7 +482,7 @@
     "label": "Day 6 Lower",
     "cycle": null,
     "cardio": "Short walk after lifting",
-    "notes": "Phase 2 Day 6 Lower \u2014 Solid session overall \u2014 hip thrust and cable crunch skipped, everything else hit.",
+    "notes": "Phase 2 Day 6 Lower — Solid session overall — hip thrust and cable crunch skipped, everything else hit.",
     "exercises": [
       {
         "name": "Smith machine squat",
@@ -495,7 +495,7 @@
         ],
         "setWeights": null,
         "volume": 450,
-        "detail": "3 \u00d7 6\u201310",
+        "detail": "3 × 6–10",
         "skipped": false
       },
       {
@@ -508,7 +508,7 @@
         ],
         "setWeights": null,
         "volume": 500,
-        "detail": "2 \u00d7 10\u201312 each leg",
+        "detail": "2 × 10–12 each leg",
         "skipped": false
       },
       {
@@ -521,7 +521,7 @@
         ],
         "setWeights": null,
         "volume": 816,
-        "detail": "2 \u00d7 12\u201315",
+        "detail": "2 × 12–15",
         "skipped": false
       },
       {
@@ -535,7 +535,7 @@
         ],
         "setWeights": null,
         "volume": 900,
-        "detail": "3 \u00d7 8\u201310",
+        "detail": "3 × 8–10",
         "skipped": false
       },
       {
@@ -549,7 +549,7 @@
         ],
         "setWeights": null,
         "volume": 690,
-        "detail": "3 \u00d7 10\u201315",
+        "detail": "3 × 10–15",
         "skipped": false
       },
       {
@@ -559,7 +559,7 @@
         "sets": [],
         "setWeights": null,
         "volume": 0,
-        "detail": "3 \u00d7 8\u201312",
+        "detail": "3 × 8–12",
         "skipped": true
       },
       {
@@ -573,7 +573,7 @@
         ],
         "setWeights": null,
         "volume": 0,
-        "detail": "3 \u00d7 12\u201320",
+        "detail": "3 × 12–20",
         "skipped": false
       },
       {
@@ -587,7 +587,7 @@
         ],
         "setWeights": null,
         "volume": 360,
-        "detail": "2 \u00d7 12\u201320",
+        "detail": "2 × 12–20",
         "skipped": false
       },
       {
@@ -597,7 +597,7 @@
         "sets": [],
         "setWeights": null,
         "volume": 0,
-        "detail": "3 \u00d7 12\u201320",
+        "detail": "3 × 12–20",
         "skipped": true
       },
       {
@@ -611,7 +611,7 @@
         ],
         "setWeights": null,
         "volume": 0,
-        "detail": "3 \u00d7 20\u201340 sec",
+        "detail": "3 × 20–40 sec",
         "skipped": false
       }
     ]
@@ -619,7 +619,7 @@
   {
     "id": "day1-push-2026-09-25",
     "date": "2026-09-25",
-    "label": "Day 1 \u2014 Push",
+    "label": "Day 1 — Push",
     "cycle": 1,
     "cardio": null,
     "notes": null,
@@ -740,7 +740,7 @@
   {
     "id": "day2-pull-2026-09-25",
     "date": "2026-09-25",
-    "label": "Day 2 \u2014 Pull",
+    "label": "Day 2 — Pull",
     "cycle": 1,
     "cardio": null,
     "notes": null,
@@ -862,7 +862,7 @@
   {
     "id": "day3-legs-2026-09-25",
     "date": "2026-09-25",
-    "label": "Day 3 \u2014 Legs",
+    "label": "Day 3 — Legs",
     "cycle": 1,
     "cardio": null,
     "notes": null,
@@ -956,10 +956,10 @@
   {
     "id": "day5-upper-2026-09-25",
     "date": "2026-09-25",
-    "label": "Day 5 \u2014 Upper",
+    "label": "Day 5 — Upper",
     "cycle": 1,
     "cardio": null,
-    "notes": "Units vary within this session (kg / lb) \u2014 as logged.",
+    "notes": "Units vary within this session (kg / lb) — as logged.",
     "exercises": [
       {
         "name": "Incline machine press",
@@ -1112,7 +1112,7 @@
   {
     "id": "day6-lower-2026-09-25",
     "date": "2026-09-25",
-    "label": "Day 6 \u2014 Lower",
+    "label": "Day 6 — Lower",
     "cycle": 1,
     "cardio": null,
     "notes": "Hip thrust and cable crunch skipped.",
@@ -1236,7 +1236,7 @@
         "sets": [],
         "setWeights": null,
         "volume": null,
-        "detail": "40 sec \u00d7 3",
+        "detail": "40 sec × 3",
         "skipped": false
       }
     ]
@@ -1244,7 +1244,7 @@
   {
     "id": "day1-push-2026-09-26",
     "date": "2026-09-26",
-    "label": "Day 1 \u2014 Push",
+    "label": "Day 1 — Push",
     "cycle": 2,
     "cardio": "40 min @ 3 speed, then 10 min @ 15 incline, 3 speed",
     "notes": "2 sets for everything. Triceps (pushdown + rope extension) moved to tomorrow. Reverse pec deck 2nd set unlogged.",
@@ -1351,7 +1351,7 @@
   {
     "id": "day2-pull-2026-09-26",
     "date": "2026-09-26",
-    "label": "Day 2 \u2014 Pull",
+    "label": "Day 2 — Pull",
     "cycle": 2,
     "inProgress": true,
     "cardio": "40 min @ 3 speed (warmup) + 10 min @ 15 incline (finisher)",
@@ -1461,7 +1461,7 @@
   {
     "id": "day3-legs-2026-09-29",
     "date": "2026-09-29",
-    "label": "Day 3 \u2014 Legs",
+    "label": "Day 3 — Legs",
     "cycle": 2,
     "inProgress": true,
     "cardio": null,
@@ -1496,6 +1496,147 @@
           36
         ],
         "volume": 720,
+        "detail": null,
+        "skipped": false
+      }
+    ]
+  },
+  {
+    "id": "day5-upper-2026-09-30",
+    "date": "2026-09-30",
+    "label": "Day 5 — Upper",
+    "cycle": 2,
+    "inProgress": true,
+    "cardio": "40 min @ 3 speed",
+    "notes": "Walk started 8:12 PM. Leg extension + Dumbbell RDL added — missed on Day 3 (Sep 29).",
+    "exercises": [
+      {
+        "name": "Incline machine press",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Machine chest press",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Assisted pull-up",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Chest-supported row",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Lat pullover machine",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Dumbbell lateral raise",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Reverse pec deck",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Preacher curl",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Cable curl",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Rope pushdown",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Overhead cable extension",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Leg extension",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
+        "detail": null,
+        "skipped": false
+      },
+      {
+        "name": "Dumbbell RDL",
+        "weight": null,
+        "unit": null,
+        "sets": [],
+        "setWeights": null,
+        "volume": null,
         "detail": null,
         "skipped": false
       }
