@@ -1,1645 +1,1804 @@
 [
-  {
-    "id": "session-day6-prev",
-    "date": "2026-08-26",
-    "label": "Day 6 Lower",
-    "cycle": null,
-    "cardio": "Steps logged throughout day",
-    "notes": "Phase 2 Day 6 Lower — First baseline testing on smith machine squat and walking lunge combination.",
-    "exercises": [
-      {
-        "name": "Smith machine squat",
-        "weight": 20,
-        "unit": "kg",
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 360,
-        "detail": "3 × 6–10",
-        "skipped": false
-      },
-      {
-        "name": "Walking lunge",
-        "weight": 20,
-        "unit": "kg",
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 400,
-        "detail": "2 × 10–12 each leg",
-        "skipped": false
-      },
-      {
-        "name": "Leg extension",
-        "weight": 30,
-        "unit": "kg",
-        "sets": [
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 720,
-        "detail": "2 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Romanian deadlift",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 600,
-        "detail": "3 × 8–10",
-        "skipped": false
-      },
-      {
-        "name": "Lying leg curl",
-        "weight": 20,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 600,
-        "detail": "3 × 10–15",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "session-day1-push",
-    "date": "2026-09-01",
-    "label": "Day 1 Push",
-    "cycle": null,
-    "cardio": "15 min incline treadmill walk at 10% incline, 4.0 km/h",
-    "notes": "Phase 2 Day 1 Push — Felt strong on chest press. Kept dips skipped for shoulder comfort per coach Mousa's advice.",
-    "exercises": [
-      {
-        "name": "Machine chest press",
-        "weight": 35,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          7
-        ],
-        "setWeights": null,
-        "volume": 805,
-        "detail": "3 × 6–10",
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell press",
-        "weight": 16,
-        "unit": "kg",
-        "sets": [
-          10,
-          9,
-          8
-        ],
-        "setWeights": null,
-        "volume": 432,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Machine pec deck fly",
-        "weight": 27,
-        "unit": "kg",
-        "sets": [
-          12,
-          11
-        ],
-        "setWeights": null,
-        "volume": 621,
-        "detail": "2 × 10–15",
-        "skipped": false
-      },
-      {
-        "name": "Supported dips",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": 0,
-        "detail": "3 × 10",
-        "skipped": true
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": 8,
-        "unit": "kg",
-        "sets": [
-          14,
-          13,
-          12
-        ],
-        "setWeights": null,
-        "volume": 312,
-        "detail": "3 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": 22,
-        "unit": "kg",
-        "sets": [
-          13,
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 814,
-        "detail": "3 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Triceps pushdown",
-        "weight": 18,
-        "unit": "kg",
-        "sets": [
-          12,
-          12,
-          11
-        ],
-        "setWeights": null,
-        "volume": 630,
-        "detail": "3 × 10–15",
-        "skipped": false
-      },
-      {
-        "name": "Overhead rope extension",
-        "weight": 14,
-        "unit": "kg",
-        "sets": [
-          12,
-          11,
-          10
-        ],
-        "setWeights": null,
-        "volume": 462,
-        "detail": "3 × 10–15",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "session-day2-pull",
-    "date": "2026-09-03",
-    "label": "Day 2 Pull",
-    "cycle": null,
-    "cardio": "15 mins on StairMaster easy pace, level 5",
-    "notes": "Phase 2 Day 2 Pull — Lats felt very engaged. Focused on pulling toward lower ribs on seated cable row.",
-    "exercises": [
-      {
-        "name": "Wide-grip lat pulldown",
-        "weight": 40,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          9
-        ],
-        "setWeights": null,
-        "volume": 1160,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Close-grip lat pulldown",
-        "weight": 45,
-        "unit": "kg",
-        "sets": [
-          10,
-          9,
-          8
-        ],
-        "setWeights": null,
-        "volume": 1215,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Seated cable row",
-        "weight": 38,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 1140,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Wide-grip row",
-        "weight": 32,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 768,
-        "detail": "3 × 8",
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          12,
-          12,
-          11
-        ],
-        "setWeights": null,
-        "volume": 875,
-        "detail": "3 × 10–15",
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": 15,
-        "unit": "kg",
-        "sets": [
-          10,
-          9,
-          8
-        ],
-        "setWeights": null,
-        "volume": 405,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell curl",
-        "weight": 10,
-        "unit": "kg",
-        "sets": [
-          11,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 310,
-        "detail": "3 × 10–12",
-        "skipped": false
-      },
-      {
-        "name": "Hammer curl",
-        "weight": 12,
-        "unit": "kg",
-        "sets": [
-          11,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 372,
-        "detail": "3 × 10–12",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "session-day5-upper",
-    "date": "2026-09-07",
-    "label": "Day 5 Upper",
-    "cycle": null,
-    "cardio": "Step routine maintained across the day",
-    "notes": "Phase 2 Day 5 Upper — High pump throughout chest and back. Incline machine press reached top rep range.",
-    "exercises": [
-      {
-        "name": "Incline machine press",
-        "weight": 40,
-        "unit": "kg",
-        "sets": [
-          12,
-          11,
-          10
-        ],
-        "setWeights": null,
-        "volume": 1320,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Machine chest press",
-        "weight": 38,
-        "unit": "kg",
-        "sets": [
-          10,
-          9
-        ],
-        "setWeights": null,
-        "volume": 722,
-        "detail": "2 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Pull-up or assisted pull-up",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          8,
-          7,
-          6
-        ],
-        "setWeights": null,
-        "volume": 525,
-        "detail": "3 × 6–10",
-        "skipped": false
-      },
-      {
-        "name": "Chest-supported row",
-        "weight": 30,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          9
-        ],
-        "setWeights": null,
-        "volume": 870,
-        "detail": "3 × 8–12",
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": 27,
-        "unit": "kg",
-        "sets": [
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 648,
-        "detail": "2 × 10–15",
-        "skipped": false
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": 9,
-        "unit": "kg",
-        "sets": [
-          13,
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 333,
-        "detail": "3 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          13,
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 925,
-        "detail": "3 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": 15,
-        "unit": "kg",
-        "sets": [
-          11,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 465,
-        "detail": "3 × 10–12",
-        "skipped": false
-      },
-      {
-        "name": "Cable curl",
-        "weight": 18,
-        "unit": "kg",
-        "sets": [
-          11,
-          10
-        ],
-        "setWeights": null,
-        "volume": 378,
-        "detail": "2 × 10–12",
-        "skipped": false
-      },
-      {
-        "name": "Rope pushdown",
-        "weight": 20,
-        "unit": "kg",
-        "sets": [
-          11,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 620,
-        "detail": "3 × 10–12",
-        "skipped": false
-      },
-      {
-        "name": "Overhead cable extension",
-        "weight": 16,
-        "unit": "kg",
-        "sets": [
-          11,
-          10
-        ],
-        "setWeights": null,
-        "volume": 336,
-        "detail": "2 × 10–12",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "session-day6-actual",
-    "date": "2026-09-09",
-    "label": "Day 6 Lower",
-    "cycle": null,
-    "cardio": "Short walk after lifting",
-    "notes": "Phase 2 Day 6 Lower — Solid session overall — hip thrust and cable crunch skipped, everything else hit.",
-    "exercises": [
-      {
-        "name": "Smith machine squat",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 450,
-        "detail": "3 × 6–10",
-        "skipped": false
-      },
-      {
-        "name": "Walking lunge",
-        "weight": 25,
-        "unit": "kg",
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 500,
-        "detail": "2 × 10–12 each leg",
-        "skipped": false
-      },
-      {
-        "name": "Leg extension",
-        "weight": 34,
-        "unit": "kg",
-        "sets": [
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": "2 × 12–15",
-        "skipped": false
-      },
-      {
-        "name": "Romanian deadlift",
-        "weight": 30,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 900,
-        "detail": "3 × 8–10",
-        "skipped": false
-      },
-      {
-        "name": "Lying leg curl",
-        "weight": 23,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 690,
-        "detail": "3 × 10–15",
-        "skipped": false
-      },
-      {
-        "name": "Hip thrust",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": 0,
-        "detail": "3 × 8–12",
-        "skipped": true
-      },
-      {
-        "name": "Standing calf raise",
-        "weight": null,
-        "unit": null,
-        "sets": [
-          15,
-          15,
-          15
-        ],
-        "setWeights": null,
-        "volume": 0,
-        "detail": "3 × 12–20",
-        "skipped": false
-      },
-      {
-        "name": "Seated calf raise",
-        "weight": 10,
-        "unit": "kg",
-        "sets": [
-          12,
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 360,
-        "detail": "2 × 12–20",
-        "skipped": false
-      },
-      {
-        "name": "Cable crunch",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": 0,
-        "detail": "3 × 12–20",
-        "skipped": true
-      },
-      {
-        "name": "Plank",
-        "weight": null,
-        "unit": null,
-        "sets": [
-          null,
-          null,
-          null
-        ],
-        "setWeights": null,
-        "volume": 0,
-        "detail": "3 × 20–40 sec",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day1-push-2026-09-25",
-    "date": "2026-09-25",
-    "label": "Day 1 — Push",
-    "cycle": 1,
-    "cardio": null,
-    "notes": null,
-    "exercises": [
-      {
-        "name": "Machine chest press",
-        "weight": 50,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 1200,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell press",
-        "weight": 20,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 600,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Machine pec deck fly",
-        "weight": 34,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Supported dips",
-        "weight": null,
-        "unit": "BW",
-        "sets": [
-          7,
-          7,
-          7
-        ],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": 20,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 480,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": 29,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 870,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Overhead rope extension",
-        "weight": 23,
-        "unit": null,
-        "sets": [
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 276,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Triceps pushdown",
-        "weight": 32,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 768,
-        "detail": null,
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day2-pull-2026-09-25",
-    "date": "2026-09-25",
-    "label": "Day 2 — Pull",
-    "cycle": 1,
-    "cardio": null,
-    "notes": null,
-    "exercises": [
-      {
-        "name": "Wide-grip lat pulldown",
-        "weight": 34,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Close-grip lat pulldown",
-        "weight": 34,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Seated cable row",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 1140,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Wide-grip row",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 912,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 912,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": 30,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 900,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell curl",
-        "weight": 15,
-        "unit": null,
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 360,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Hammer curl",
-        "weight": 20,
-        "unit": null,
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 360,
-        "detail": null,
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day3-legs-2026-09-25",
-    "date": "2026-09-25",
-    "label": "Day 3 — Legs",
-    "cycle": 1,
-    "cardio": null,
-    "notes": null,
-    "exercises": [
-      {
-        "name": "Hack squat",
-        "weight": 45,
-        "unit": null,
-        "sets": [
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 720,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Leg press",
-        "weight": 45,
-        "unit": null,
-        "sets": [
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 720,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Leg extension",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": true
-      },
-      {
-        "name": "Dumbbell RDL",
-        "weight": 40,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 1200,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Seated leg curl",
-        "weight": 34,
-        "unit": null,
-        "sets": [
-          12,
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Standing calf raise",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not logged",
-        "skipped": false
-      },
-      {
-        "name": "Seated leg raise",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not logged",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day5-upper-2026-09-25",
-    "date": "2026-09-25",
-    "label": "Day 5 — Upper",
-    "cycle": 1,
-    "cardio": null,
-    "notes": "Units vary within this session (kg / lb) — as logged.",
-    "exercises": [
-      {
-        "name": "Incline machine press",
-        "weight": 45,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 1350,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Machine chest press",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not logged",
-        "skipped": false
-      },
-      {
-        "name": "Assisted pull-up",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not logged",
-        "skipped": false
-      },
-      {
-        "name": "Chest-supported row",
-        "weight": 35,
-        "unit": "lb",
-        "sets": [
-          6,
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 840,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": 15.9,
-        "unit": "kg",
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 318,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": 20,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 480,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": 29,
-        "unit": "kg",
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 870,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": 40,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 960,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Cable curl",
-        "weight": 34,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Rope pushdown",
-        "weight": 34,
-        "unit": "kg",
-        "sets": [
-          8,
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Overhead cable extension",
-        "weight": 23,
-        "unit": "kg",
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 414,
-        "detail": null,
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day6-lower-2026-09-25",
-    "date": "2026-09-25",
-    "label": "Day 6 — Lower",
-    "cycle": 1,
-    "cardio": null,
-    "notes": "Hip thrust and cable crunch skipped.",
-    "exercises": [
-      {
-        "name": "Smith machine squat",
-        "weight": 25,
-        "unit": null,
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 450,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Walking lunge",
-        "weight": 25,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 500,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Leg extension",
-        "weight": 34,
-        "unit": null,
-        "sets": [
-          12,
-          12
-        ],
-        "setWeights": null,
-        "volume": 816,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Romanian deadlift",
-        "weight": 30,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 900,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Lying leg curl",
-        "weight": 23,
-        "unit": null,
-        "sets": [
-          10,
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 690,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Hip thrust",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": true
-      },
-      {
-        "name": "Standing calf raise",
-        "weight": null,
-        "unit": "BW",
-        "sets": [
-          15,
-          15,
-          15
-        ],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Seated calf raise",
-        "weight": 10,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "3 sets, reps not recorded",
-        "skipped": false
-      },
-      {
-        "name": "Cable crunch",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": true
-      },
-      {
-        "name": "Plank",
-        "weight": null,
-        "unit": "BW",
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "40 sec × 3",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day1-push-2026-09-26",
-    "date": "2026-09-26",
-    "label": "Day 1 — Push",
-    "cycle": 2,
-    "cardio": "40 min @ 3 speed, then 10 min @ 15 incline, 3 speed",
-    "notes": "2 sets for everything. Triceps (pushdown + rope extension) moved to tomorrow. Reverse pec deck 2nd set unlogged.",
-    "exercises": [
-      {
-        "name": "Machine chest press",
-        "weight": 50,
-        "unit": null,
-        "sets": [
-          8,
-          8
-        ],
-        "setWeights": [
-          50,
-          46
-        ],
-        "volume": 768,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell press",
-        "weight": 20,
-        "unit": null,
-        "sets": [
-          15,
-          15
-        ],
-        "setWeights": null,
-        "volume": 600,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Machine pec deck fly",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          15,
-          15
-        ],
-        "setWeights": null,
-        "volume": 1140,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Supported dips",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": true
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": 20,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 400,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": 29,
-        "unit": null,
-        "sets": [
-          8
-        ],
-        "setWeights": null,
-        "volume": 232,
-        "detail": "2nd set unlogged",
-        "skipped": false
-      },
-      {
-        "name": "Triceps pushdown",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Moved to tomorrow",
-        "skipped": false
-      },
-      {
-        "name": "Overhead rope extension",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Moved to tomorrow",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day2-pull-2026-09-26",
-    "date": "2026-09-26",
-    "label": "Day 2 — Pull",
-    "cycle": 2,
-    "inProgress": true,
-    "cardio": "40 min @ 3 speed (warmup) + 10 min @ 15 incline (finisher)",
-    "notes": "Session paused after preacher curl. Incline DB curl + hammer curl not done.",
-    "exercises": [
-      {
-        "name": "Wide-grip lat pulldown",
-        "weight": 36,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 720,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Close-grip lat pulldown",
-        "weight": 36,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 720,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Seated cable row",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": null,
-        "volume": 760,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Wide-grip row",
-        "weight": 38,
-        "unit": null,
-        "sets": [
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 608,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": 41,
-        "unit": null,
-        "sets": [
-          8,
-          8
-        ],
-        "setWeights": null,
-        "volume": 656,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": 10,
-        "unit": "kg",
-        "sets": [
-          6,
-          6,
-          6
-        ],
-        "setWeights": null,
-        "volume": 180,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Incline dumbbell curl",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not done",
-        "skipped": false
-      },
-      {
-        "name": "Hammer curl",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": "Not done",
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day3-legs-2026-09-29",
-    "date": "2026-09-29",
-    "label": "Day 3 — Legs",
-    "cycle": 2,
-    "inProgress": true,
-    "cardio": null,
-    "notes": null,
-    "exercises": [
-      {
-        "name": "Leg press",
-        "weight": 45,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": [
-          45,
-          45
-        ],
-        "volume": 900,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Seated leg curl",
-        "weight": 36,
-        "unit": null,
-        "sets": [
-          10,
-          10
-        ],
-        "setWeights": [
-          36,
-          36
-        ],
-        "volume": 720,
-        "detail": null,
-        "skipped": false
-      }
-    ]
-  },
-  {
-    "id": "day5-upper-2026-09-30",
-    "date": "2026-09-30",
-    "label": "Day 5 — Upper",
-    "cycle": 2,
-    "inProgress": true,
-    "cardio": "40 min @ 3 speed",
-    "notes": "Walk started 8:12 PM. Leg extension + Dumbbell RDL added — missed on Day 3 (Sep 29).",
-    "exercises": [
-      {
-        "name": "Incline machine press",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Machine chest press",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Assisted pull-up",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Chest-supported row",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Lat pullover machine",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Dumbbell lateral raise",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Reverse pec deck",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Preacher curl",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Cable curl",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Rope pushdown",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Overhead cable extension",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Leg extension",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      },
-      {
-        "name": "Dumbbell RDL",
-        "weight": null,
-        "unit": null,
-        "sets": [],
-        "setWeights": null,
-        "volume": null,
-        "detail": null,
-        "skipped": false
-      }
-    ]
-  }
+ {
+  "id": "session-day6-prev",
+  "date": "2026-08-26",
+  "label": "Day 6 Lower",
+  "cycle": null,
+  "cardio": "Steps logged throughout day",
+  "notes": "Phase 2 Day 6 Lower — First baseline testing on smith machine squat and walking lunge combination.",
+  "exercises": [
+   {
+    "name": "Smith machine squat",
+    "weight": 20,
+    "unit": "kg",
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 360,
+    "detail": "3 × 6–10",
+    "skipped": false
+   },
+   {
+    "name": "Walking lunge",
+    "weight": 20,
+    "unit": "kg",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 400,
+    "detail": "2 × 10–12 each leg",
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": 30,
+    "unit": "kg",
+    "sets": [
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 720,
+    "detail": "2 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Romanian deadlift",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 600,
+    "detail": "3 × 8–10",
+    "skipped": false
+   },
+   {
+    "name": "Lying leg curl",
+    "weight": 20,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 600,
+    "detail": "3 × 10–15",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "session-day1-push",
+  "date": "2026-09-01",
+  "label": "Day 1 Push",
+  "cycle": null,
+  "cardio": "15 min incline treadmill walk at 10% incline, 4.0 km/h",
+  "notes": "Phase 2 Day 1 Push — Felt strong on chest press. Kept dips skipped for shoulder comfort per coach Mousa's advice.",
+  "exercises": [
+   {
+    "name": "Machine chest press",
+    "weight": 35,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     7
+    ],
+    "setWeights": null,
+    "volume": 805,
+    "detail": "3 × 6–10",
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell press",
+    "weight": 16,
+    "unit": "kg",
+    "sets": [
+     10,
+     9,
+     8
+    ],
+    "setWeights": null,
+    "volume": 432,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Machine pec deck fly",
+    "weight": 27,
+    "unit": "kg",
+    "sets": [
+     12,
+     11
+    ],
+    "setWeights": null,
+    "volume": 621,
+    "detail": "2 × 10–15",
+    "skipped": false
+   },
+   {
+    "name": "Supported dips",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": 0,
+    "detail": "3 × 10",
+    "skipped": true
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 8,
+    "unit": "kg",
+    "sets": [
+     14,
+     13,
+     12
+    ],
+    "setWeights": null,
+    "volume": 312,
+    "detail": "3 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Reverse pec deck",
+    "weight": 22,
+    "unit": "kg",
+    "sets": [
+     13,
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 814,
+    "detail": "3 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Triceps pushdown",
+    "weight": 18,
+    "unit": "kg",
+    "sets": [
+     12,
+     12,
+     11
+    ],
+    "setWeights": null,
+    "volume": 630,
+    "detail": "3 × 10–15",
+    "skipped": false
+   },
+   {
+    "name": "Overhead rope extension",
+    "weight": 14,
+    "unit": "kg",
+    "sets": [
+     12,
+     11,
+     10
+    ],
+    "setWeights": null,
+    "volume": 462,
+    "detail": "3 × 10–15",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "session-day2-pull",
+  "date": "2026-09-03",
+  "label": "Day 2 Pull",
+  "cycle": null,
+  "cardio": "15 mins on StairMaster easy pace, level 5",
+  "notes": "Phase 2 Day 2 Pull — Lats felt very engaged. Focused on pulling toward lower ribs on seated cable row.",
+  "exercises": [
+   {
+    "name": "Wide-grip lat pulldown",
+    "weight": 40,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     9
+    ],
+    "setWeights": null,
+    "volume": 1160,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Close-grip lat pulldown",
+    "weight": 45,
+    "unit": "kg",
+    "sets": [
+     10,
+     9,
+     8
+    ],
+    "setWeights": null,
+    "volume": 1215,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Seated cable row",
+    "weight": 38,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 1140,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Wide-grip row",
+    "weight": 32,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 768,
+    "detail": "3 × 8",
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover machine",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     12,
+     12,
+     11
+    ],
+    "setWeights": null,
+    "volume": 875,
+    "detail": "3 × 10–15",
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 15,
+    "unit": "kg",
+    "sets": [
+     10,
+     9,
+     8
+    ],
+    "setWeights": null,
+    "volume": 405,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell curl",
+    "weight": 10,
+    "unit": "kg",
+    "sets": [
+     11,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 310,
+    "detail": "3 × 10–12",
+    "skipped": false
+   },
+   {
+    "name": "Hammer curl",
+    "weight": 12,
+    "unit": "kg",
+    "sets": [
+     11,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 372,
+    "detail": "3 × 10–12",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "session-day5-upper",
+  "date": "2026-09-07",
+  "label": "Day 5 Upper",
+  "cycle": null,
+  "cardio": "Step routine maintained across the day",
+  "notes": "Phase 2 Day 5 Upper — High pump throughout chest and back. Incline machine press reached top rep range.",
+  "exercises": [
+   {
+    "name": "Incline machine press",
+    "weight": 40,
+    "unit": "kg",
+    "sets": [
+     12,
+     11,
+     10
+    ],
+    "setWeights": null,
+    "volume": 1320,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Machine chest press",
+    "weight": 38,
+    "unit": "kg",
+    "sets": [
+     10,
+     9
+    ],
+    "setWeights": null,
+    "volume": 722,
+    "detail": "2 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Pull-up or assisted pull-up",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     8,
+     7,
+     6
+    ],
+    "setWeights": null,
+    "volume": 525,
+    "detail": "3 × 6–10",
+    "skipped": false
+   },
+   {
+    "name": "Chest-supported row",
+    "weight": 30,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     9
+    ],
+    "setWeights": null,
+    "volume": 870,
+    "detail": "3 × 8–12",
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover machine",
+    "weight": 27,
+    "unit": "kg",
+    "sets": [
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 648,
+    "detail": "2 × 10–15",
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 9,
+    "unit": "kg",
+    "sets": [
+     13,
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 333,
+    "detail": "3 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Reverse pec deck",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     13,
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 925,
+    "detail": "3 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 15,
+    "unit": "kg",
+    "sets": [
+     11,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 465,
+    "detail": "3 × 10–12",
+    "skipped": false
+   },
+   {
+    "name": "Cable curl",
+    "weight": 18,
+    "unit": "kg",
+    "sets": [
+     11,
+     10
+    ],
+    "setWeights": null,
+    "volume": 378,
+    "detail": "2 × 10–12",
+    "skipped": false
+   },
+   {
+    "name": "Rope pushdown",
+    "weight": 20,
+    "unit": "kg",
+    "sets": [
+     11,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 620,
+    "detail": "3 × 10–12",
+    "skipped": false
+   },
+   {
+    "name": "Overhead cable extension",
+    "weight": 16,
+    "unit": "kg",
+    "sets": [
+     11,
+     10
+    ],
+    "setWeights": null,
+    "volume": 336,
+    "detail": "2 × 10–12",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "session-day6-actual",
+  "date": "2026-09-09",
+  "label": "Day 6 Lower",
+  "cycle": null,
+  "cardio": "Short walk after lifting",
+  "notes": "Phase 2 Day 6 Lower — Solid session overall — hip thrust and cable crunch skipped, everything else hit.",
+  "exercises": [
+   {
+    "name": "Smith machine squat",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 450,
+    "detail": "3 × 6–10",
+    "skipped": false
+   },
+   {
+    "name": "Walking lunge",
+    "weight": 25,
+    "unit": "kg",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 500,
+    "detail": "2 × 10–12 each leg",
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": 34,
+    "unit": "kg",
+    "sets": [
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": "2 × 12–15",
+    "skipped": false
+   },
+   {
+    "name": "Romanian deadlift",
+    "weight": 30,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 900,
+    "detail": "3 × 8–10",
+    "skipped": false
+   },
+   {
+    "name": "Lying leg curl",
+    "weight": 23,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 690,
+    "detail": "3 × 10–15",
+    "skipped": false
+   },
+   {
+    "name": "Hip thrust",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": 0,
+    "detail": "3 × 8–12",
+    "skipped": true
+   },
+   {
+    "name": "Standing calf raise",
+    "weight": null,
+    "unit": null,
+    "sets": [
+     15,
+     15,
+     15
+    ],
+    "setWeights": null,
+    "volume": 0,
+    "detail": "3 × 12–20",
+    "skipped": false
+   },
+   {
+    "name": "Seated calf raise",
+    "weight": 10,
+    "unit": "kg",
+    "sets": [
+     12,
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 360,
+    "detail": "2 × 12–20",
+    "skipped": false
+   },
+   {
+    "name": "Cable crunch",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": 0,
+    "detail": "3 × 12–20",
+    "skipped": true
+   },
+   {
+    "name": "Plank",
+    "weight": null,
+    "unit": null,
+    "sets": [
+     null,
+     null,
+     null
+    ],
+    "setWeights": null,
+    "volume": 0,
+    "detail": "3 × 20–40 sec",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day1-push-2026-09-25",
+  "date": "2026-09-25",
+  "label": "Day 1 — Push",
+  "cycle": 1,
+  "cardio": null,
+  "notes": null,
+  "exercises": [
+   {
+    "name": "Machine chest press",
+    "weight": 50,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 1200,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell press",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 600,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Machine pec deck fly",
+    "weight": 34,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Supported dips",
+    "weight": null,
+    "unit": "BW",
+    "sets": [
+     7,
+     7,
+     7
+    ],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 480,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Reverse pec deck",
+    "weight": 29,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 870,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Overhead rope extension",
+    "weight": 23,
+    "unit": null,
+    "sets": [
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 276,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Triceps pushdown",
+    "weight": 32,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 768,
+    "detail": null,
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day2-pull-2026-09-25",
+  "date": "2026-09-25",
+  "label": "Day 2 — Pull",
+  "cycle": 1,
+  "cardio": null,
+  "notes": null,
+  "exercises": [
+   {
+    "name": "Wide-grip lat pulldown",
+    "weight": 34,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Close-grip lat pulldown",
+    "weight": 34,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Seated cable row",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 1140,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Wide-grip row",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 912,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover machine",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 912,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 30,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 900,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell curl",
+    "weight": 15,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 360,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Hammer curl",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 360,
+    "detail": null,
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day3-legs-2026-09-25",
+  "date": "2026-09-25",
+  "label": "Day 3 — Legs",
+  "cycle": 1,
+  "cardio": null,
+  "notes": null,
+  "exercises": [
+   {
+    "name": "Hack squat",
+    "weight": 45,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 720,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Leg press",
+    "weight": 45,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 720,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": true
+   },
+   {
+    "name": "Dumbbell RDL",
+    "weight": 40,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 1200,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Seated leg curl",
+    "weight": 34,
+    "unit": null,
+    "sets": [
+     12,
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Standing calf raise",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not logged",
+    "skipped": false
+   },
+   {
+    "name": "Seated leg raise",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not logged",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day5-upper-2026-09-25",
+  "date": "2026-09-25",
+  "label": "Day 5 — Upper",
+  "cycle": 1,
+  "cardio": null,
+  "notes": "Units vary within this session (kg / lb) — as logged.",
+  "exercises": [
+   {
+    "name": "Incline machine press",
+    "weight": 45,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 1350,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Machine chest press",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not logged",
+    "skipped": false
+   },
+   {
+    "name": "Assisted pull-up",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not logged",
+    "skipped": false
+   },
+   {
+    "name": "Chest-supported row",
+    "weight": 35,
+    "unit": "lb",
+    "sets": [
+     6,
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 840,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover machine",
+    "weight": 15.9,
+    "unit": "kg",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 318,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 20,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 480,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Reverse pec deck",
+    "weight": 29,
+    "unit": "kg",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 870,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 40,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 960,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Cable curl",
+    "weight": 34,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Rope pushdown",
+    "weight": 34,
+    "unit": "kg",
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Overhead cable extension",
+    "weight": 23,
+    "unit": "kg",
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 414,
+    "detail": null,
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day6-lower-2026-09-25",
+  "date": "2026-09-25",
+  "label": "Day 6 — Lower",
+  "cycle": 1,
+  "cardio": null,
+  "notes": "Hip thrust and cable crunch skipped.",
+  "exercises": [
+   {
+    "name": "Smith machine squat",
+    "weight": 25,
+    "unit": null,
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 450,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Walking lunge",
+    "weight": 25,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 500,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": 34,
+    "unit": null,
+    "sets": [
+     12,
+     12
+    ],
+    "setWeights": null,
+    "volume": 816,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Romanian deadlift",
+    "weight": 30,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 900,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Lying leg curl",
+    "weight": 23,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 690,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Hip thrust",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": true
+   },
+   {
+    "name": "Standing calf raise",
+    "weight": null,
+    "unit": "BW",
+    "sets": [
+     15,
+     15,
+     15
+    ],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Seated calf raise",
+    "weight": 10,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "3 sets, reps not recorded",
+    "skipped": false
+   },
+   {
+    "name": "Cable crunch",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": true
+   },
+   {
+    "name": "Plank",
+    "weight": null,
+    "unit": "BW",
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "40 sec × 3",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day1-push-2026-09-26",
+  "date": "2026-09-26",
+  "label": "Day 1 — Push",
+  "cycle": 2,
+  "cardio": "40 min @ 3 speed, then 10 min @ 15 incline, 3 speed",
+  "notes": "2 sets for everything. Triceps (pushdown + rope extension) moved to tomorrow. Reverse pec deck 2nd set unlogged.",
+  "exercises": [
+   {
+    "name": "Machine chest press",
+    "weight": 50,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": [
+     50,
+     46
+    ],
+    "volume": 768,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell press",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     15,
+     15
+    ],
+    "setWeights": null,
+    "volume": 600,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Machine pec deck fly",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     15,
+     15
+    ],
+    "setWeights": null,
+    "volume": 1140,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Supported dips",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": null,
+    "skipped": true
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 400,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Reverse pec deck",
+    "weight": 29,
+    "unit": null,
+    "sets": [
+     8
+    ],
+    "setWeights": null,
+    "volume": 232,
+    "detail": "2nd set unlogged",
+    "skipped": false
+   },
+   {
+    "name": "Triceps pushdown",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Moved to tomorrow",
+    "skipped": false
+   },
+   {
+    "name": "Overhead rope extension",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Moved to tomorrow",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day2-pull-2026-09-26",
+  "date": "2026-09-26",
+  "label": "Day 2 — Pull",
+  "cycle": 2,
+  "inProgress": true,
+  "cardio": "40 min @ 3 speed (warmup) + 10 min @ 15 incline (finisher)",
+  "notes": "Session paused after preacher curl. Incline DB curl + hammer curl not done.",
+  "exercises": [
+   {
+    "name": "Wide-grip lat pulldown",
+    "weight": 36,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 720,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Close-grip lat pulldown",
+    "weight": 36,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 720,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Seated cable row",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": null,
+    "volume": 760,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Wide-grip row",
+    "weight": 38,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 608,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover machine",
+    "weight": 41,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": null,
+    "volume": 656,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 10,
+    "unit": "kg",
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": null,
+    "volume": 180,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell curl",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done",
+    "skipped": false
+   },
+   {
+    "name": "Hammer curl",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day3-legs-2026-09-29",
+  "date": "2026-09-29",
+  "label": "Day 3 — Legs",
+  "cycle": 2,
+  "inProgress": true,
+  "cardio": null,
+  "notes": null,
+  "exercises": [
+   {
+    "name": "Leg press",
+    "weight": 45,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     45,
+     45
+    ],
+    "volume": 900,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Seated leg curl",
+    "weight": 36,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     36,
+     36
+    ],
+    "volume": 720,
+    "detail": null,
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "day5-upper-2026-09-30",
+  "date": "2026-09-30",
+  "label": "Day 5 — Upper",
+  "cycle": 2,
+  "inProgress": true,
+  "cardio": "40 min @ 3 speed",
+  "notes": "Walk started 8:12 PM. Leg extension + Dumbbell RDL added — missed on Day 3 (Sep 29). Incline machine press swapped for incline dumbbell press (machine not at this gym). Lat pullover machine swapped for straight-bar cable pullover (machine not found). Session ended by Mohamed; remaining exercises carried to tomorrow.",
+  "exercises": [
+   {
+    "name": "Incline dumbbell press",
+    "weight": 25,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     25,
+     25
+    ],
+    "volume": 500,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Machine chest press",
+    "weight": 41,
+    "unit": null,
+    "sets": [
+     10,
+     8
+    ],
+    "setWeights": [
+     41,
+     41
+    ],
+    "volume": 738,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Assisted pull-up",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Skipped",
+    "skipped": true
+   },
+   {
+    "name": "Chest-supported row",
+    "weight": 25,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": [
+     25,
+     25
+    ],
+    "volume": 400,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Straight-bar cable pullover",
+    "weight": 21,
+    "unit": null,
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": [
+     21,
+     21
+    ],
+    "volume": 336,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell lateral raise",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     20,
+     20
+    ],
+    "volume": 400,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Pec deck fly",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Started but reps/sets never reported — carried to tomorrow",
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     8
+    ],
+    "setWeights": [
+     20
+    ],
+    "volume": 160,
+    "detail": "One-arm dumbbell preacher curl using the incline bench as the pad (preacher bench not available)",
+    "skipped": false
+   },
+   {
+    "name": "Cable curl",
+    "weight": 14,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     14,
+     14
+    ],
+    "volume": 280,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Rope pushdown",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done — moved to tomorrow",
+    "skipped": false
+   },
+   {
+    "name": "Overhead cable extension",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done — moved to tomorrow",
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done — moved to tomorrow",
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell RDL",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Not done — moved to tomorrow",
+    "skipped": false
+   }
+  ]
+ },
+ {
+  "id": "carryover-2026-10-01",
+  "date": "2026-10-01",
+  "label": "Carryover — Oct 1",
+  "cycle": 2,
+  "inProgress": false,
+  "cardio": "20 min walk",
+  "notes": "Finished yesterday's carried-over exercises (from day5-upper-2026-09-30). Dumbbell RDL skipped; pec deck fly replaced by reverse pec fly. Preacher curl added as extra arm work.",
+  "exercises": [
+   {
+    "name": "Rope pushdown",
+    "weight": 20,
+    "unit": null,
+    "sets": [
+     8,
+     8,
+     8
+    ],
+    "setWeights": [
+     20,
+     20,
+     20
+    ],
+    "volume": 480,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Overhead cable extension",
+    "weight": 14,
+    "unit": null,
+    "sets": [
+     6,
+     6,
+     6
+    ],
+    "setWeights": [
+     14,
+     14,
+     14
+    ],
+    "volume": 252,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Leg extension",
+    "weight": 43,
+    "unit": null,
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": [
+     43,
+     43,
+     43
+    ],
+    "volume": 1290,
+    "detail": null,
+    "skipped": false
+   },
+   {
+    "name": "Dumbbell RDL",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Skipped by Mohamed",
+    "skipped": true
+   },
+   {
+    "name": "Pec deck fly",
+    "weight": null,
+    "unit": null,
+    "sets": [],
+    "setWeights": null,
+    "volume": null,
+    "detail": "Replaced by reverse pec fly",
+    "skipped": true
+   },
+   {
+    "name": "Reverse pec fly",
+    "weight": 41,
+    "unit": null,
+    "sets": [
+     7,
+     7,
+     3
+    ],
+    "setWeights": [
+     41,
+     41,
+     32
+    ],
+    "volume": 670,
+    "detail": "Substituted for pec deck fly; extra set 32 x 3",
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "weight": 25,
+    "unit": null,
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     25,
+     25
+    ],
+    "volume": 500,
+    "detail": "Added after carryover session closed",
+    "skipped": false
+   }
+  ]
+ }
 ]
