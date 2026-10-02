@@ -1607,7 +1607,7 @@
     "sets": [],
     "setWeights": null,
     "volume": null,
-    "detail": "Started but reps/sets never reported — carried to tomorrow",
+    "detail": "Done (reps not reported)",
     "skipped": false
    },
    {
@@ -1756,16 +1756,6 @@
     "skipped": true
    },
    {
-    "name": "Pec deck fly",
-    "weight": null,
-    "unit": null,
-    "sets": [],
-    "setWeights": null,
-    "volume": null,
-    "detail": "Replaced by reverse pec fly",
-    "skipped": true
-   },
-   {
     "name": "Reverse pec fly",
     "weight": 41,
     "unit": null,
@@ -1780,7 +1770,7 @@
      32
     ],
     "volume": 670,
-    "detail": "Substituted for pec deck fly; extra set 32 x 3",
+    "detail": "Extra set 32 x 3",
     "skipped": false
    },
    {

@@ -1,4 +1,4 @@
-# Sharafath's Gym Progress
+# Gym Progress
 
 Static dashboard tracking gym sessions: session calendar, volume/progression graphs, weekly/monthly stats, and personal records.
 
