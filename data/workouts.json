@@ -1873,5 +1873,115 @@
     "detail": "Wrong machine, off-plan"
    }
   ]
+ },
+ {
+  "id": "day2-pull-2026-10-07",
+  "date": "2026-10-07",
+  "label": "Day 2 \u2014 Pull",
+  "cycle": 2,
+  "cardio": "50 min treadmill (40 warmup + 10 incline finisher) + 20 min walk",
+  "notes": "Split session: back work in the morning, arms in the evening. Lat pullover done on cable (sub for machine). Incline DB curl subbed with regular DB curl. Hammer curl skipped.",
+  "exercises": [
+   {
+    "name": "Wide-grip lat pulldown",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     36,
+     36
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Close-grip lat pulldown",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     36,
+     36
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Seated cable row",
+    "sets": [
+     10,
+     10
+    ],
+    "setWeights": [
+     38,
+     38
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Wide-grip row",
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": [
+     38,
+     38
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Lat pullover (cable, sub for machine)",
+    "sets": [
+     10,
+     10,
+     10
+    ],
+    "setWeights": [
+     41,
+     41,
+     41
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Preacher curl",
+    "sets": [
+     12,
+     12,
+     12
+    ],
+    "setWeights": [
+     20,
+     20,
+     20
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Incline dumbbell curl",
+    "sets": [],
+    "setWeights": null,
+    "skipped": true
+   },
+   {
+    "name": "Dumbbell curl (sub for incline)",
+    "sets": [
+     8,
+     8
+    ],
+    "setWeights": [
+     20,
+     20
+    ],
+    "skipped": false
+   },
+   {
+    "name": "Hammer curl",
+    "sets": [],
+    "setWeights": null,
+    "skipped": true
+   }
+  ]
  }
 ]
